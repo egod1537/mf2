@@ -1,0 +1,20 @@
+{
+    "name": "MF2.World.Editor",
+    "rootNamespace": "MF2.World.Editor",
+    "references": [
+        "MF2.World.Runtime",
+        "Unity.Collections",
+        "Unity.Mathematics"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

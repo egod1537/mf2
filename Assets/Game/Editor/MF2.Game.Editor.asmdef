@@ -1,0 +1,19 @@
+{
+  "name": "MF2.Game.Editor",
+  "rootNamespace": "MF2.Editor",
+  "references": [
+    "MF2.Game",
+    "FishNet.Runtime",
+    "Unity.InputSystem",
+    "UnityEngine.UI"
+  ],
+  "includePlatforms": ["Editor"],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

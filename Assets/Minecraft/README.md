@@ -18,11 +18,15 @@ Unity import intent:
 
 ## Generated Unity blocks
 
-`Prefabs/Blocks` contains 401 ready-to-place, one-unit cube prefabs generated
-from Minecraft 26.3 blockstate and model JSON. All prefabs share the single
-`Materials/MinecraftBlockAtlas.mat` material and the 512x512
-`Atlas/minecraft_blocks_atlas.png` texture. Each prefab uses its own UV-mapped
-mesh under `Models/Blocks` and includes a one-unit `BoxCollider`.
+`Assets/Entities/Blocks/<block-name>` contains each ready-to-place,
+one-unit cube prefab together with its dedicated UV-mapped mesh and copies of
+every original source texture used by its six faces. A block such as grass can
+therefore contain several PNG files, while shared Minecraft textures are copied
+into each block folder that uses them. The 401 block folders are generated from
+Minecraft 26.3 blockstate and model JSON. All prefabs still render through the
+single `Materials/MinecraftBlockAtlas.mat` material and the 512x512
+`Atlas/minecraft_blocks_atlas.png` texture, which remain under
+`Assets/Minecraft`. Each prefab includes a one-unit `BoxCollider`.
 
 The atlas contains 441 padded 16x16 entries. It uses Point filtering, no mip
 maps and no texture compression. Biome tint variants are baked into separate

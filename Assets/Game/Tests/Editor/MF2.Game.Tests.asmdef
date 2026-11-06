@@ -1,0 +1,15 @@
+{
+  "name": "MF2.Game.Tests",
+  "rootNamespace": "MF2.Tests",
+  "references": ["MF2.Game"],
+  "includePlatforms": ["Editor"],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": [],
+  "optionalUnityReferences": ["TestAssemblies"],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

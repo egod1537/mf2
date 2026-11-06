@@ -13,13 +13,13 @@ Material:
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
   - _SPECULAR_SETUP
-  m_InvalidKeywords: []
+  m_InvalidKeywords:
+  - _ALPHATEST_ON
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: 2450
-  stringTagMap:
-    RenderType: TransparentCutout
+  stringTagMap: {}
   disabledShaderPasses: []
   m_LockedProperties: 
   m_SavedProperties:
@@ -125,7 +125,7 @@ Material:
     - _LightingRampRange: 1
     - _Metallic: 0
     - _OcclusionStrength: 1
-    - _PixelSize: 2
+    - _PixelSize: 5
     - _QueueControl: 1
     - _QueueOffset: 0
     - _ReceiveShadows: 1
