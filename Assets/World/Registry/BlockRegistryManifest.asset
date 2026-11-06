@@ -1,0 +1,818 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5a559654bdc2a124f903d7949845f571, type: 3}
+  m_Name: BlockRegistryManifest
+  m_EditorClassIdentifier: MF2.World.Runtime::MF2.World.Registry.BlockRegistryManifest
+  idSchemeVersion: 1
+  entries:
+  - canonicalName: minecraft:acacia_leaves
+    prefab: {fileID: 3068463959911719596, guid: 1319665e0ed07954488912235dc885ca, type: 3}
+  - canonicalName: minecraft:acacia_log
+    prefab: {fileID: 219765668903817152, guid: fc39a1e961518284b9c3957fa1e291c9, type: 3}
+  - canonicalName: minecraft:acacia_planks
+    prefab: {fileID: 8158012557241693117, guid: ceb2f0b597d336046bee1f4be35d7f75, type: 3}
+  - canonicalName: minecraft:acacia_wood
+    prefab: {fileID: 5230224805317357651, guid: 21fbc25a252e0f54e993abfa189d9282, type: 3}
+  - canonicalName: minecraft:amethyst_block
+    prefab: {fileID: 1232109327241225493, guid: 4d5827a76f89b9f4bb993d35ecc38a8b, type: 3}
+  - canonicalName: minecraft:ancient_debris
+    prefab: {fileID: 982045461197805604, guid: 4a163cfc519927b4594f9e8908c15b80, type: 3}
+  - canonicalName: minecraft:andesite
+    prefab: {fileID: 7802471141811877501, guid: 0e3da304f9139754d9bb565f0328e0bf, type: 3}
+  - canonicalName: minecraft:azalea_leaves
+    prefab: {fileID: 1379702894104439590, guid: a012646ca02a24f419b0acc1566c1686, type: 3}
+  - canonicalName: minecraft:bamboo_block
+    prefab: {fileID: 7436173692799111290, guid: 4f663d502b5071e4eafacd9e5219bbec, type: 3}
+  - canonicalName: minecraft:bamboo_mosaic
+    prefab: {fileID: 3205324369079558532, guid: 340b6da225cbc474b8a721a4bfe90f06, type: 3}
+  - canonicalName: minecraft:bamboo_planks
+    prefab: {fileID: 2436629397474541085, guid: fb2ab1867d7b6e0459a7fc3a18e6b40c, type: 3}
+  - canonicalName: minecraft:barrel
+    prefab: {fileID: 1416514318170216283, guid: 5dd5a3d5ad0a30a4fbe32e07af52f166, type: 3}
+  - canonicalName: minecraft:basalt
+    prefab: {fileID: 4123606354419541002, guid: 6da9ebb7d5336574ca52dec71ddc606c, type: 3}
+  - canonicalName: minecraft:bedrock
+    prefab: {fileID: 4889721541895925832, guid: cbcf5408c56580041bf1cc865f0928c2, type: 3}
+  - canonicalName: minecraft:bee_nest
+    prefab: {fileID: 2389441014758968278, guid: a91c9298115fd7242b06237483349a3f, type: 3}
+  - canonicalName: minecraft:beehive
+    prefab: {fileID: 5271169651809873224, guid: 9ed5e48863c40454196bc697ab418bf8, type: 3}
+  - canonicalName: minecraft:birch_leaves
+    prefab: {fileID: 2185629989902753011, guid: 9004fbd48e8d25146be60fd36f1ded38, type: 3}
+  - canonicalName: minecraft:birch_log
+    prefab: {fileID: 5260189234946894223, guid: 0cfc31c58fb2de344938da1d3df8e3de, type: 3}
+  - canonicalName: minecraft:birch_planks
+    prefab: {fileID: 158350608438772224, guid: 594b3ad7cf7c15c4ea27d1dbbb60a12d, type: 3}
+  - canonicalName: minecraft:birch_wood
+    prefab: {fileID: 5770297904840151077, guid: 2427e2848df58114580ed71b2976bba1, type: 3}
+  - canonicalName: minecraft:black_concrete
+    prefab: {fileID: 2062600998562171439, guid: 711ff06f1b863764591836c3145a68bc, type: 3}
+  - canonicalName: minecraft:black_concrete_powder
+    prefab: {fileID: 3126881452101921655, guid: 3fb57d29b87256149b68fda579d3fa90, type: 3}
+  - canonicalName: minecraft:black_stained_glass
+    prefab: {fileID: 4857933914169730984, guid: 941cb6f210df85442a445eb20b616b98, type: 3}
+  - canonicalName: minecraft:black_terracotta
+    prefab: {fileID: 380700673693737962, guid: 220ab5b72ad9d19468c31314e80bcc81, type: 3}
+  - canonicalName: minecraft:black_wool
+    prefab: {fileID: 4535932390636400990, guid: a9f9a2efd0c367c44aa1ef2abe5dd338, type: 3}
+  - canonicalName: minecraft:blackstone
+    prefab: {fileID: 3645535201791986000, guid: ec65f1a658f77f6458184f5f3348dba1, type: 3}
+  - canonicalName: minecraft:blast_furnace
+    prefab: {fileID: 9138818393565640471, guid: 87aba6f6dd3ae3442b81fcd85c9d6aca, type: 3}
+  - canonicalName: minecraft:blue_concrete
+    prefab: {fileID: 5403068340741286746, guid: 8657b2576ecc2a54fb5c7f0239f34742, type: 3}
+  - canonicalName: minecraft:blue_concrete_powder
+    prefab: {fileID: 5789078862694640167, guid: 16d8dcfcefe7265459ca15ec2311bb4a, type: 3}
+  - canonicalName: minecraft:blue_ice
+    prefab: {fileID: 7978368368965572540, guid: 05e9956ce43d82a49939db0b0beb15f5, type: 3}
+  - canonicalName: minecraft:blue_stained_glass
+    prefab: {fileID: 8782008792714815556, guid: 54ce6fb005ea2c948a54042ab7fdcbc6, type: 3}
+  - canonicalName: minecraft:blue_terracotta
+    prefab: {fileID: 1242563259287169640, guid: 214ca4b02dc89f64f8312dd8acf8ff90, type: 3}
+  - canonicalName: minecraft:blue_wool
+    prefab: {fileID: 8650999597686751380, guid: 8c01e67a7063e7d44b6c700154807cf0, type: 3}
+  - canonicalName: minecraft:bone_block
+    prefab: {fileID: 4460287425550535972, guid: 419cbae7207681d4e932ab64a07437e8, type: 3}
+  - canonicalName: minecraft:bookshelf
+    prefab: {fileID: 2137925678827457674, guid: be95a47541a9fa64cb1fc097b6680c9e, type: 3}
+  - canonicalName: minecraft:brain_coral_block
+    prefab: {fileID: 7887475538970543783, guid: bd530a11758f5144b8fb2e9a00e5ff38, type: 3}
+  - canonicalName: minecraft:bricks
+    prefab: {fileID: 354302190677127138, guid: a52df939d3b43d94b985514895d528e4, type: 3}
+  - canonicalName: minecraft:brown_concrete
+    prefab: {fileID: 6243211045914319896, guid: 882d6ebe9ebe1c546a811bcab354ce93, type: 3}
+  - canonicalName: minecraft:brown_concrete_powder
+    prefab: {fileID: 5464520837962598074, guid: 4c61c4a679536194fbdc7fb88ff93b4a, type: 3}
+  - canonicalName: minecraft:brown_stained_glass
+    prefab: {fileID: 2235017702294542334, guid: e3fc8d23e3a3a194597de2dbcb0d9862, type: 3}
+  - canonicalName: minecraft:brown_terracotta
+    prefab: {fileID: 4430380233579504719, guid: e7adebd5d4619b14e88c12ba3249565a, type: 3}
+  - canonicalName: minecraft:brown_wool
+    prefab: {fileID: 5147307149318925491, guid: 7c73dff5a0856574cb88a4fd28a75c0a, type: 3}
+  - canonicalName: minecraft:bubble_coral_block
+    prefab: {fileID: 8414094840622242187, guid: d0fb428594d0a4b4983b59dbf85a8764, type: 3}
+  - canonicalName: minecraft:budding_amethyst
+    prefab: {fileID: 2293964487835960485, guid: c808a1b8f7dfb094d8b2faa31ea87db8, type: 3}
+  - canonicalName: minecraft:calcite
+    prefab: {fileID: 2904167217621810268, guid: 0dd643ac68fcde844853eb8983f0304f, type: 3}
+  - canonicalName: minecraft:cartography_table
+    prefab: {fileID: 7506389420160789654, guid: f36bcc02f81bf0943bdfd9a7bf1ab0eb, type: 3}
+  - canonicalName: minecraft:carved_pumpkin
+    prefab: {fileID: 2311027385642289504, guid: 128405bbaaa314d47b8547dc1d66a4b7, type: 3}
+  - canonicalName: minecraft:cherry_leaves
+    prefab: {fileID: 5779618415597936551, guid: e93c31d8ba468c348903f591a9485831, type: 3}
+  - canonicalName: minecraft:cherry_log
+    prefab: {fileID: 2280046959974164787, guid: cac5deeb1a65c764b988c708cb3d7adf, type: 3}
+  - canonicalName: minecraft:cherry_planks
+    prefab: {fileID: 8730907496134966750, guid: 75423487efeb91b429535514239919d0, type: 3}
+  - canonicalName: minecraft:cherry_wood
+    prefab: {fileID: 336257344122083915, guid: 6d6dd1243025621499b7a85be94fde84, type: 3}
+  - canonicalName: minecraft:chiseled_cinnabar
+    prefab: {fileID: 7344850719017166708, guid: e364b963b905c984e85598b7d0ec8047, type: 3}
+  - canonicalName: minecraft:chiseled_copper
+    prefab: {fileID: 232994952364228912, guid: b1749bf6eaa760641a2ff651d16f92e8, type: 3}
+  - canonicalName: minecraft:chiseled_deepslate
+    prefab: {fileID: 606159600716400524, guid: 3a573e5eecfd2314e9215217967b7e8e, type: 3}
+  - canonicalName: minecraft:chiseled_nether_bricks
+    prefab: {fileID: 4421461798904010990, guid: 2fe0ffbd6221ac343b9b70be6d3b150d, type: 3}
+  - canonicalName: minecraft:chiseled_polished_blackstone
+    prefab: {fileID: 4114938344567888432, guid: e4d3014bdc76b274aaab245f1cb835b6, type: 3}
+  - canonicalName: minecraft:chiseled_quartz_block
+    prefab: {fileID: 3121961572722697316, guid: 6ead5c192939f974f95317a127ece66b, type: 3}
+  - canonicalName: minecraft:chiseled_red_sandstone
+    prefab: {fileID: 5216427254218733323, guid: 4fcc40b381448664f81efe14766602bb, type: 3}
+  - canonicalName: minecraft:chiseled_resin_bricks
+    prefab: {fileID: 8587468862105746790, guid: a7467710fd4073246972452c2908352a, type: 3}
+  - canonicalName: minecraft:chiseled_sandstone
+    prefab: {fileID: 6075245328705265502, guid: efc712f6669dd9b41910cc14283497ec, type: 3}
+  - canonicalName: minecraft:chiseled_stone_bricks
+    prefab: {fileID: 4477022871412862009, guid: 88fc1b37f0229884c82ffc4c3216ef14, type: 3}
+  - canonicalName: minecraft:chiseled_sulfur
+    prefab: {fileID: 1807234236330769506, guid: 6c5e7ce972039274ea5191b7b70d58bb, type: 3}
+  - canonicalName: minecraft:chiseled_tuff
+    prefab: {fileID: 7256397070321158814, guid: f6592a95829e45c498179152e749549a, type: 3}
+  - canonicalName: minecraft:chiseled_tuff_bricks
+    prefab: {fileID: 8079216728644403915, guid: 44f568ead67f79740a02cc83af140841, type: 3}
+  - canonicalName: minecraft:cinnabar
+    prefab: {fileID: 2071679302805273468, guid: fca8dd85c8a96e84f91c93bfd7e85b58, type: 3}
+  - canonicalName: minecraft:cinnabar_bricks
+    prefab: {fileID: 1448407020671932368, guid: 2fb112c62f3f1824db6df1a855a52e19, type: 3}
+  - canonicalName: minecraft:clay
+    prefab: {fileID: 3706830708576770372, guid: 6a9fa43042a5940419614cddeff54e75, type: 3}
+  - canonicalName: minecraft:coal_block
+    prefab: {fileID: 3224686965063555141, guid: 973308ce5ef15ea429d08e11fbb22d38, type: 3}
+  - canonicalName: minecraft:coal_ore
+    prefab: {fileID: 953019323347946586, guid: 898160833f6108d418d7a72e3b8f6801, type: 3}
+  - canonicalName: minecraft:coarse_dirt
+    prefab: {fileID: 6501245451828247922, guid: dcf56c5b50023ea48b80df367895b832, type: 3}
+  - canonicalName: minecraft:cobbled_deepslate
+    prefab: {fileID: 1092331902170409040, guid: 05fd0bfc077929543b0292e0c801afe2, type: 3}
+  - canonicalName: minecraft:cobblestone
+    prefab: {fileID: 5319614783238686726, guid: 1b1350e7fb4472a418915f8bdfd4f9b7, type: 3}
+  - canonicalName: minecraft:copper_block
+    prefab: {fileID: 5339723071641088675, guid: 2f51d8be46d534648930ca27f3062a7c, type: 3}
+  - canonicalName: minecraft:copper_bulb
+    prefab: {fileID: 101640465359202477, guid: 51d4806afbf68664ca6202cf783fc957, type: 3}
+  - canonicalName: minecraft:copper_grate
+    prefab: {fileID: 4643369063263824043, guid: 93c390703e0509546a7432103e9c539a, type: 3}
+  - canonicalName: minecraft:copper_ore
+    prefab: {fileID: 3268275644278007997, guid: ec3f4f99a34269745813583ef962a1cf, type: 3}
+  - canonicalName: minecraft:cracked_deepslate_bricks
+    prefab: {fileID: 2377634705853551616, guid: b000ca29f5bd9074e844c304e33ef848, type: 3}
+  - canonicalName: minecraft:cracked_deepslate_tiles
+    prefab: {fileID: 1805204583774745456, guid: 5d706f4fc2c626347b44ade36d6783ec, type: 3}
+  - canonicalName: minecraft:cracked_nether_bricks
+    prefab: {fileID: 8729264333973242253, guid: 59b2a6b4a6286ca4d9951f5aee62d53b, type: 3}
+  - canonicalName: minecraft:cracked_polished_blackstone_bricks
+    prefab: {fileID: 3028567512421696624, guid: 5e175fa1b1128944bacfea927ae35505, type: 3}
+  - canonicalName: minecraft:cracked_stone_bricks
+    prefab: {fileID: 8051335871545874244, guid: db1c78f61c3093046b68215e9afa19ed, type: 3}
+  - canonicalName: minecraft:crafting_table
+    prefab: {fileID: 4002919831780023933, guid: f18fe2d2f7b1a2640941b49bb80ff704, type: 3}
+  - canonicalName: minecraft:creaking_heart
+    prefab: {fileID: 7856403053320812016, guid: 0180410fa1ee50348bc872f5146fa646, type: 3}
+  - canonicalName: minecraft:crimson_hyphae
+    prefab: {fileID: 3940754830629450153, guid: 2a581eef7a81a804b8d1274fca85bf89, type: 3}
+  - canonicalName: minecraft:crimson_nylium
+    prefab: {fileID: 7093202925113883509, guid: c330582c043dfdf42be3849df4e0ae48, type: 3}
+  - canonicalName: minecraft:crimson_planks
+    prefab: {fileID: 265314753014686658, guid: 10a02eaa74fee1b4db1240b57ed53066, type: 3}
+  - canonicalName: minecraft:crimson_stem
+    prefab: {fileID: 4658064402786961699, guid: 5e095126b99df2a4c9112b60f1ab3a81, type: 3}
+  - canonicalName: minecraft:crying_obsidian
+    prefab: {fileID: 8121212291535108279, guid: ea9ad04b466198d47b88a6746affbdba, type: 3}
+  - canonicalName: minecraft:cut_copper
+    prefab: {fileID: 194103959213490186, guid: 6ac11ab7e7de73845bb26d94d345ad2d, type: 3}
+  - canonicalName: minecraft:cut_red_sandstone
+    prefab: {fileID: 2028708363324853578, guid: 40c577a90450c904baf443737502a394, type: 3}
+  - canonicalName: minecraft:cut_sandstone
+    prefab: {fileID: 695090350641861946, guid: 41b20b9f187ee3143bca844310c0a3b3, type: 3}
+  - canonicalName: minecraft:cyan_concrete
+    prefab: {fileID: 5959530067259832082, guid: 40d7fdbafc5d72449a7dc3c6f3f696fb, type: 3}
+  - canonicalName: minecraft:cyan_concrete_powder
+    prefab: {fileID: 6948593544700367693, guid: af82374774ceba3479497b9b426f23e4, type: 3}
+  - canonicalName: minecraft:cyan_stained_glass
+    prefab: {fileID: 3066631849653996534, guid: 10b531ea74ff39b4bbfd11d571a4e92b, type: 3}
+  - canonicalName: minecraft:cyan_terracotta
+    prefab: {fileID: 3759285849955189162, guid: 79bae5c8327c93f41a19c5354b5336e9, type: 3}
+  - canonicalName: minecraft:cyan_wool
+    prefab: {fileID: 8256768980448185113, guid: a9df8b9fd78551a4088d750bd3aaf008, type: 3}
+  - canonicalName: minecraft:dark_oak_leaves
+    prefab: {fileID: 7222230667232653560, guid: e485ac737e3f40a44a02bebba6629aaa, type: 3}
+  - canonicalName: minecraft:dark_oak_log
+    prefab: {fileID: 5132412690311872475, guid: b3c3c41003110d246b590b8ec2d3217e, type: 3}
+  - canonicalName: minecraft:dark_oak_planks
+    prefab: {fileID: 5113784801436304360, guid: 65e0a81bed844074392fba325555f7fe, type: 3}
+  - canonicalName: minecraft:dark_oak_wood
+    prefab: {fileID: 6761059151262776495, guid: 32e9b4a95df46a242992e9d3ab854793, type: 3}
+  - canonicalName: minecraft:dark_prismarine
+    prefab: {fileID: 862317591072981178, guid: 92cd6e63c57c2c149890c61caa36a9f5, type: 3}
+  - canonicalName: minecraft:dead_brain_coral_block
+    prefab: {fileID: 2475097219215853574, guid: 27e242309a2f5c34d8dcfc779cadec07, type: 3}
+  - canonicalName: minecraft:dead_bubble_coral_block
+    prefab: {fileID: 1632891227538938189, guid: ae87af69b2f7f984993902e41af57728, type: 3}
+  - canonicalName: minecraft:dead_fire_coral_block
+    prefab: {fileID: 5626145102580378599, guid: 1b7cf1324630de844babab5d3e2e9b40, type: 3}
+  - canonicalName: minecraft:dead_horn_coral_block
+    prefab: {fileID: 4652835970520181205, guid: c2941aa7514fa494082dbda6802ae061, type: 3}
+  - canonicalName: minecraft:dead_tube_coral_block
+    prefab: {fileID: 8096270481722148678, guid: 57ed85a3a4f1488488ff8e642d5b02f0, type: 3}
+  - canonicalName: minecraft:deepslate
+    prefab: {fileID: 3247617759638178087, guid: 87a9197c40303ea4cb8c1264245102c3, type: 3}
+  - canonicalName: minecraft:deepslate_bricks
+    prefab: {fileID: 2568472788367116941, guid: c929804c668cfc94382a95b41f349b2f, type: 3}
+  - canonicalName: minecraft:deepslate_coal_ore
+    prefab: {fileID: 2748020486611659379, guid: 460d75e452c3dd147ae2622435cf47e2, type: 3}
+  - canonicalName: minecraft:deepslate_copper_ore
+    prefab: {fileID: 1528381708727392544, guid: 2fbeb9a676b9e234b9bdc0f390ecd7f2, type: 3}
+  - canonicalName: minecraft:deepslate_diamond_ore
+    prefab: {fileID: 6874848026002648575, guid: d9df1bee597e1cc4e8e8500e6498cc72, type: 3}
+  - canonicalName: minecraft:deepslate_emerald_ore
+    prefab: {fileID: 7231083018383723640, guid: 112f59279e1c9da4fa0c5c669b777c76, type: 3}
+  - canonicalName: minecraft:deepslate_gold_ore
+    prefab: {fileID: 3108669934990459949, guid: 7251452bfeb88044fa4f5d324f5f996c, type: 3}
+  - canonicalName: minecraft:deepslate_iron_ore
+    prefab: {fileID: 2686703352542030147, guid: 079e83e01d998cd47aa9c9d7a87a650a, type: 3}
+  - canonicalName: minecraft:deepslate_lapis_ore
+    prefab: {fileID: 5523873137841691993, guid: b1a2c746f117ef141969f2df21e302c3, type: 3}
+  - canonicalName: minecraft:deepslate_redstone_ore
+    prefab: {fileID: 4764078054637837557, guid: 15003e426ae5e0c4dbdd7cf306d947cd, type: 3}
+  - canonicalName: minecraft:deepslate_tiles
+    prefab: {fileID: 3562657418211439059, guid: f0f139c687e484040a6ed09c6b774701, type: 3}
+  - canonicalName: minecraft:diamond_block
+    prefab: {fileID: 4897941696038740976, guid: c9af7e6ab77b71b48be50cf359805aac, type: 3}
+  - canonicalName: minecraft:diamond_ore
+    prefab: {fileID: 7230435708916806889, guid: b42c081ed4624fd4ea83dbfe9d6d769e, type: 3}
+  - canonicalName: minecraft:diorite
+    prefab: {fileID: 4436109931994002192, guid: 1bf79fe2082760b41831788543cc5c1d, type: 3}
+  - canonicalName: minecraft:dirt
+    prefab: {fileID: 5971254768081824073, guid: b334b47f9fd0850409d92f7bdc7fc418, type: 3}
+  - canonicalName: minecraft:dispenser
+    prefab: {fileID: 2711575900599556030, guid: ba9ea6a9a36422840b4d6d24c2781063, type: 3}
+  - canonicalName: minecraft:dripstone_block
+    prefab: {fileID: 8122199027115881965, guid: 5785ee5435d0fd04b91be6fcb7bb6e60, type: 3}
+  - canonicalName: minecraft:dropper
+    prefab: {fileID: 9070156396321760776, guid: 05d4c6096854f5b42ac6475c9041f49e, type: 3}
+  - canonicalName: minecraft:emerald_block
+    prefab: {fileID: 8983182487345010379, guid: e68b295c970fedd4392cb4aa5f75cf43, type: 3}
+  - canonicalName: minecraft:emerald_ore
+    prefab: {fileID: 4731258104337066484, guid: 02d523d37a5660c4f8719177d5b8cf85, type: 3}
+  - canonicalName: minecraft:end_stone
+    prefab: {fileID: 179817745796611493, guid: 2fe3a71f6f0ea6749b24b402fc8cc926, type: 3}
+  - canonicalName: minecraft:end_stone_bricks
+    prefab: {fileID: 264131203057093873, guid: 05a22557eeb810048b8f32bff0e22081, type: 3}
+  - canonicalName: minecraft:exposed_chiseled_copper
+    prefab: {fileID: 5509941798312972383, guid: 0a31e5b2ed410d9429257f722f396c36, type: 3}
+  - canonicalName: minecraft:exposed_copper
+    prefab: {fileID: 674370012089641244, guid: 284ca6aa6448c384088530653e505886, type: 3}
+  - canonicalName: minecraft:exposed_copper_bulb
+    prefab: {fileID: 6330780661897437381, guid: 1e19ae8d0b0da944ba63059acdb63568, type: 3}
+  - canonicalName: minecraft:exposed_copper_grate
+    prefab: {fileID: 6584296294963309816, guid: 749513a3fa9c84c49a0a28a936748357, type: 3}
+  - canonicalName: minecraft:exposed_cut_copper
+    prefab: {fileID: 2528481410822955992, guid: f285e962326094740be6f7900dd77733, type: 3}
+  - canonicalName: minecraft:fire_coral_block
+    prefab: {fileID: 5425308197693204444, guid: ca1c48df44c5e3f43b2c61d9768de0ac, type: 3}
+  - canonicalName: minecraft:fletching_table
+    prefab: {fileID: 6467486129318009495, guid: 9921aad79bc159e40914b4a8866c4fcf, type: 3}
+  - canonicalName: minecraft:flowering_azalea_leaves
+    prefab: {fileID: 8893634879862452516, guid: f4d3ef266c9ecec42b6bd89cc6f816bd, type: 3}
+  - canonicalName: minecraft:frosted_ice
+    prefab: {fileID: 1764842163672721580, guid: 22ace47d41373a349a931c3811bf52eb, type: 3}
+  - canonicalName: minecraft:furnace
+    prefab: {fileID: 2810895044796652336, guid: 64a8de6a18855bc408f209e52f2cb356, type: 3}
+  - canonicalName: minecraft:gilded_blackstone
+    prefab: {fileID: 3311925066752753903, guid: 71023a870d37c9a4f97f6e32ca935811, type: 3}
+  - canonicalName: minecraft:glass
+    prefab: {fileID: 8957886260967216712, guid: a4ee560f9c4dea342a53e3154d39304c, type: 3}
+  - canonicalName: minecraft:glowstone
+    prefab: {fileID: 3958913717671338074, guid: 7e770087c81df7649a8e4060780c6315, type: 3}
+  - canonicalName: minecraft:gold_block
+    prefab: {fileID: 8790664826089935507, guid: 793677647286fff4ca9b1fcc236aed8e, type: 3}
+  - canonicalName: minecraft:gold_ore
+    prefab: {fileID: 909330181223000351, guid: 78c48fa7411653d489dd3461609c2358, type: 3}
+  - canonicalName: minecraft:granite
+    prefab: {fileID: 5767144969177262000, guid: 0b28e15cba849fe4eb36a92c1a70b694, type: 3}
+  - canonicalName: minecraft:grass_block
+    prefab: {fileID: 4740634926410361127, guid: c71b1206a8f9030469ff70bd018a143f, type: 3}
+  - canonicalName: minecraft:gravel
+    prefab: {fileID: 5635170323559583325, guid: 6958baa310a29c540b658c7eea7ff5ae, type: 3}
+  - canonicalName: minecraft:gray_concrete
+    prefab: {fileID: 819467676143402843, guid: a7ef677f54791904cb526680107f1aac, type: 3}
+  - canonicalName: minecraft:gray_concrete_powder
+    prefab: {fileID: 4665075377758069385, guid: 1ea45faf5540d3d43a457538c43ee219, type: 3}
+  - canonicalName: minecraft:gray_stained_glass
+    prefab: {fileID: 8941300054499898010, guid: 16b71045a3a76574cad29145795d4817, type: 3}
+  - canonicalName: minecraft:gray_terracotta
+    prefab: {fileID: 2682099530864783909, guid: e07923b30a989694d902a31b5e6736e8, type: 3}
+  - canonicalName: minecraft:gray_wool
+    prefab: {fileID: 2290249908047421988, guid: dc0e1d9fd1ee1184388aad83043c563c, type: 3}
+  - canonicalName: minecraft:green_concrete
+    prefab: {fileID: 6264597268720923836, guid: 5de884d669f8e9c45bc2805eeb7cc3cc, type: 3}
+  - canonicalName: minecraft:green_concrete_powder
+    prefab: {fileID: 1261737305921399074, guid: 44877a41f2d81954b9c5928e8e92c091, type: 3}
+  - canonicalName: minecraft:green_stained_glass
+    prefab: {fileID: 7339438715284874205, guid: 0d4dceefd84d16841b82d502b6ff4642, type: 3}
+  - canonicalName: minecraft:green_terracotta
+    prefab: {fileID: 2066455831377620080, guid: 98e0560fe950769449d22a935fc3483e, type: 3}
+  - canonicalName: minecraft:green_wool
+    prefab: {fileID: 1622729190071551004, guid: 0d1f61f3c8a372f46922a4e65b746461, type: 3}
+  - canonicalName: minecraft:hay_block
+    prefab: {fileID: 4069033342429639029, guid: 98115126005b1fc46882f8bea99d1be1, type: 3}
+  - canonicalName: minecraft:honeycomb_block
+    prefab: {fileID: 1262671791430283781, guid: cba30f419c16e204aa166bd89ff328ee, type: 3}
+  - canonicalName: minecraft:horn_coral_block
+    prefab: {fileID: 8454134645878873693, guid: 97d5b6bdae52d1041b62766456f0800b, type: 3}
+  - canonicalName: minecraft:ice
+    prefab: {fileID: 3566339085746065332, guid: 0568726344209c941bd8c04ff344e8a8, type: 3}
+  - canonicalName: minecraft:infested_chiseled_stone_bricks
+    prefab: {fileID: 8428338028287251769, guid: ac8a73699bad33a4d99b8c42ac73bedc, type: 3}
+  - canonicalName: minecraft:infested_cobblestone
+    prefab: {fileID: 2247401503129549865, guid: 4dd47e145deae7e48957ba378efe18e6, type: 3}
+  - canonicalName: minecraft:infested_cracked_stone_bricks
+    prefab: {fileID: 6717694034069199834, guid: 7b17d81c2f25a6c498005966cb4a83ed, type: 3}
+  - canonicalName: minecraft:infested_deepslate
+    prefab: {fileID: 1224157934455380572, guid: 85eeea232b2f8854cbad8b6e12bfdd7b, type: 3}
+  - canonicalName: minecraft:infested_mossy_stone_bricks
+    prefab: {fileID: 7810352467104196395, guid: 73253f94a3c16d34bbcda2a218512533, type: 3}
+  - canonicalName: minecraft:infested_stone
+    prefab: {fileID: 7054464784417867504, guid: 4e787e7e78b0aad4fa930ec2e1a38367, type: 3}
+  - canonicalName: minecraft:infested_stone_bricks
+    prefab: {fileID: 1535469606197759842, guid: 582851c7e7617fb4080d89f70151719b, type: 3}
+  - canonicalName: minecraft:iron_block
+    prefab: {fileID: 3810821944354052290, guid: aba79bfba2b3e5844af7b8a1007dbdc7, type: 3}
+  - canonicalName: minecraft:iron_ore
+    prefab: {fileID: 2492243771839813053, guid: 06b49438a9f533a4191584206a1c83b5, type: 3}
+  - canonicalName: minecraft:jack_o_lantern
+    prefab: {fileID: 504195401323925629, guid: 8d44b5d123c5a704da9f3a7c95d98daf, type: 3}
+  - canonicalName: minecraft:jukebox
+    prefab: {fileID: 4277589607766637064, guid: 8853ce5dc8be93b42b2fc584ebcdec24, type: 3}
+  - canonicalName: minecraft:jungle_leaves
+    prefab: {fileID: 2796118082326211259, guid: 0cba0f98acfe921499a89ee1b350b2dc, type: 3}
+  - canonicalName: minecraft:jungle_log
+    prefab: {fileID: 21484272491158106, guid: 48317052d3d57d84c919daeaddc1c231, type: 3}
+  - canonicalName: minecraft:jungle_planks
+    prefab: {fileID: 7112968939958006644, guid: 150e037eb432af14c854ec521de6368c, type: 3}
+  - canonicalName: minecraft:jungle_wood
+    prefab: {fileID: 4413653375657399463, guid: 149624d13f9cd7b46b611239b24ad5c4, type: 3}
+  - canonicalName: minecraft:lapis_block
+    prefab: {fileID: 7378322986124505563, guid: a1850dbdf68362946935b574884a1b89, type: 3}
+  - canonicalName: minecraft:lapis_ore
+    prefab: {fileID: 997177296155681562, guid: 86d51776f9cf8b04c902de07dea6b27b, type: 3}
+  - canonicalName: minecraft:light_blue_concrete
+    prefab: {fileID: 3608676641018963187, guid: ee82cfbcac2961140aedae6f46566693, type: 3}
+  - canonicalName: minecraft:light_blue_concrete_powder
+    prefab: {fileID: 2029459624583227881, guid: 47c79637d2c4fb747b8aa55f299492ed, type: 3}
+  - canonicalName: minecraft:light_blue_stained_glass
+    prefab: {fileID: 4129151502020396046, guid: 285a187115ec94d46ace5fa55bb6100e, type: 3}
+  - canonicalName: minecraft:light_blue_terracotta
+    prefab: {fileID: 1592802583759599396, guid: b5cc96bb35b7b2641b0a106043258a7f, type: 3}
+  - canonicalName: minecraft:light_blue_wool
+    prefab: {fileID: 8541321054671686577, guid: 5ea269f7544380c4aa9d42916803108d, type: 3}
+  - canonicalName: minecraft:light_gray_concrete
+    prefab: {fileID: 6583209550374663947, guid: 6f16a55574bb8234a830400d90836147, type: 3}
+  - canonicalName: minecraft:light_gray_concrete_powder
+    prefab: {fileID: 8560086780418212462, guid: bdb922abaccdf614fae153febba69721, type: 3}
+  - canonicalName: minecraft:light_gray_stained_glass
+    prefab: {fileID: 4877817524798034952, guid: f7a894cd18f76fa4481b8426410323ad, type: 3}
+  - canonicalName: minecraft:light_gray_terracotta
+    prefab: {fileID: 5740398253772902475, guid: 4515dd799af42fe4cb8dd88788483b3a, type: 3}
+  - canonicalName: minecraft:light_gray_wool
+    prefab: {fileID: 967960340048753985, guid: 6002884fb90de9a4a985a660576774d2, type: 3}
+  - canonicalName: minecraft:lime_concrete
+    prefab: {fileID: 6804537151478143986, guid: d0cceeeeecf249846890309c2c6d203a, type: 3}
+  - canonicalName: minecraft:lime_concrete_powder
+    prefab: {fileID: 333250574063683100, guid: 47814f91fdc5c5a4f9921f0251286dbb, type: 3}
+  - canonicalName: minecraft:lime_stained_glass
+    prefab: {fileID: 864591579501066627, guid: 3abd1a0285f37e64097ac4970f32738b, type: 3}
+  - canonicalName: minecraft:lime_terracotta
+    prefab: {fileID: 4906530037506231937, guid: 8d60b793b50f62c4a8dabf49302472c0, type: 3}
+  - canonicalName: minecraft:lime_wool
+    prefab: {fileID: 7711979294459948704, guid: 1b277b6585e2c82459645e827558adfc, type: 3}
+  - canonicalName: minecraft:lodestone
+    prefab: {fileID: 4241302052479174072, guid: 24e7c20c44e95ec4db88708b9524fef2, type: 3}
+  - canonicalName: minecraft:loom
+    prefab: {fileID: 4955502684545792719, guid: e576d6c843a11474686849c1b8fa76c1, type: 3}
+  - canonicalName: minecraft:magenta_concrete
+    prefab: {fileID: 2781101401661430119, guid: 86f0f435856a9a049822f8b6e22c777d, type: 3}
+  - canonicalName: minecraft:magenta_concrete_powder
+    prefab: {fileID: 98178656380381294, guid: 85191d6d78fa87e4cb9ffb27a7d1e62e, type: 3}
+  - canonicalName: minecraft:magenta_stained_glass
+    prefab: {fileID: 1633518765669745931, guid: 26f4ce7b618ee9847b2e23d524b9f367, type: 3}
+  - canonicalName: minecraft:magenta_terracotta
+    prefab: {fileID: 1820377615951358155, guid: c667f485b64a8cf408e48226a2ef702c, type: 3}
+  - canonicalName: minecraft:magenta_wool
+    prefab: {fileID: 5778962358692842516, guid: baba27ce1843a244eaf3afda6cc2d249, type: 3}
+  - canonicalName: minecraft:magma_block
+    prefab: {fileID: 7182245133587413818, guid: 183ea39ce463ca74698ad83ed5011bbe, type: 3}
+  - canonicalName: minecraft:mangrove_leaves
+    prefab: {fileID: 1217073078422071775, guid: 6e286e1526263f145b5374e6f714ee50, type: 3}
+  - canonicalName: minecraft:mangrove_log
+    prefab: {fileID: 9037779382621385879, guid: b0034ae9150f92946be60eec847c1b42, type: 3}
+  - canonicalName: minecraft:mangrove_planks
+    prefab: {fileID: 842130093823768625, guid: 20755fef94ac6ab4c845dea499a1ef6f, type: 3}
+  - canonicalName: minecraft:mangrove_wood
+    prefab: {fileID: 4422526636502333389, guid: 96ca10b36d5855b449695e2502a0f8a8, type: 3}
+  - canonicalName: minecraft:melon
+    prefab: {fileID: 4630589037449686941, guid: 114392dc589347642a768bbe32d63273, type: 3}
+  - canonicalName: minecraft:moss_block
+    prefab: {fileID: 3815565678775540618, guid: cfc81af7950965242a4de88534e34b99, type: 3}
+  - canonicalName: minecraft:mossy_cobblestone
+    prefab: {fileID: 9095065332551659298, guid: fba1c3787d764044a84a777b76d52f2d, type: 3}
+  - canonicalName: minecraft:mossy_stone_bricks
+    prefab: {fileID: 5825661935139503745, guid: 32a3c48d569015d49a38f044ce404cc3, type: 3}
+  - canonicalName: minecraft:mud
+    prefab: {fileID: 4994118797153683832, guid: 1c86623a5c5f840489f85d7860d428f0, type: 3}
+  - canonicalName: minecraft:muddy_mangrove_roots
+    prefab: {fileID: 8361370675812967013, guid: ccd6a633d7bdff24bb9b03acf9faeab1, type: 3}
+  - canonicalName: minecraft:mycelium
+    prefab: {fileID: 4570375516714328908, guid: 2047bd9042c4c914389f51673a407bf2, type: 3}
+  - canonicalName: minecraft:nether_bricks
+    prefab: {fileID: 240239075397000885, guid: 320ad57eb1671014a834b75b2d038c22, type: 3}
+  - canonicalName: minecraft:nether_gold_ore
+    prefab: {fileID: 840850854354585488, guid: a79ca6d0d275ceb4e8f55758bf9cfadf, type: 3}
+  - canonicalName: minecraft:nether_quartz_ore
+    prefab: {fileID: 1196390197750596729, guid: 0fc4ec8bb484a8745a6dc2c47fbcfe73, type: 3}
+  - canonicalName: minecraft:nether_wart_block
+    prefab: {fileID: 3065038303268962121, guid: 3c2e2bf8ee316fa4db65577c26c31512, type: 3}
+  - canonicalName: minecraft:netherite_block
+    prefab: {fileID: 4359822974036918872, guid: 8e8f387c32f30a844911d18fe158dfa3, type: 3}
+  - canonicalName: minecraft:netherrack
+    prefab: {fileID: 2886369300459000392, guid: 81496fcaeac9d9148ad3ee08db2bec98, type: 3}
+  - canonicalName: minecraft:note_block
+    prefab: {fileID: 3878820828713495895, guid: 2e6f72f9e1ec3154cae098a9bcd43add, type: 3}
+  - canonicalName: minecraft:oak_leaves
+    prefab: {fileID: 4564067715610826046, guid: 41007523c5d2a2b45b30c2a58dc5aefe, type: 3}
+  - canonicalName: minecraft:oak_log
+    prefab: {fileID: 7617641831992559348, guid: 755b8c0ec1a22c5458fb5122bf86fb04, type: 3}
+  - canonicalName: minecraft:oak_planks
+    prefab: {fileID: 7365501773912465458, guid: 284f9d60aacae514e8673c8d762aaeea, type: 3}
+  - canonicalName: minecraft:oak_wood
+    prefab: {fileID: 4768695994218978671, guid: b56671ac9bb0ae24588fa56b563aac51, type: 3}
+  - canonicalName: minecraft:obsidian
+    prefab: {fileID: 4951736340183721970, guid: 7834db426208d7d468720d44ee30f696, type: 3}
+  - canonicalName: minecraft:ochre_froglight
+    prefab: {fileID: 3561741148759789063, guid: 0abe24d244698684ea17b041e59423f8, type: 3}
+  - canonicalName: minecraft:orange_concrete
+    prefab: {fileID: 6459109974207151743, guid: 19845a8153b97e343ab500f49c04469d, type: 3}
+  - canonicalName: minecraft:orange_concrete_powder
+    prefab: {fileID: 4451767203378623449, guid: c20d0863b8dd2314993aa92b17666068, type: 3}
+  - canonicalName: minecraft:orange_poplar_leaves
+    prefab: {fileID: 7410028956122508416, guid: 84a38bce8cf1010479bc23fb269b4488, type: 3}
+  - canonicalName: minecraft:orange_stained_glass
+    prefab: {fileID: 5028813371233749142, guid: b4d8d9b582523ff46b0587d7b0c89c6c, type: 3}
+  - canonicalName: minecraft:orange_terracotta
+    prefab: {fileID: 8341609383584859197, guid: c39c9167da9011c4e9d9ce951b32dd70, type: 3}
+  - canonicalName: minecraft:orange_wool
+    prefab: {fileID: 3025812571952938991, guid: b13b7bc2db5c5434eb950b7ee30c8115, type: 3}
+  - canonicalName: minecraft:oxidized_chiseled_copper
+    prefab: {fileID: 8573567851894632631, guid: 1aca61c67c618584787156e3132ff54e, type: 3}
+  - canonicalName: minecraft:oxidized_copper
+    prefab: {fileID: 4315704810095391237, guid: 2dc992e5d7c469843b02b5c2c788a2e3, type: 3}
+  - canonicalName: minecraft:oxidized_copper_bulb
+    prefab: {fileID: 6410592466993564114, guid: 7a0f23c8be735114fb2428bf380f3359, type: 3}
+  - canonicalName: minecraft:oxidized_copper_grate
+    prefab: {fileID: 7634768533426801312, guid: 96e779e6d39042240b21ce631f1c160a, type: 3}
+  - canonicalName: minecraft:oxidized_cut_copper
+    prefab: {fileID: 5485934763272010862, guid: 47daa5cb9e571af49aa0e08532879ba5, type: 3}
+  - canonicalName: minecraft:packed_ice
+    prefab: {fileID: 9009667758926822055, guid: 9084fe689e644684498027850ef316e1, type: 3}
+  - canonicalName: minecraft:packed_mud
+    prefab: {fileID: 2892538084178587595, guid: b25f601459bb9944ca4f0ec123274a67, type: 3}
+  - canonicalName: minecraft:pale_moss_block
+    prefab: {fileID: 1333701558924186697, guid: 67ca811158c6359458b16ea7310551d5, type: 3}
+  - canonicalName: minecraft:pale_oak_leaves
+    prefab: {fileID: 1601991154080190561, guid: 9931e7c12bae6fb4ea72089a3f28a2c4, type: 3}
+  - canonicalName: minecraft:pale_oak_log
+    prefab: {fileID: 7006278615855759624, guid: cda4bb04ad60ab64db51d0eb17f4e189, type: 3}
+  - canonicalName: minecraft:pale_oak_planks
+    prefab: {fileID: 5503635664730401681, guid: ec1ab27ed87c4ee4081c9a2827f184b0, type: 3}
+  - canonicalName: minecraft:pale_oak_wood
+    prefab: {fileID: 8519410004791580881, guid: 9a63086ab3636e04993a30a42f5e9d54, type: 3}
+  - canonicalName: minecraft:pearlescent_froglight
+    prefab: {fileID: 7646151536646162958, guid: 4adb57084e762654e86f75e6ef6c9322, type: 3}
+  - canonicalName: minecraft:pink_concrete
+    prefab: {fileID: 8710588370955047403, guid: cb4b918dfd09db24bb83946d8ab04890, type: 3}
+  - canonicalName: minecraft:pink_concrete_powder
+    prefab: {fileID: 2100034863013634001, guid: 00140bdcba71d854aa367b7eb34a819e, type: 3}
+  - canonicalName: minecraft:pink_stained_glass
+    prefab: {fileID: 4744400529559987607, guid: 47ea951d40507994698c5c7a61546945, type: 3}
+  - canonicalName: minecraft:pink_terracotta
+    prefab: {fileID: 3936415320483020902, guid: cfe6c25719d88824b8ef18c99bcff6e9, type: 3}
+  - canonicalName: minecraft:pink_wool
+    prefab: {fileID: 5810061811830252228, guid: e5471ae8c5737c6458c1c2f9629356e6, type: 3}
+  - canonicalName: minecraft:podzol
+    prefab: {fileID: 5746299296187294354, guid: 2fea8fc5a2dba664cbe72610f73bd03f, type: 3}
+  - canonicalName: minecraft:polished_andesite
+    prefab: {fileID: 3540599179196526629, guid: 6ff7e326672628f43b86b056b7601d0b, type: 3}
+  - canonicalName: minecraft:polished_basalt
+    prefab: {fileID: 8421662129195387209, guid: 0507a2bc44b427544979419170cfcadb, type: 3}
+  - canonicalName: minecraft:polished_blackstone
+    prefab: {fileID: 4463729391650085562, guid: d2b53c0f76badbc43b5058cde28d0bef, type: 3}
+  - canonicalName: minecraft:polished_blackstone_bricks
+    prefab: {fileID: 1358220570876399929, guid: e6bf213ded05a7b429530c32bc413d1d, type: 3}
+  - canonicalName: minecraft:polished_cinnabar
+    prefab: {fileID: 974820491788912614, guid: 43e346097366a8248a178e1e203be14d, type: 3}
+  - canonicalName: minecraft:polished_deepslate
+    prefab: {fileID: 4484703103007845315, guid: 68e34ebcd103eb34395b07170ba1f2d3, type: 3}
+  - canonicalName: minecraft:polished_diorite
+    prefab: {fileID: 5051226411190605936, guid: 51fd2f33bda039a4ebb39987ae96fe75, type: 3}
+  - canonicalName: minecraft:polished_granite
+    prefab: {fileID: 4480041218316591145, guid: 2941bac98251bf44bbea032944a6008e, type: 3}
+  - canonicalName: minecraft:polished_sulfur
+    prefab: {fileID: 5729503080726486017, guid: 16e8e5c603bfb8645bb1ebb4a9c398a5, type: 3}
+  - canonicalName: minecraft:polished_tuff
+    prefab: {fileID: 818930853960488710, guid: 60cb6b98ba1f00041a87f656264f2ddb, type: 3}
+  - canonicalName: minecraft:poplar_log
+    prefab: {fileID: 2922379366762211365, guid: 2ef3bf9ebad5eb5499e7475d7e2b0cf8, type: 3}
+  - canonicalName: minecraft:poplar_planks
+    prefab: {fileID: 5757943865550803265, guid: 1b8da8a2ec4d08f4f841c372bd8d318e, type: 3}
+  - canonicalName: minecraft:poplar_wood
+    prefab: {fileID: 1565000524535911951, guid: e6f747cef3928f84197656122c0eaff7, type: 3}
+  - canonicalName: minecraft:potent_sulfur
+    prefab: {fileID: 4246350255566392399, guid: 5aea7efa65916484b9b7bd2c5be81fbe, type: 3}
+  - canonicalName: minecraft:prismarine
+    prefab: {fileID: 3938266694741823021, guid: 7502ad39ad440e048b4629b615f562d5, type: 3}
+  - canonicalName: minecraft:prismarine_bricks
+    prefab: {fileID: 7774780998475103032, guid: abb9799eb42403a4dab3940bfcb50620, type: 3}
+  - canonicalName: minecraft:pumpkin
+    prefab: {fileID: 9140336439842398160, guid: 23b74021746b0a34a93270e0f3d2fd6a, type: 3}
+  - canonicalName: minecraft:purple_concrete
+    prefab: {fileID: 3802122684092084697, guid: 5d50e1d56f19a384eabd8c69c5bc0e06, type: 3}
+  - canonicalName: minecraft:purple_concrete_powder
+    prefab: {fileID: 3713276702490243481, guid: c7efd858edf2ba14496af329ea7ff7b5, type: 3}
+  - canonicalName: minecraft:purple_stained_glass
+    prefab: {fileID: 7369953155144347911, guid: e7cdd90ddd79c454fa90e74858860581, type: 3}
+  - canonicalName: minecraft:purple_terracotta
+    prefab: {fileID: 6952046883060125787, guid: f2ea311484b5c06489eabf0b8824e008, type: 3}
+  - canonicalName: minecraft:purple_wool
+    prefab: {fileID: 7909428037649795615, guid: d43918f05efa88446b13826ef3161fe2, type: 3}
+  - canonicalName: minecraft:purpur_block
+    prefab: {fileID: 7130817386368415399, guid: 856095a887c48c2418ca2dd37a72db65, type: 3}
+  - canonicalName: minecraft:purpur_pillar
+    prefab: {fileID: 4859014144343576282, guid: c5c992952c547744bac4058140bb28f3, type: 3}
+  - canonicalName: minecraft:quartz_block
+    prefab: {fileID: 3250974826463493824, guid: c5aab9fd446e9a14aa3aed85581b4dbe, type: 3}
+  - canonicalName: minecraft:quartz_bricks
+    prefab: {fileID: 7238160276409061736, guid: 99b3a94bc5fe57f47b5a6348d7f9523f, type: 3}
+  - canonicalName: minecraft:quartz_pillar
+    prefab: {fileID: 6407100637013061156, guid: fbb8c264b37d7744f9d5a8421bfb8a2c, type: 3}
+  - canonicalName: minecraft:raw_copper_block
+    prefab: {fileID: 5294896181905942044, guid: ad7c9dbb02ac53d4cb0de04a862f7d4d, type: 3}
+  - canonicalName: minecraft:raw_gold_block
+    prefab: {fileID: 7328689913447078905, guid: fb81363153f42124195dcfa434171eed, type: 3}
+  - canonicalName: minecraft:raw_iron_block
+    prefab: {fileID: 7904836532707748088, guid: 7814e0b98a852b04082a9bc5c596da1c, type: 3}
+  - canonicalName: minecraft:red_concrete
+    prefab: {fileID: 7847794081535148938, guid: 8432cde3635019d488094f3598725aef, type: 3}
+  - canonicalName: minecraft:red_concrete_powder
+    prefab: {fileID: 7806059925861383675, guid: 3e3ba288ed2180c40b6e49c06be1104e, type: 3}
+  - canonicalName: minecraft:red_nether_bricks
+    prefab: {fileID: 2914555099522370286, guid: 9c1d9709e56aa5741a984b3695cf5e41, type: 3}
+  - canonicalName: minecraft:red_poplar_leaves
+    prefab: {fileID: 3022781539425763121, guid: 224e1015b6b23704cafa8e1199502e77, type: 3}
+  - canonicalName: minecraft:red_sand
+    prefab: {fileID: 8150051005437995716, guid: d93628e43587c9c4e902587ea46adc9f, type: 3}
+  - canonicalName: minecraft:red_sandstone
+    prefab: {fileID: 182293732398886429, guid: 4610be81983f85e4798ad1c3b02755c4, type: 3}
+  - canonicalName: minecraft:red_stained_glass
+    prefab: {fileID: 7033407641794803644, guid: f8d4ca69b5e583b47ae2003dd1dd9754, type: 3}
+  - canonicalName: minecraft:red_terracotta
+    prefab: {fileID: 1482243430751662625, guid: 483cafcd72f2ead47b0cbe8adc9df87e, type: 3}
+  - canonicalName: minecraft:red_wool
+    prefab: {fileID: 1500869812961123007, guid: 99eb81261bbfdd949afd50412f5fbd74, type: 3}
+  - canonicalName: minecraft:redstone_block
+    prefab: {fileID: 8616226825378432015, guid: 99960bad3261d3149913adeee512aaed, type: 3}
+  - canonicalName: minecraft:redstone_lamp
+    prefab: {fileID: 1111066650598614409, guid: f4cba9810b4ef4d418d197ee556f377d, type: 3}
+  - canonicalName: minecraft:redstone_ore
+    prefab: {fileID: 7949456831708685985, guid: 0bdaa1e4a3c35c34fa3419e99bf55a52, type: 3}
+  - canonicalName: minecraft:reinforced_deepslate
+    prefab: {fileID: 875271811328511791, guid: d9accda19b2d33847814f9fbd7621795, type: 3}
+  - canonicalName: minecraft:resin_block
+    prefab: {fileID: 9125266432333582079, guid: 3463e3d579d33ff47856f0ff87cadade, type: 3}
+  - canonicalName: minecraft:resin_bricks
+    prefab: {fileID: 4297484951610233138, guid: f311fca0dd19bab4096000f983f46507, type: 3}
+  - canonicalName: minecraft:respawn_anchor
+    prefab: {fileID: 7570594204832996803, guid: 4eaabc849d5fbfe4ba6d3aae3f1f1a18, type: 3}
+  - canonicalName: minecraft:rooted_dirt
+    prefab: {fileID: 7161047889323438468, guid: c19d039a2ee99494cbf6de23ab449536, type: 3}
+  - canonicalName: minecraft:sand
+    prefab: {fileID: 4032398290303574039, guid: 038f7e4932a9444428cbbe3e1c9b8a4f, type: 3}
+  - canonicalName: minecraft:sandstone
+    prefab: {fileID: 8365914522815910173, guid: 6120d0f17c64373428f3be6560b7c76c, type: 3}
+  - canonicalName: minecraft:sculk
+    prefab: {fileID: 5844675497326180476, guid: 02e2544b5a2f9544b824cd8c1855bd09, type: 3}
+  - canonicalName: minecraft:sculk_catalyst
+    prefab: {fileID: 5028086954862198357, guid: 318b2fb9b8a59034bafef32197451e77, type: 3}
+  - canonicalName: minecraft:sea_lantern
+    prefab: {fileID: 2965914938878315409, guid: c536f8c377d4ebb4398a106423d59380, type: 3}
+  - canonicalName: minecraft:shroomlight
+    prefab: {fileID: 7554359158538916241, guid: 2ac29fb1413772b4cb33202a309c6521, type: 3}
+  - canonicalName: minecraft:smithing_table
+    prefab: {fileID: 8286572836530821829, guid: 18215078603fe6e49834c52d3faa66dc, type: 3}
+  - canonicalName: minecraft:smoker
+    prefab: {fileID: 5117248896487655489, guid: d6d7b2717bfbbf14fa5b6807670e9fbd, type: 3}
+  - canonicalName: minecraft:smooth_basalt
+    prefab: {fileID: 6997355222948917212, guid: 4949f39d033149a46b98f4cdf7c6510f, type: 3}
+  - canonicalName: minecraft:smooth_quartz
+    prefab: {fileID: 6185313463971029751, guid: 9515d216a97ce1e44b07fe87da58bfdd, type: 3}
+  - canonicalName: minecraft:smooth_red_sandstone
+    prefab: {fileID: 5638851989259803828, guid: f916ff6a2d567f14d9ab6786e68c884c, type: 3}
+  - canonicalName: minecraft:smooth_sandstone
+    prefab: {fileID: 557005477195894212, guid: 6b1c26d9988ff4f478d3378d4845cef8, type: 3}
+  - canonicalName: minecraft:smooth_stone
+    prefab: {fileID: 8585320481836102415, guid: e2d6869ea57ef9f49a30ba1bcac8f8a8, type: 3}
+  - canonicalName: minecraft:snow_block
+    prefab: {fileID: 6819421391747250033, guid: bbc46089f778ae14eb2bf54ad08c0839, type: 3}
+  - canonicalName: minecraft:soul_sand
+    prefab: {fileID: 3178048540290557716, guid: 0213c89bfab818145b3072df4b89ec45, type: 3}
+  - canonicalName: minecraft:soul_soil
+    prefab: {fileID: 7407909627997420550, guid: aec4e162652f45e4d872e4fb3f31273d, type: 3}
+  - canonicalName: minecraft:sponge
+    prefab: {fileID: 4070861554230264451, guid: 43b6925f6f9b44246b65ccf4f66069f6, type: 3}
+  - canonicalName: minecraft:spruce_leaves
+    prefab: {fileID: 4806059337911103162, guid: 2ac58e5bc6d9b0043a7fa4b67090e56a, type: 3}
+  - canonicalName: minecraft:spruce_log
+    prefab: {fileID: 7266632452963716491, guid: d3c187e3972600b48b9d1de13072cb4f, type: 3}
+  - canonicalName: minecraft:spruce_planks
+    prefab: {fileID: 3841713011565591854, guid: 05cc84bc28722bb44adcd5d6d66661c6, type: 3}
+  - canonicalName: minecraft:spruce_wood
+    prefab: {fileID: 6845195310950045370, guid: cab89893b8cb55f4e83168f778f77b0d, type: 3}
+  - canonicalName: minecraft:stone
+    prefab: {fileID: 8521225069164984246, guid: 3a1345f7b2061cc4fb1d75843f44b353, type: 3}
+  - canonicalName: minecraft:stone_bricks
+    prefab: {fileID: 3975281181257203003, guid: a33889d3c77fc6148a6d5828df0dcfc3, type: 3}
+  - canonicalName: minecraft:stripped_acacia_log
+    prefab: {fileID: 6007274568663923542, guid: fcf0a164d06cccf4194e0251f4154482, type: 3}
+  - canonicalName: minecraft:stripped_acacia_wood
+    prefab: {fileID: 400966907722821138, guid: a6e87ceff3a4ab144bc3229eec15e24e, type: 3}
+  - canonicalName: minecraft:stripped_bamboo_block
+    prefab: {fileID: 1183937652326235079, guid: 7b790f0c52511ac4a9dc8143cd4196cc, type: 3}
+  - canonicalName: minecraft:stripped_birch_log
+    prefab: {fileID: 5184615065237234505, guid: c515d99b42458394c9324cd3204c0570, type: 3}
+  - canonicalName: minecraft:stripped_birch_wood
+    prefab: {fileID: 5713099644149972469, guid: 694b1352e7f464f4e8f68cbdc5415610, type: 3}
+  - canonicalName: minecraft:stripped_cherry_log
+    prefab: {fileID: 4092712080960531327, guid: 95d7c5722600b024fb9b7a7a08a97a33, type: 3}
+  - canonicalName: minecraft:stripped_cherry_wood
+    prefab: {fileID: 346458902753706389, guid: d2ba03bc51a3be849a3bcd070b92b2f1, type: 3}
+  - canonicalName: minecraft:stripped_crimson_hyphae
+    prefab: {fileID: 6611782094855189395, guid: df5535ef485d19d4aaccbd9050880164, type: 3}
+  - canonicalName: minecraft:stripped_crimson_stem
+    prefab: {fileID: 7709188457196418946, guid: 5dcd9d278fdd6f84595a66d45113199d, type: 3}
+  - canonicalName: minecraft:stripped_dark_oak_log
+    prefab: {fileID: 7950239144426516621, guid: f3a466bade851554baa6e50e4c549343, type: 3}
+  - canonicalName: minecraft:stripped_dark_oak_wood
+    prefab: {fileID: 2201903618922209082, guid: ae222e86b9df6824caa7d90c2e9bf248, type: 3}
+  - canonicalName: minecraft:stripped_jungle_log
+    prefab: {fileID: 437505792092618071, guid: 8776a42218e9be34c94c819d0c05111b, type: 3}
+  - canonicalName: minecraft:stripped_jungle_wood
+    prefab: {fileID: 3460073298221190841, guid: d42e65d41ea902f4fb279f5a84095f9d, type: 3}
+  - canonicalName: minecraft:stripped_mangrove_log
+    prefab: {fileID: 307463127694362839, guid: 6e66cd9c7abfba145920dad39e8cb4be, type: 3}
+  - canonicalName: minecraft:stripped_mangrove_wood
+    prefab: {fileID: 1388086330381735664, guid: 527e28af6e1c75e4ab1bfbc123485f95, type: 3}
+  - canonicalName: minecraft:stripped_oak_log
+    prefab: {fileID: 3850884788324970004, guid: 86f4ccd9a8aa59a4daefc07732f32252, type: 3}
+  - canonicalName: minecraft:stripped_oak_wood
+    prefab: {fileID: 6258390944607065266, guid: 659464e6d93914647bab807cea013a29, type: 3}
+  - canonicalName: minecraft:stripped_pale_oak_log
+    prefab: {fileID: 5176373766460520663, guid: 7cd7f25cf86109d499da432dd23866f6, type: 3}
+  - canonicalName: minecraft:stripped_pale_oak_wood
+    prefab: {fileID: 7869072157076552838, guid: 33cd7414905d8884bbd81e5111315511, type: 3}
+  - canonicalName: minecraft:stripped_poplar_log
+    prefab: {fileID: 6273867720999181226, guid: 49c58b2ce112db94fa9d8c2b8df62293, type: 3}
+  - canonicalName: minecraft:stripped_poplar_wood
+    prefab: {fileID: 1360175223389466305, guid: 40c974fa260dfb64d8ab97fd82c35154, type: 3}
+  - canonicalName: minecraft:stripped_spruce_log
+    prefab: {fileID: 804055926349241626, guid: 827300fc1638cc84c863c75d83830e8b, type: 3}
+  - canonicalName: minecraft:stripped_spruce_wood
+    prefab: {fileID: 1755000801903965937, guid: 450b76a4a3a7334459235734d3a89122, type: 3}
+  - canonicalName: minecraft:stripped_warped_hyphae
+    prefab: {fileID: 5122395481273592347, guid: 740cac724dd3f6344aea6d125225dfba, type: 3}
+  - canonicalName: minecraft:stripped_warped_stem
+    prefab: {fileID: 2858697268026107276, guid: 1b3a4e5d7f606c44487b5b8f7bb98466, type: 3}
+  - canonicalName: minecraft:structure_block
+    prefab: {fileID: 7966682731366286850, guid: 6a9d85f689c39ab49af944e39cb25386, type: 3}
+  - canonicalName: minecraft:sulfur
+    prefab: {fileID: 6093360630098706160, guid: a7089e5e77b9ab2449a3c63e1e3ee17e, type: 3}
+  - canonicalName: minecraft:sulfur_bricks
+    prefab: {fileID: 9008726224104983451, guid: cbfb28195f20bb744a4cc950c8e9a4a7, type: 3}
+  - canonicalName: minecraft:suspicious_gravel
+    prefab: {fileID: 5029447355299385862, guid: 83cd3003aed9af74c8a6b17995188d59, type: 3}
+  - canonicalName: minecraft:suspicious_sand
+    prefab: {fileID: 2213695793060094985, guid: 5f21acc8fb8577141a8be0d6a61b8196, type: 3}
+  - canonicalName: minecraft:target
+    prefab: {fileID: 5549344639098499996, guid: 3dfab109a0d31bf4caf5d8c6fe90cd57, type: 3}
+  - canonicalName: minecraft:terracotta
+    prefab: {fileID: 8464160911142508326, guid: ca57a4dc6bcba0347b23c97e8f218451, type: 3}
+  - canonicalName: minecraft:test_block
+    prefab: {fileID: 5094325124008577504, guid: 79760f5b5846e7742b0256d2bff38fcf, type: 3}
+  - canonicalName: minecraft:test_instance_block
+    prefab: {fileID: 286657755827204888, guid: 1fbe6d541e1dc3540b562b0d517e6fd4, type: 3}
+  - canonicalName: minecraft:tinted_glass
+    prefab: {fileID: 6900124147937495323, guid: 71fc3ea61c3fd0d459392cc8c5b51bab, type: 3}
+  - canonicalName: minecraft:tnt
+    prefab: {fileID: 4922950981574596680, guid: 72548931113188a49b07b1071f32691c, type: 3}
+  - canonicalName: minecraft:tube_coral_block
+    prefab: {fileID: 6652339354284147943, guid: a4ccffc952284d54481136fdf3a0dca8, type: 3}
+  - canonicalName: minecraft:tuff
+    prefab: {fileID: 3161989646108095969, guid: e9a02d11bb1edfe4ba5e679a17e206bb, type: 3}
+  - canonicalName: minecraft:tuff_bricks
+    prefab: {fileID: 1475009642015701699, guid: 85f272ee45778214aa3f4fa8e91444ad, type: 3}
+  - canonicalName: minecraft:verdant_froglight
+    prefab: {fileID: 5716816365192895101, guid: b511b3aa0612fe94fb3d51e79e2a13c9, type: 3}
+  - canonicalName: minecraft:warped_hyphae
+    prefab: {fileID: 8428435152242028058, guid: 7214b67e4f761af4db5a24349fe16bba, type: 3}
+  - canonicalName: minecraft:warped_nylium
+    prefab: {fileID: 4297997852987462912, guid: 127f3e12f83fc3648b7160287b929563, type: 3}
+  - canonicalName: minecraft:warped_planks
+    prefab: {fileID: 4208855184288019990, guid: d3d371bd09aa6d7488f2780a056ac6b2, type: 3}
+  - canonicalName: minecraft:warped_stem
+    prefab: {fileID: 1922423057796443268, guid: 6775d37d760277d4087192a228a1d350, type: 3}
+  - canonicalName: minecraft:warped_wart_block
+    prefab: {fileID: 839373971773489453, guid: a4da2813a0132ab44b14a1e2d609bba4, type: 3}
+  - canonicalName: minecraft:waxed_chiseled_copper
+    prefab: {fileID: 8006098880648284856, guid: dc521ea8d65381e499163fc69b73bd6b, type: 3}
+  - canonicalName: minecraft:waxed_copper_block
+    prefab: {fileID: 1882447216890674363, guid: b9ca5c721d242d44c9ac715fe8e9cb8a, type: 3}
+  - canonicalName: minecraft:waxed_copper_bulb
+    prefab: {fileID: 6329035225062095384, guid: 88b8d36d7dbfc1f418a25eeb344dac66, type: 3}
+  - canonicalName: minecraft:waxed_copper_grate
+    prefab: {fileID: 6711674700214142512, guid: cd4ee110f24a7394b94310c45bca41d5, type: 3}
+  - canonicalName: minecraft:waxed_cut_copper
+    prefab: {fileID: 7621456781173607910, guid: 09eaf2298c551b545b2388ffb6fb6124, type: 3}
+  - canonicalName: minecraft:waxed_exposed_chiseled_copper
+    prefab: {fileID: 5369825586601312425, guid: 8b7273a5db10b674ba7e16de37d2cd30, type: 3}
+  - canonicalName: minecraft:waxed_exposed_copper
+    prefab: {fileID: 1591695952008516970, guid: 4e233405c164f8342898ff1972eba015, type: 3}
+  - canonicalName: minecraft:waxed_exposed_copper_bulb
+    prefab: {fileID: 8868031502687487240, guid: 3b48d2807c45fa34b8a2446dcc29fb6d, type: 3}
+  - canonicalName: minecraft:waxed_exposed_copper_grate
+    prefab: {fileID: 7479295082441825640, guid: ec8cb88f70a870e4d83dbbbf69bfd19f, type: 3}
+  - canonicalName: minecraft:waxed_exposed_cut_copper
+    prefab: {fileID: 3624825897383802608, guid: f9f6d60a832fb154daf2583d0d292b14, type: 3}
+  - canonicalName: minecraft:waxed_oxidized_chiseled_copper
+    prefab: {fileID: 5109821726405088564, guid: aecbe4357ad66b648a330b8994ec2f7c, type: 3}
+  - canonicalName: minecraft:waxed_oxidized_copper
+    prefab: {fileID: 5826745738760412232, guid: aa0f606b555e06044981ab5d019f4f1b, type: 3}
+  - canonicalName: minecraft:waxed_oxidized_copper_bulb
+    prefab: {fileID: 4238104341858150343, guid: 746d4198ecec3644eb817db6623dcccc, type: 3}
+  - canonicalName: minecraft:waxed_oxidized_copper_grate
+    prefab: {fileID: 3637539120598356713, guid: 5d2121c5c299b6942ab4e7819cef0a73, type: 3}
+  - canonicalName: minecraft:waxed_oxidized_cut_copper
+    prefab: {fileID: 3742029836495870176, guid: 6720fb90c15ab6846bfda9f2e0d490ed, type: 3}
+  - canonicalName: minecraft:waxed_weathered_chiseled_copper
+    prefab: {fileID: 3097850542800018617, guid: c5bb43c3dd0185c4794363846e113827, type: 3}
+  - canonicalName: minecraft:waxed_weathered_copper
+    prefab: {fileID: 8017051137991406911, guid: 3497b446f17ff9249a3ed5903fdcdc0d, type: 3}
+  - canonicalName: minecraft:waxed_weathered_copper_bulb
+    prefab: {fileID: 6005699280804580616, guid: 5337044bd85cb6f4b8f0f0a7a0e8cb4d, type: 3}
+  - canonicalName: minecraft:waxed_weathered_copper_grate
+    prefab: {fileID: 404418759195790777, guid: 3bd48cf11a483b9428e6125b31b3e35b, type: 3}
+  - canonicalName: minecraft:waxed_weathered_cut_copper
+    prefab: {fileID: 7512258533448602542, guid: a7fd744f22ab93d46bbbfe1053137c77, type: 3}
+  - canonicalName: minecraft:weathered_chiseled_copper
+    prefab: {fileID: 563730278669423027, guid: b18ddb08856a47f4db7c0004e2131def, type: 3}
+  - canonicalName: minecraft:weathered_copper
+    prefab: {fileID: 893065079910784503, guid: 94716da00b67f22459ebd674576e2944, type: 3}
+  - canonicalName: minecraft:weathered_copper_bulb
+    prefab: {fileID: 2485824608307846030, guid: 141bba6c36910534fa82ea685991be09, type: 3}
+  - canonicalName: minecraft:weathered_copper_grate
+    prefab: {fileID: 1764263171250101419, guid: d5cf8cbfb38d90045bf54114b6d4f637, type: 3}
+  - canonicalName: minecraft:weathered_cut_copper
+    prefab: {fileID: 9183637651863829991, guid: 692b1ea0074f29742a1ada6ff18eadf9, type: 3}
+  - canonicalName: minecraft:wet_sponge
+    prefab: {fileID: 7853696811744261679, guid: 0894a3fa04286b14d9efd2aedef5120e, type: 3}
+  - canonicalName: minecraft:white_concrete
+    prefab: {fileID: 7158134832658163491, guid: ff7b0c1b607ac5e4e96e99b581165725, type: 3}
+  - canonicalName: minecraft:white_concrete_powder
+    prefab: {fileID: 8109902194785048107, guid: 622c129045cff0f4fafdf96abeff4e88, type: 3}
+  - canonicalName: minecraft:white_stained_glass
+    prefab: {fileID: 6998347193664280983, guid: 0dddb558d90f3e04aa247a78b2e1e5ab, type: 3}
+  - canonicalName: minecraft:white_terracotta
+    prefab: {fileID: 4872230529073807825, guid: 1fe25d13cf34132418943f083670909f, type: 3}
+  - canonicalName: minecraft:white_wool
+    prefab: {fileID: 160762258460620708, guid: 4165bf299a2223d458b303fba0d66bdd, type: 3}
+  - canonicalName: minecraft:yellow_concrete
+    prefab: {fileID: 3142923836193837329, guid: fe371f5e8e7116f4db1d0c15aa1141b1, type: 3}
+  - canonicalName: minecraft:yellow_concrete_powder
+    prefab: {fileID: 7920224407445387964, guid: 03b6ecf11aee1454ebba07d98ca82143, type: 3}
+  - canonicalName: minecraft:yellow_poplar_leaves
+    prefab: {fileID: 4248625277380833049, guid: 6b78bd0520bb2684ea5a2ad99e8ce93e, type: 3}
+  - canonicalName: minecraft:yellow_stained_glass
+    prefab: {fileID: 7037062958406750985, guid: 998da105a22fee14e98b551719cef957, type: 3}
+  - canonicalName: minecraft:yellow_terracotta
+    prefab: {fileID: 230959243695975557, guid: d3b91183618dc6b48aa3965966417b9e, type: 3}
+  - canonicalName: minecraft:yellow_wool
+    prefab: {fileID: 9255391210370779, guid: 4ab6dc8b7e8f9a64ebbee41b40fb97ae, type: 3}

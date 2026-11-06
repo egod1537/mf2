@@ -23,12 +23,9 @@ namespace MF2.Minecraft.Editor
 
         private const string RootFolder = "Assets/Minecraft";
         private const string TextureFolder = RootFolder + "/Textures/Block";
-        private const string ModelFolder = RootFolder + "/Models";
-        private const string BlockMeshFolder = ModelFolder + "/Blocks";
         private const string MaterialFolder = RootFolder + "/Materials";
         private const string AtlasFolder = RootFolder + "/Atlas";
-        private const string PrefabFolder = RootFolder + "/Prefabs/Blocks";
-        private const string CubeMeshPath = ModelFolder + "/MinecraftCube.asset";
+        private const string BlockEntityFolder = "Assets/Entities/Blocks";
         private const string AtlasTexturePath = AtlasFolder + "/minecraft_blocks_atlas.png";
         private const string AtlasMaterialPath = MaterialFolder + "/MinecraftBlockAtlas.mat";
 
@@ -61,6 +58,7 @@ namespace MF2.Minecraft.Editor
             public int atlasEntries;
             public int atlasSize;
             public int blockMeshes;
+            public int blockTextureCopies;
             public int legacyMaterialsDeleted;
             public int prefabsCreated;
             public int prefabsUpdated;
@@ -135,6 +133,23 @@ namespace MF2.Minecraft.Editor
                 $"{result.skippedMissingTextures} missing-texture blockstates skipped.");
         }
 
+        [MenuItem("Tools/Minecraft/Sync Block Entity Source Textures")]
+        public static int SyncBlockEntitySourceTextures()
+        {
+            var source = ReadSource();
+            EnsureFolder(BlockEntityFolder);
+            foreach (var definition in source.Definitions)
+                EnsureFolder(BlockAssetFolder(definition.Name));
+
+            var copied = SyncBlockEntitySourceTextures(source.Definitions);
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+            Debug.Log(
+                $"Synchronized {copied} Minecraft source texture copies across " +
+                $"{source.Definitions.Count} block entity folders.");
+            return copied;
+        }
+
         public static GenerationResult Analyze()
         {
             var source = ReadSource();
@@ -145,11 +160,12 @@ namespace MF2.Minecraft.Editor
         {
             var source = ReadSource();
 
-            EnsureFolder(ModelFolder);
-            EnsureFolder(BlockMeshFolder);
             EnsureFolder(MaterialFolder);
             EnsureFolder(AtlasFolder);
-            EnsureFolder(PrefabFolder);
+            EnsureFolder(BlockEntityFolder);
+            foreach (var definition in source.Definitions)
+                EnsureFolder(BlockAssetFolder(definition.Name));
+            var blockTextureCopies = SyncBlockEntitySourceTextures(source.Definitions);
 
             var atlas = CreateAtlas(source.Definitions);
             var atlasMaterial = CreateOrUpdateAtlasMaterial(atlas.Texture);
@@ -162,10 +178,11 @@ namespace MF2.Minecraft.Editor
             {
                 foreach (var definition in source.Definitions)
                 {
-                    var blockMesh = CreateOrUpdateBlockMesh(definition, atlas.Rects);
+                    var blockFolder = BlockAssetFolder(definition.Name);
+                    var blockMesh = CreateOrUpdateBlockMesh(definition, atlas.Rects, blockFolder);
                     generatedMeshes.Add(blockMesh);
 
-                    var prefabPath = PrefabFolder + "/" +
+                    var prefabPath = blockFolder + "/" +
                                      SanitizeFileName(definition.Name) + ".prefab";
                     var existed = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath) != null;
 
@@ -212,11 +229,8 @@ namespace MF2.Minecraft.Editor
                 AssetDatabase.SaveAssetIfDirty(mesh);
             AssetDatabase.SaveAssetIfDirty(atlasMaterial);
 
-            // The atlas migration supersedes the per-texture materials and the old six-submesh
-            // cube. Delete only assets produced by earlier versions of this generator.
+            // The atlas migration supersedes the per-texture materials.
             var legacyMaterialsDeleted = DeleteLegacyGeneratedMaterials();
-            if (AssetDatabase.LoadAssetAtPath<Mesh>(CubeMeshPath) != null)
-                AssetDatabase.DeleteAsset(CubeMeshPath);
 
             AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
 
@@ -225,6 +239,7 @@ namespace MF2.Minecraft.Editor
             result.atlasEntries = atlas.EntryCount;
             result.atlasSize = atlas.Size;
             result.blockMeshes = generatedMeshes.Count;
+            result.blockTextureCopies = blockTextureCopies;
             result.legacyMaterialsDeleted = legacyMaterialsDeleted;
             result.prefabsCreated = prefabsCreated;
             result.prefabsUpdated = prefabsUpdated;
@@ -556,6 +571,75 @@ namespace MF2.Minecraft.Editor
             return TextureFolder + "/" + textureId.Substring(prefix.Length) + ".png";
         }
 
+        private static int SyncBlockEntitySourceTextures(IList<BlockDefinition> definitions)
+        {
+            var copies = 0;
+            foreach (var definition in definitions)
+            {
+                var blockFolder = BlockAssetFolder(definition.Name);
+                var destinations = new Dictionary<string, string>(StringComparer.Ordinal);
+                foreach (var textureId in definition.FaceTextureIds.Distinct(StringComparer.Ordinal))
+                {
+                    var sourcePath = TextureAssetPath(textureId);
+                    if (string.IsNullOrEmpty(sourcePath) ||
+                        !File.Exists(ToAbsoluteProjectPath(sourcePath)))
+                    {
+                        throw new FileNotFoundException(
+                            "Minecraft source texture is missing.", sourcePath);
+                    }
+
+                    var destinationPath = blockFolder + "/" + TextureCopyFileName(textureId);
+                    if (destinations.TryGetValue(destinationPath, out var existingTextureId) &&
+                        !string.Equals(existingTextureId, textureId, StringComparison.Ordinal))
+                    {
+                        throw new InvalidOperationException(
+                            $"Texture copy name collision in '{blockFolder}': " +
+                            $"'{existingTextureId}' and '{textureId}'.");
+                    }
+
+                    destinations[destinationPath] = textureId;
+                    CopyAssetContents(sourcePath, destinationPath);
+
+                    var sourceMetadataPath = sourcePath + ".mcmeta";
+                    if (File.Exists(ToAbsoluteProjectPath(sourceMetadataPath)))
+                        CopyAssetContents(sourceMetadataPath, destinationPath + ".mcmeta");
+                    copies++;
+                }
+            }
+
+            return copies;
+        }
+
+        private static void CopyAssetContents(string sourcePath, string destinationPath)
+        {
+            if (string.IsNullOrEmpty(AssetDatabase.AssetPathToGUID(destinationPath)))
+            {
+                if (!AssetDatabase.CopyAsset(sourcePath, destinationPath))
+                {
+                    throw new InvalidOperationException(
+                        $"Failed to copy Minecraft source asset '{sourcePath}' to " +
+                        $"'{destinationPath}'.");
+                }
+                return;
+            }
+
+            File.Copy(
+                ToAbsoluteProjectPath(sourcePath),
+                ToAbsoluteProjectPath(destinationPath),
+                true);
+            AssetDatabase.ImportAsset(destinationPath, ImportAssetOptions.ForceUpdate);
+        }
+
+        private static string TextureCopyFileName(string textureId)
+        {
+            const string prefix = "minecraft:block/";
+            if (!textureId.StartsWith(prefix, StringComparison.Ordinal))
+                throw new ArgumentException("Unsupported Minecraft block texture ID: " + textureId);
+
+            var relativeName = textureId.Substring(prefix.Length).Replace("/", "__");
+            return SanitizeFileName(relativeName) + ".png";
+        }
+
         private static AtlasBuild CreateAtlas(IList<BlockDefinition> definitions)
         {
             var sources = new Dictionary<string, AtlasSource>(StringComparer.Ordinal);
@@ -743,9 +827,10 @@ namespace MF2.Minecraft.Editor
 
         private static Mesh CreateOrUpdateBlockMesh(
             BlockDefinition definition,
-            IDictionary<string, Rect> atlasRects)
+            IDictionary<string, Rect> atlasRects,
+            string blockFolder)
         {
-            var meshPath = BlockMeshFolder + "/" + SanitizeFileName(definition.Name) + ".asset";
+            var meshPath = blockFolder + "/" + SanitizeFileName(definition.Name) + ".asset";
             var mesh = AssetDatabase.LoadAssetAtPath<Mesh>(meshPath);
             var isNew = mesh == null;
             if (isNew)
@@ -972,82 +1057,13 @@ namespace MF2.Minecraft.Editor
                 material.SetFloat(property, value);
         }
 
-        private static Mesh CreateOrUpdateCubeMesh()
-        {
-            var mesh = AssetDatabase.LoadAssetAtPath<Mesh>(CubeMeshPath);
-            var isNew = mesh == null;
-            if (isNew)
-                mesh = new Mesh { name = "MinecraftCube" };
-            else
-                mesh.Clear();
-
-            const float half = 0.5f;
-            mesh.vertices = new[]
-            {
-                // North (-Z)
-                new Vector3(-half, -half, -half), new Vector3(-half, half, -half),
-                new Vector3(half, half, -half), new Vector3(half, -half, -half),
-                // South (+Z)
-                new Vector3(half, -half, half), new Vector3(half, half, half),
-                new Vector3(-half, half, half), new Vector3(-half, -half, half),
-                // East (+X)
-                new Vector3(half, -half, -half), new Vector3(half, half, -half),
-                new Vector3(half, half, half), new Vector3(half, -half, half),
-                // West (-X)
-                new Vector3(-half, -half, half), new Vector3(-half, half, half),
-                new Vector3(-half, half, -half), new Vector3(-half, -half, -half),
-                // Up (+Y)
-                new Vector3(-half, half, -half), new Vector3(-half, half, half),
-                new Vector3(half, half, half), new Vector3(half, half, -half),
-                // Down (-Y)
-                new Vector3(-half, -half, half), new Vector3(-half, -half, -half),
-                new Vector3(half, -half, -half), new Vector3(half, -half, half)
-            };
-
-            mesh.normals = FaceNames.SelectMany((face, index) =>
-            {
-                var normal = index == 0 ? Vector3.back :
-                    index == 1 ? Vector3.forward :
-                    index == 2 ? Vector3.right :
-                    index == 3 ? Vector3.left :
-                    index == 4 ? Vector3.up : Vector3.down;
-                return new[] { normal, normal, normal, normal };
-            }).ToArray();
-
-            var faceUvs = new[]
-            {
-                new Vector2(0f, 0f), new Vector2(0f, 1f),
-                new Vector2(1f, 1f), new Vector2(1f, 0f)
-            };
-            mesh.uv = Enumerable.Range(0, FaceNames.Length)
-                .SelectMany(_ => faceUvs).ToArray();
-
-            mesh.subMeshCount = FaceNames.Length;
-            for (var face = 0; face < FaceNames.Length; face++)
-            {
-                var first = face * 4;
-                mesh.SetTriangles(new[]
-                {
-                    first, first + 1, first + 2,
-                    first, first + 2, first + 3
-                }, face, false);
-            }
-
-            mesh.RecalculateBounds();
-            if (isNew)
-                AssetDatabase.CreateAsset(mesh, CubeMeshPath);
-            else
-                EditorUtility.SetDirty(mesh);
-            return mesh;
-        }
-
         private static GenerationResult ToResult(SourceData source)
         {
             return new GenerationResult
             {
                 sourceVersion = SourceVersion,
                 sourceJar = source.JarPath,
-                outputFolder = PrefabFolder,
+                outputFolder = BlockEntityFolder,
                 blockstatesRead = source.BlockstateCount,
                 modelsRead = source.ModelCount,
                 cubeBlocksFound = source.Definitions.Count,
@@ -1103,6 +1119,11 @@ namespace MF2.Minecraft.Editor
             var invalid = Path.GetInvalidFileNameChars();
             return new string(name.Select(character =>
                 invalid.Contains(character) ? '_' : character).ToArray());
+        }
+
+        private static string BlockAssetFolder(string blockName)
+        {
+            return BlockEntityFolder + "/" + SanitizeFileName(blockName);
         }
     }
 }

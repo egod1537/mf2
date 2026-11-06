@@ -17,7 +17,7 @@ namespace MF2.EditorTools
         private const string MaterialRoot = DemoRoot + "/Materials";
         private const string ScenePath = "Assets/Scenes/ProPixelizerDemo.unity";
         private const string TemplateMaterialPath =
-            "Assets/ProPixelizer/ExampleAssets/Edges and Outlines/Test_Outline.mat";
+            "Assets/External/ProPixelizer/ExampleAssets/Edges and Outlines/Test_Outline.mat";
 
         private static byte nextOutlineId;
 
