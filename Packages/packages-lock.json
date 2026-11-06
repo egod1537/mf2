@@ -270,6 +270,22 @@
       },
       "url": "https://packages.unity.com"
     },
+    "com.veriorpies.parrelsync": {
+      "version": "https://github.com/VeriorPies/ParrelSync.git?path=/ParrelSync",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "a122dc90cbe2d4cc2669ddad00b12b3917ef934b"
+    },
+    "dev.tnayuki.unterm": {
+      "version": "https://github.com/tnayuki/Unity-Unterm.git#upm/v0.6.0",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.unity.nuget.newtonsoft-json": "3.2.1"
+      },
+      "hash": "3d35648c564dafab2a8df9df02cc424d321446e8"
+    },
     "jp.hadashikick.vcontainer": {
       "version": "https://github.com/hadashiA/VContainer.git?path=VContainer/Assets/VContainer#1.19.0",
       "depth": 0,

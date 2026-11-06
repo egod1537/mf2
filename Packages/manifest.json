@@ -16,6 +16,8 @@
     "com.unity.timeline": "1.8.13",
     "com.unity.ugui": "2.0.0",
     "com.unity.visualscripting": "1.9.12",
+    "com.veriorpies.parrelsync": "https://github.com/VeriorPies/ParrelSync.git?path=/ParrelSync",
+    "dev.tnayuki.unterm": "https://github.com/tnayuki/Unity-Unterm.git#upm/v0.6.0",
     "jp.hadashikick.vcontainer": "https://github.com/hadashiA/VContainer.git?path=VContainer/Assets/VContainer#1.19.0",
     "com.unity.modules.accessibility": "1.0.0",
     "com.unity.modules.adaptiveperformance": "1.0.0",
