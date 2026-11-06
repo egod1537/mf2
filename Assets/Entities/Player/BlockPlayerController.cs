@@ -73,7 +73,6 @@ namespace MF2.Entities.Player
         private Vector2 moveInput;
         private bool sprintInput;
         private bool jumpQueued;
-        private bool offlineControl;
         private float stepCycle;
 
         public bool IsGrounded { get; private set; }
@@ -105,20 +104,8 @@ namespace MF2.Entities.Player
             SetOwnerPresentation(false);
         }
 
-        private void Start()
-        {
-            if (IsSpawned)
-                return;
-
-            offlineControl = true;
-            if (FindActiveSceneCamera() == null)
-                SetOwnerPresentation(true);
-        }
-
         public override void OnStartNetwork()
         {
-            offlineControl = false;
-            SetOwnerPresentation(false);
             SetTickCallbacks(TickCallback.Tick | TickCallback.PostTick);
         }
 
@@ -144,19 +131,11 @@ namespace MF2.Entities.Player
 
         private void Update()
         {
-            if (offlineControl || IsOwner)
+            if (IsOwner)
                 ReadInput();
 
             var horizontal = new Vector3(body.linearVelocity.x, 0f, body.linearVelocity.z).magnitude;
             AnimateRig(Mathf.Clamp01(horizontal / Mathf.Max(0.01f, sprintSpeed)));
-        }
-
-        private void FixedUpdate()
-        {
-            if (!offlineControl)
-                return;
-
-            ApplyVelocity(BuildLocalMoveData(), false);
         }
 
         protected override void TimeManager_OnTick()
@@ -174,19 +153,13 @@ namespace MF2.Entities.Player
             if (!IsOwner)
                 return default;
 
-            return BuildLocalMoveData();
-        }
-
-        private MoveData BuildLocalMoveData()
-        {
             var local = Vector2.ClampMagnitude(moveInput, 1f);
-            var movementCamera = offlineControl ? FindActiveSceneCamera() : ownerCamera;
-            var forward = movementCamera == null
+            var forward = ownerCamera == null
                 ? Vector3.forward
-                : Vector3.ProjectOnPlane(movementCamera.transform.forward, Vector3.up).normalized;
-            var right = movementCamera == null
+                : Vector3.ProjectOnPlane(ownerCamera.transform.forward, Vector3.up).normalized;
+            var right = ownerCamera == null
                 ? Vector3.right
-                : Vector3.ProjectOnPlane(movementCamera.transform.right, Vector3.up).normalized;
+                : Vector3.ProjectOnPlane(ownerCamera.transform.right, Vector3.up).normalized;
             var world = Vector3.ClampMagnitude(forward * local.y + right * local.x, 1f);
             var data = new MoveData(new Vector2(world.x, world.z), sprintInput, jumpQueued);
             jumpQueued = false;
@@ -196,11 +169,6 @@ namespace MF2.Entities.Player
         [Replicate]
         private void PerformReplicate(MoveData data, ReplicateState state = ReplicateState.Invalid, Channel channel = Channel.Unreliable)
         {
-            ApplyVelocity(data, true);
-        }
-
-        private void ApplyVelocity(MoveData data, bool predicted)
-        {
             IsGrounded = CheckGrounded();
             var speed = data.Sprint ? sprintSpeed : walkSpeed;
             var velocity = body.linearVelocity;
@@ -208,16 +176,8 @@ namespace MF2.Entities.Player
             velocity.z = data.WorldMove.y * speed;
             if (data.Jump && IsGrounded)
                 velocity.y = jumpVelocity;
-
-            if (predicted)
-            {
-                predictionBody.Velocity(velocity);
-                predictionBody.Simulate();
-            }
-            else
-            {
-                body.linearVelocity = velocity;
-            }
+            predictionBody.Velocity(velocity);
+            predictionBody.Simulate();
         }
 
         public override void CreateReconcile()
@@ -282,17 +242,6 @@ namespace MF2.Entities.Player
                 ownerCamera.gameObject.SetActive(active);
             if (ownerAudioListener != null)
                 ownerAudioListener.enabled = active;
-        }
-
-        private Camera FindActiveSceneCamera()
-        {
-            foreach (var sceneCamera in FindObjectsByType<Camera>(FindObjectsInactive.Exclude, FindObjectsSortMode.None))
-            {
-                if (sceneCamera != ownerCamera && sceneCamera.gameObject.scene == gameObject.scene)
-                    return sceneCamera;
-            }
-
-            return ownerCamera != null && ownerCamera.isActiveAndEnabled ? ownerCamera : null;
         }
 
         private void AnimateRig(float moveAmount)
