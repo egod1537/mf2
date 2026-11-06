@@ -1,0 +1,21 @@
+{
+    "name": "MF2.EditorUI.Tests",
+    "rootNamespace": "MF2.EditorUI.Tests",
+    "references": [
+        "MF2.EditorUI"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false,
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ]
+}
