@@ -111,6 +111,12 @@ their GUIDs stay stable. It writes only these derived assets under `Assets/World
 - `ChunkMaterialSet.asset`: fixed Opaque, Cutout, Transparent material order.
 - Three derived materials referencing the same Minecraft atlas.
 
+The Editor-only **Tools > Minecraft > Texture Pack Switcher** is the explicit exception to the
+exporter's read-only atlas behavior: it rebakes the existing atlas in place, then rebuilds this
+derived render manifest. Minecraft Default and the locally downloaded Rodrigo pack share the same
+stable atlas key order and mesh UV layout; Rodrigo textures missing from its 1.16 source fall back
+to the built-in Minecraft 26.3 source. No runtime texture-pack selection is included.
+
 Pass classification reflects the emitted atlas pixels: fully opaque tiles are Opaque, binary
 alpha tiles are Cutout, and tiles containing partial alpha are Transparent. The source generator's
 single cutout material is not treated as a stable block/pass registry.

@@ -1,0 +1,20 @@
+{
+    "name": "MF2.Minecraft.Editor",
+    "rootNamespace": "MF2.Minecraft.Editor",
+    "references": [
+        "MF2.World.Editor",
+        "MF2.World.Runtime",
+        "Unity.Newtonsoft.Json"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

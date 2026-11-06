@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using MF2.World.Core;
+using MF2.World.Editor.Registry;
 using Newtonsoft.Json.Linq;
 using UnityEditor;
 using UnityEngine;
@@ -62,6 +64,9 @@ namespace MF2.Minecraft.Editor
             public int legacyMaterialsDeleted;
             public int prefabsCreated;
             public int prefabsUpdated;
+            public string texturePack;
+            public int texturePackOverrides;
+            public int texturePackFallbacks;
             public string[] sampleBlocks;
         }
 
@@ -112,6 +117,9 @@ namespace MF2.Minecraft.Editor
                 new Dictionary<string, Rect>(StringComparer.Ordinal);
             public int Size;
             public int EntryCount;
+            public MinecraftTexturePackId TexturePackId;
+            public int TexturePackOverrides;
+            public int TexturePackFallbacks;
         }
 
         [MenuItem("Tools/Minecraft/Generate Cube Block Prefabs")]
@@ -120,7 +128,8 @@ namespace MF2.Minecraft.Editor
             var result = GenerateAll();
             Debug.Log(
                 $"Minecraft block generation complete: {result.cubeBlocksFound} cube prefabs, " +
-                $"{result.materialsUsed} materials, source {result.sourceVersion}.");
+                $"{result.materialsUsed} materials, source {result.sourceVersion}, " +
+                $"texture pack {result.texturePack}.");
         }
 
         [MenuItem("Tools/Minecraft/Analyze Cube Block Prefabs")]
@@ -154,6 +163,49 @@ namespace MF2.Minecraft.Editor
         {
             var source = ReadSource();
             return ToResult(source);
+        }
+
+        [MenuItem("Tools/Minecraft/Texture Packs/Apply Minecraft Default")]
+        public static void ApplyMinecraftDefaultTexturePack()
+        {
+            ApplyTexturePack(MinecraftTexturePackId.MinecraftDefault);
+        }
+
+        [MenuItem("Tools/Minecraft/Texture Packs/Apply Rodrigo")]
+        public static void ApplyRodrigoTexturePack()
+        {
+            ApplyTexturePack(MinecraftTexturePackId.Rodrigo);
+        }
+
+        public static GenerationResult ApplyTexturePack(MinecraftTexturePackId packId)
+        {
+            if (!MinecraftTexturePackCatalog.ValidateInstalledPack(packId, out var validation))
+                throw new InvalidOperationException(validation);
+
+            var source = ReadSource();
+            EnsureFolder(MaterialFolder);
+            EnsureFolder(AtlasFolder);
+
+            var atlas = CreateAtlas(source.Definitions, packId);
+            var atlasMaterial = CreateOrUpdateAtlasMaterial(atlas.Texture);
+            AssetDatabase.SaveAssetIfDirty(atlasMaterial);
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+
+            BlockRenderManifestBuilder.RebuildFromRegistryManifest();
+            MinecraftTexturePackCatalog.SetActivePack(packId);
+            RefreshActiveWorldHosts();
+
+            var result = ToResult(source);
+            result.materialsUsed = 1;
+            result.atlasEntries = atlas.EntryCount;
+            result.atlasSize = atlas.Size;
+            SetTexturePackResult(result, atlas);
+            Debug.Log(
+                $"Applied {MinecraftTexturePackCatalog.DisplayName(packId)} to the Minecraft " +
+                $"atlas: {atlas.TexturePackOverrides} overrides and " +
+                $"{atlas.TexturePackFallbacks} default fallbacks.");
+            return result;
         }
 
         public static GenerationResult GenerateAll()
@@ -243,6 +295,7 @@ namespace MF2.Minecraft.Editor
             result.legacyMaterialsDeleted = legacyMaterialsDeleted;
             result.prefabsCreated = prefabsCreated;
             result.prefabsUpdated = prefabsUpdated;
+            SetTexturePackResult(result, atlas);
             return result;
         }
 
@@ -642,6 +695,21 @@ namespace MF2.Minecraft.Editor
 
         private static AtlasBuild CreateAtlas(IList<BlockDefinition> definitions)
         {
+            return CreateAtlas(definitions, MinecraftTexturePackCatalog.ActivePack);
+        }
+
+        private static AtlasBuild CreateAtlas(
+            IList<BlockDefinition> definitions,
+            MinecraftTexturePackId packId)
+        {
+            using (var texturePack = MinecraftTexturePackSource.Open(packId))
+                return CreateAtlas(definitions, texturePack);
+        }
+
+        private static AtlasBuild CreateAtlas(
+            IList<BlockDefinition> definitions,
+            MinecraftTexturePackSource texturePack)
+        {
             var sources = new Dictionary<string, AtlasSource>(StringComparer.Ordinal);
             foreach (var definition in definitions)
             {
@@ -682,7 +750,7 @@ namespace MF2.Minecraft.Editor
             for (var index = 0; index < orderedSources.Count; index++)
             {
                 var source = orderedSources[index];
-                var tilePixels = ReadAtlasTile(source);
+                var tilePixels = ReadAtlasTile(source, texturePack);
                 var cellX = index % cellsPerAxis;
                 var cellY = index / cellsPerAxis;
                 var originX = cellX * AtlasCellSize;
@@ -745,18 +813,27 @@ namespace MF2.Minecraft.Editor
             build.Texture = AssetDatabase.LoadAssetAtPath<Texture2D>(AtlasTexturePath);
             if (build.Texture == null)
                 throw new InvalidOperationException("Minecraft texture atlas did not load after import.");
+            build.TexturePackId = texturePack.PackId;
+            build.TexturePackOverrides = texturePack.OverrideTextureCount;
+            build.TexturePackFallbacks = texturePack.FallbackTextureCount;
             return build;
         }
 
-        private static Color32[] ReadAtlasTile(AtlasSource source)
+        private static Color32[] ReadAtlasTile(
+            AtlasSource source,
+            MinecraftTexturePackSource texturePack)
         {
-            var texturePath = TextureAssetPath(source.TextureId);
-            var absolutePath = ToAbsoluteProjectPath(texturePath);
             var decoded = new Texture2D(2, 2, TextureFormat.RGBA32, false, false);
             try
             {
-                if (!ImageConversion.LoadImage(decoded, File.ReadAllBytes(absolutePath), false))
-                    throw new InvalidDataException("Failed to decode Minecraft texture: " + texturePath);
+                if (!ImageConversion.LoadImage(
+                        decoded,
+                        texturePack.ReadTextureBytes(source.TextureId),
+                        false))
+                {
+                    throw new InvalidDataException(
+                        "Failed to decode Minecraft texture: " + source.TextureId);
+                }
 
                 var sourcePixels = decoded.GetPixels32();
                 var frameSize = Mathf.Min(decoded.width, decoded.height);
@@ -1071,6 +1148,28 @@ namespace MF2.Minecraft.Editor
                 skippedMissingTextures = source.SkippedMissingTextures,
                 sampleBlocks = source.Definitions.Take(20).Select(item => item.Name).ToArray()
             };
+        }
+
+        private static void SetTexturePackResult(GenerationResult result, AtlasBuild atlas)
+        {
+            result.texturePack = MinecraftTexturePackCatalog.DisplayName(atlas.TexturePackId);
+            result.texturePackOverrides = atlas.TexturePackOverrides;
+            result.texturePackFallbacks = atlas.TexturePackFallbacks;
+        }
+
+        private static void RefreshActiveWorldHosts()
+        {
+            var hosts = Resources.FindObjectsOfTypeAll<WorldHost>();
+            for (var i = 0; i < hosts.Length; i++)
+            {
+                var host = hosts[i];
+                if (host == null || EditorUtility.IsPersistent(host) ||
+                    !host.gameObject.scene.IsValid() || !host.isActiveAndEnabled)
+                    continue;
+                host.Reinitialize();
+            }
+
+            SceneView.RepaintAll();
         }
 
         private static void EnsureFolder(string assetPath)

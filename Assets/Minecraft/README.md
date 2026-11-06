@@ -42,3 +42,26 @@ partial transparency is required.
 To rebuild the generated assets in the Unity Editor, use:
 
 `Tools > Minecraft > Generate Cube Block Prefabs`
+
+## Editor texture-pack switcher
+
+Open **Tools > Minecraft > Texture Pack Switcher** to bake either of these
+sources into the existing atlas:
+
+- **Minecraft Default**: the checked-in Minecraft 26.3 block textures.
+- **Rodrigo**: Rodrigo's Pack 1.16 block textures from its official Modrinth
+  download. Textures that do not exist in the older 1.16 pack fall back to the
+  matching Minecraft 26.3 texture.
+
+Switching is Editor-only. It rebuilds the pixels in
+`Atlas/minecraft_blocks_atlas.png`, updates the shared material and derived
+World render manifest, and refreshes active scene world hosts. It does not
+change block IDs, mesh UV layout, prefab GUIDs, or add a runtime pack selector.
+The selected source is stored as a per-user Editor preference.
+
+The Rodrigo ZIP is downloaded to
+`LocalTexturePacks/Rodrigo/RodrigosPack-1.16.zip`, verified against the pinned
+official SHA-512, and excluded from Git. Rodrigo's Pack is marked All Rights
+Reserved by its author; do not commit, redistribute, or package that ZIP
+without permission. Applying it changes the checked-in atlas-derived assets in
+the local working tree, so review those changes before committing.

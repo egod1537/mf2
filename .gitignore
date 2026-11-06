@@ -10,6 +10,9 @@
 /[Ll]ogs/
 /[Uu]ser[Ss]ettings/
 
+# Licensed texture packs downloaded for local Editor-only use.
+/LocalTexturePacks/
+
 # MemoryCaptures can get excessive in size.
 /[Mm]emoryCaptures/
 

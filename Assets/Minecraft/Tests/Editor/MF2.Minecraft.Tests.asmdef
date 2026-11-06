@@ -1,0 +1,21 @@
+{
+    "name": "MF2.Minecraft.Tests",
+    "rootNamespace": "MF2.Minecraft.Tests",
+    "references": [
+        "MF2.Minecraft.Editor"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false,
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ]
+}
