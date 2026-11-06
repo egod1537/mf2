@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 34b05db9acc26ac4b9af4595e25de294
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 177877
+  packageName: ProPixelizer - Realtime 3D Pixel Art
+  packageVersion: 2.0.3
+  assetPath: Assets/ProPixelizer/ShaderGraph/Targets/readme.md
+  uploadId: 1002610

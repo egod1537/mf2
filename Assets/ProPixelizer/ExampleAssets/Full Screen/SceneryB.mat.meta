@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 0ae07cb565de4554cbe2702cccab112e
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 177877
+  packageName: ProPixelizer - Realtime 3D Pixel Art
+  packageVersion: 2.0.3
+  assetPath: Assets/ProPixelizer/ExampleAssets/Full Screen/SceneryB.mat
+  uploadId: 1002610

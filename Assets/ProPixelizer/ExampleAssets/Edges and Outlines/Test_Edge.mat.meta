@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: f1591f99867dc964492015d44fd97adc
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 177877
+  packageName: ProPixelizer - Realtime 3D Pixel Art
+  packageVersion: 2.0.3
+  assetPath: Assets/ProPixelizer/ExampleAssets/Edges and Outlines/Test_Edge.mat
+  uploadId: 1002610

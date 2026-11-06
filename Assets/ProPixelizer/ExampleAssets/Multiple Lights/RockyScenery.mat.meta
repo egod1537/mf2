@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 357e6dbf243cdb543863fa98762570aa
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 177877
+  packageName: ProPixelizer - Realtime 3D Pixel Art
+  packageVersion: 2.0.3
+  assetPath: Assets/ProPixelizer/ExampleAssets/Multiple Lights/RockyScenery.mat
+  uploadId: 1002610

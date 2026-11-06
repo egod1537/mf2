@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 4ee4fbc6a14720c4d9e9b0515fe2335a
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 177877
+  packageName: ProPixelizer - Realtime 3D Pixel Art
+  packageVersion: 2.0.3
+  assetPath: Assets/ProPixelizer/Tools/Migration/ProPixelizer2_0b1MaterialUpdater.cs
+  uploadId: 1002610

@@ -1,0 +1,9 @@
+fileFormatVersion: 2
+guid: 7b8ed6f1f11a2654a91b1e78645353fa
+AssetOrigin:
+  serializedVersion: 1
+  productId: 177877
+  packageName: ProPixelizer - Realtime 3D Pixel Art
+  packageVersion: 2.0.3
+  assetPath: Assets/ProPixelizer/SRP/Passes/ProPixelizerExportSubcameraColorPass.cs
+  uploadId: 1002610

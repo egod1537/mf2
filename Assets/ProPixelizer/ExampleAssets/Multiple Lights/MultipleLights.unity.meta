@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 2864f7ed998c22e4ca0978a5662519dc
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 177877
+  packageName: ProPixelizer - Realtime 3D Pixel Art
+  packageVersion: 2.0.3
+  assetPath: Assets/ProPixelizer/ExampleAssets/Multiple Lights/MultipleLights.unity
+  uploadId: 1002610

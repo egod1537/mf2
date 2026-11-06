@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: bb33a38fc33287344955ab4ce518f350
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 177877
+  packageName: ProPixelizer - Realtime 3D Pixel Art
+  packageVersion: 2.0.3
+  assetPath: Assets/ProPixelizer/ExampleAssets/DBuffer Decals/Decals.unity
+  uploadId: 1002610

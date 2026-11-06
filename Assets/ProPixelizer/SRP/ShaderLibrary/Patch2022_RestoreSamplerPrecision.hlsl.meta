@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 66974cf1b7da4bc2827a1f5b33d5d128
+ShaderImporter:
+  externalObjects: {}
+  defaultTextures: []
+  nonModifiableTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 177877
+  packageName: ProPixelizer - Realtime 3D Pixel Art
+  packageVersion: 2.0.3
+  assetPath: Assets/ProPixelizer/SRP/ShaderLibrary/Patch2022_RestoreSamplerPrecision.hlsl
+  uploadId: 1002610

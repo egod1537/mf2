@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 14fe1d15dcc6c7445912176e93aabb61
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 177877
+  packageName: ProPixelizer - Realtime 3D Pixel Art
+  packageVersion: 2.0.3
+  assetPath: Assets/ProPixelizer/ExampleAssets/ShaderGraph/CustomShaderGraphExamples.unity
+  uploadId: 1002610

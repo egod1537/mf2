@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 6d676c29bfdd4d48bb6db8052581e15c
+ShaderIncludeImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 177877
+  packageName: ProPixelizer - Realtime 3D Pixel Art
+  packageVersion: 2.0.3
+  assetPath: Assets/ProPixelizer/ShaderGraph/Includes/ProPixelizerSurfaceDescriptionPre.hlsl
+  uploadId: 1002610

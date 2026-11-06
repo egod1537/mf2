@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 36a72e286c6f6c4438a8c2df5f63e093
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 177877
+  packageName: ProPixelizer - Realtime 3D Pixel Art
+  packageVersion: 2.0.3
+  assetPath: Assets/ProPixelizer/SRP/Passes/ProPixelizerOutlineDetectionPass.cs
+  uploadId: 1002610

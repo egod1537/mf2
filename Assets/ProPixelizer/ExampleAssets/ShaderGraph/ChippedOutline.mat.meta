@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: b1b0b29414485514ab2569afd427e9de
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 177877
+  packageName: ProPixelizer - Realtime 3D Pixel Art
+  packageVersion: 2.0.3
+  assetPath: Assets/ProPixelizer/ExampleAssets/ShaderGraph/ChippedOutline.mat
+  uploadId: 1002610

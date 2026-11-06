@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 3eb5a2557fcc9ef46a6060947582b11e
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 177877
+  packageName: ProPixelizer - Realtime 3D Pixel Art
+  packageVersion: 2.0.3
+  assetPath: Assets/ProPixelizer/ShaderGraph/Targets/ProPixelizerShaderGraphGUI.cs
+  uploadId: 1002610

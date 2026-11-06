@@ -1,0 +1,9 @@
+fileFormatVersion: 2
+guid: 5b67bb359a0f07e4eb162147a0da45d5
+AssetOrigin:
+  serializedVersion: 1
+  productId: 177877
+  packageName: ProPixelizer - Realtime 3D Pixel Art
+  packageVersion: 2.0.3
+  assetPath: Assets/ProPixelizer/SRP/Passes/PixelExpansion/ProPixelizerApplyPixelizationMapToDepth.cs
+  uploadId: 1002610

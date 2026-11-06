@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: bb31adb5d84e0bd4ba8666610a0d5ce8
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 177877
+  packageName: ProPixelizer - Realtime 3D Pixel Art
+  packageVersion: 2.0.3
+  assetPath: Assets/ProPixelizer/ExampleAssets/World Space Pixel Size/RockySceneryFloor.mat
+  uploadId: 1002610

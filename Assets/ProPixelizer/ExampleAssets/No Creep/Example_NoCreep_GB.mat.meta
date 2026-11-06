@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 4691da09342c3604096cd5b9176b864c
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 177877
+  packageName: ProPixelizer - Realtime 3D Pixel Art
+  packageVersion: 2.0.3
+  assetPath: Assets/ProPixelizer/ExampleAssets/No Creep/Example_NoCreep_GB.mat
+  uploadId: 1002610

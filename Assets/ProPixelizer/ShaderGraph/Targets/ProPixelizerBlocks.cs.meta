@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 8de3f7445797f6a43a81f5f2980f931d
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 177877
+  packageName: ProPixelizer - Realtime 3D Pixel Art
+  packageVersion: 2.0.3
+  assetPath: Assets/ProPixelizer/ShaderGraph/Targets/ProPixelizerBlocks.cs
+  uploadId: 1002610

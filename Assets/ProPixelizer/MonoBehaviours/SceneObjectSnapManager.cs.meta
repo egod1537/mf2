@@ -1,0 +1,9 @@
+fileFormatVersion: 2
+guid: 43beca72941967042b7c0219342a9d70
+AssetOrigin:
+  serializedVersion: 1
+  productId: 177877
+  packageName: ProPixelizer - Realtime 3D Pixel Art
+  packageVersion: 2.0.3
+  assetPath: Assets/ProPixelizer/MonoBehaviours/SceneObjectSnapManager.cs
+  uploadId: 1002610

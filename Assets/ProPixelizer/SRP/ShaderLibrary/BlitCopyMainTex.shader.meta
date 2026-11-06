@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 0822cee233586044e823897998d6da94
+ShaderImporter:
+  externalObjects: {}
+  defaultTextures: []
+  nonModifiableTextures: []
+  preprocessorOverride: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 177877
+  packageName: ProPixelizer - Realtime 3D Pixel Art
+  packageVersion: 2.0.3
+  assetPath: Assets/ProPixelizer/SRP/ShaderLibrary/BlitCopyMainTex.shader
+  uploadId: 1002610

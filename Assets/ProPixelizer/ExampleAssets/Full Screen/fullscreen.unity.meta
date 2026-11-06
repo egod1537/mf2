@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 7ef423b66c4cb5044976157116835e5d
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 177877
+  packageName: ProPixelizer - Realtime 3D Pixel Art
+  packageVersion: 2.0.3
+  assetPath: Assets/ProPixelizer/ExampleAssets/Full Screen/fullscreen.unity
+  uploadId: 1002610

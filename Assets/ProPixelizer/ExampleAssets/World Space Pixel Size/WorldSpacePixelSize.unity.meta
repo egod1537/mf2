@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: cd462513be2de5c42a61114c35d12b42
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 177877
+  packageName: ProPixelizer - Realtime 3D Pixel Art
+  packageVersion: 2.0.3
+  assetPath: Assets/ProPixelizer/ExampleAssets/World Space Pixel Size/WorldSpacePixelSize.unity
+  uploadId: 1002610

@@ -1,0 +1,27 @@
+{
+  "name": "com.propixelizer",
+  "description": "Render 3D objects to look like 2D sprite art, in real time.",
+  "version": "2.0.3",
+  "unity": "2022.3",
+  "displayName": "ProPixelizer",
+  "keywords": [
+    "pixelation",
+    "pixel",
+    "Pixel Art",
+    "retro",
+    "pixelated",
+    "pixelizer",
+    "pixelate",
+    "outlines",
+    "3D pixel art",
+    "cel shading",
+    "edges"
+  ],
+  "_samples": [
+    {
+      "displayName": "ProPixelizer Examples",
+      "description": "Collection of scenes showcasing different features of ProPixelizer.",
+      "path": "Samples~/URPPackageSamples"
+    }
+  ]
+}

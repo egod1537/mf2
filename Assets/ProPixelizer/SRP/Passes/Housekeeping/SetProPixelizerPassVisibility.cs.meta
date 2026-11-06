@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: cf6a80e23bee2b041a5d909701f9e586
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 177877
+  packageName: ProPixelizer - Realtime 3D Pixel Art
+  packageVersion: 2.0.3
+  assetPath: Assets/ProPixelizer/SRP/Passes/Housekeeping/SetProPixelizerPassVisibility.cs
+  uploadId: 1002610

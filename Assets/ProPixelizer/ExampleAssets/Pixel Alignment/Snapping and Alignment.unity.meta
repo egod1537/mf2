@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: c19b912acc7f03e45b68529a4ebef5a7
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 177877
+  packageName: ProPixelizer - Realtime 3D Pixel Art
+  packageVersion: 2.0.3
+  assetPath: Assets/ProPixelizer/ExampleAssets/Pixel Alignment/Snapping and Alignment.unity
+  uploadId: 1002610

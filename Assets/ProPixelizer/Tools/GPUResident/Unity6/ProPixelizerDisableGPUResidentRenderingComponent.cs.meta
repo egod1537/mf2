@@ -1,0 +1,9 @@
+fileFormatVersion: 2
+guid: 06b2ec28788bbf54692bd79d849cdbc0
+AssetOrigin:
+  serializedVersion: 1
+  productId: 177877
+  packageName: ProPixelizer - Realtime 3D Pixel Art
+  packageVersion: 2.0.3
+  assetPath: Assets/ProPixelizer/Tools/GPUResident/Unity6/ProPixelizerDisableGPUResidentRenderingComponent.cs
+  uploadId: 1002610
