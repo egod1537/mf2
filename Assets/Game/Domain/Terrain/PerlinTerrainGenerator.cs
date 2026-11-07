@@ -71,7 +71,20 @@ namespace MF2.Game.Domain
             }
 
             var normalized = weightSum > 0f ? value / weightSum : 0f;
-            var height = (int)math.round(config.BaseHeight + normalized * config.Amplitude);
+            var shaped = normalized;
+            var amplitude = config.Amplitude;
+            if (config.Profile == TerrainGenerationProfile.Amplified)
+            {
+                var warp = noise.snoise(
+                    point * (config.Frequency * 0.35f) + new float2(71.3f, -43.7f));
+                var warpedPoint = point + new float2(warp, -warp) * 6f;
+                var ridge = 1f - math.abs(noise.snoise(
+                    warpedPoint * (config.Frequency * 0.65f) + new float2(-19.1f, 37.9f)));
+                var cliff = math.sign(normalized) * math.pow(math.abs(normalized), 0.58f);
+                shaped = cliff * 0.78f + (ridge * 2f - 1f) * 0.48f;
+                amplitude *= 1.8f;
+            }
+            var height = (int)math.round(config.BaseHeight + shaped * amplitude);
             return math.clamp(height, config.MinimumY, config.MaximumY);
         }
 
@@ -97,6 +110,7 @@ namespace MF2.Game.Domain
             signature = Hash(signature, config.DirtDepth);
             signature = Hash(signature, config.WaterLevel);
             signature = Hash(signature, config.WaterEnabled ? 1 : 0);
+            signature = Hash(signature, (int)config.Profile);
 
             for (var zOffset = 0; zOffset < config.Depth; zOffset++)
             {

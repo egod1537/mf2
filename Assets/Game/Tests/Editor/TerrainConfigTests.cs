@@ -86,6 +86,12 @@ namespace MF2.Tests
             var legacy = CreateConfig();
             Assert.That(legacy.WaterEnabled, Is.False);
             Assert.That(legacy.SolidBlock, Is.EqualTo(new Block(1)));
+            Assert.That(legacy.Profile, Is.EqualTo(TerrainGenerationProfile.Normal));
+            Assert.That(
+                () => new TerrainConfig(
+                    0, 0, 1, 1, 0, 8, 4, 2f, 0.1f, 2, 1, new Block(1),
+                    profile: (TerrainGenerationProfile)99),
+                Throws.TypeOf<ArgumentOutOfRangeException>());
         }
 
         internal static TerrainConfig CreateConfig(
@@ -93,7 +99,8 @@ namespace MF2.Tests
             int originZ = 0,
             int seed = 123,
             int width = 8,
-            int depth = 8) =>
+            int depth = 8,
+            TerrainGenerationProfile profile = TerrainGenerationProfile.Normal) =>
             new TerrainConfig(
                 originX,
                 originZ,
@@ -106,7 +113,8 @@ namespace MF2.Tests
                 frequency: 0.08f,
                 octaves: 3,
                 seed,
-                new Block(1));
+                new Block(1),
+                profile: profile);
 
         internal static TerrainConfig CreateLayeredConfig(
             int originX = 0,

@@ -3,6 +3,7 @@ using FishNet.Broadcast;
 using FishNet.Connection;
 using FishNet.Managing;
 using FishNet.Transporting;
+using MF2.Entities.Player;
 using MF2.Game.Domain;
 using MF2.Game.Lifecycle;
 using MF2.World.Core;
@@ -14,6 +15,95 @@ namespace MF2.Game.Networking
     public interface IGameCommandSender
     {
         bool SendWorldCommand(WorldCommand command);
+    }
+
+    public interface IInventoryCommandSender
+    {
+        bool SendInventoryCommand(InventoryCommand command);
+    }
+
+    public struct PlayerActionBroadcast : IBroadcast
+    {
+        public ulong Sequence;
+        public byte Kind;
+        public float DirectionX;
+        public float DirectionZ;
+
+        public static PlayerActionBroadcast Dash(ulong sequence) => new PlayerActionBroadcast
+        {
+            Sequence = sequence,
+            Kind = (byte)PlayerActionCommandKind.Dash
+        };
+
+        public static PlayerActionBroadcast Attack(
+            ulong sequence,
+            float directionX,
+            float directionZ) => new PlayerActionBroadcast
+        {
+            Sequence = sequence,
+            Kind = (byte)PlayerActionCommandKind.Attack,
+            DirectionX = directionX,
+            DirectionZ = directionZ
+        };
+
+        public bool TryGetDirection(out Vector3 direction)
+        {
+            direction = new Vector3(DirectionX, 0f, DirectionZ);
+            return Sequence > 0 &&
+                   !float.IsNaN(DirectionX) && !float.IsInfinity(DirectionX) &&
+                   !float.IsNaN(DirectionZ) && !float.IsInfinity(DirectionZ) &&
+                   direction.sqrMagnitude >= 0.25f && direction.sqrMagnitude <= 2.25f;
+        }
+    }
+
+    public struct InventoryCommandBroadcast : IBroadcast
+    {
+        public ulong Sequence;
+        public byte Kind;
+        public byte SourceContainer;
+        public int SourceSlot;
+        public byte TargetContainer;
+        public int TargetSlot;
+        public int Count;
+        public int SelectedQuickbarSlot;
+
+        public static InventoryCommandBroadcast FromCommand(
+            InventoryCommand command,
+            ulong sequence)
+        {
+            if (!command.IsStructurallyValid)
+                throw new System.ArgumentException("Invalid inventory command.", nameof(command));
+            if (sequence == 0)
+                throw new System.ArgumentOutOfRangeException(nameof(sequence));
+            return new InventoryCommandBroadcast
+            {
+                Sequence = sequence,
+                Kind = (byte)command.Kind,
+                SourceContainer = (byte)command.SourceContainer,
+                SourceSlot = command.SourceSlot,
+                TargetContainer = (byte)command.TargetContainer,
+                TargetSlot = command.TargetSlot,
+                Count = command.Count,
+                SelectedQuickbarSlot = command.SelectedQuickbarSlot
+            };
+        }
+
+        public bool TryToCommand(out InventoryCommand command)
+        {
+            command = (InventoryCommandKind)Kind switch
+            {
+                InventoryCommandKind.SelectQuickbar =>
+                    InventoryCommand.SelectQuickbar(SelectedQuickbarSlot),
+                InventoryCommandKind.Move => InventoryCommand.Move(
+                    (InventoryContainerKind)SourceContainer,
+                    SourceSlot,
+                    (InventoryContainerKind)TargetContainer,
+                    TargetSlot,
+                    Count),
+                _ => default
+            };
+            return Sequence > 0 && command.IsStructurallyValid;
+        }
     }
 
     public struct WorldCommandBroadcast : IBroadcast
@@ -83,7 +173,10 @@ namespace MF2.Game.Networking
     /// </summary>
     [DisallowMultipleComponent]
     [RequireComponent(typeof(NetworkManager), typeof(ServerSessionCoordinator))]
-    public sealed class GameCommandNetworkAdapter : MonoBehaviour, IGameCommandSender
+    public sealed class GameCommandNetworkAdapter : MonoBehaviour,
+        IGameCommandSender,
+        IInventoryCommandSender,
+        IPlayerActionCommandSender
     {
         private readonly Dictionary<int, PlayerId> playerIdsByConnection =
             new Dictionary<int, PlayerId>();
@@ -94,6 +187,8 @@ namespace MF2.Game.Networking
         private ulong clientSequence;
 
         public int MappedConnectionCount => playerIdsByConnection.Count;
+        public event System.Action<int, PlayerId> ConnectionMapped;
+        public event System.Action<int, PlayerId> ConnectionUnmapped;
 
         private void Awake()
         {
@@ -113,7 +208,14 @@ namespace MF2.Game.Networking
             networkManager.ServerManager.RegisterBroadcast<WorldCommandBroadcast>(
                 OnWorldCommandReceived,
                 requireAuthentication: true);
+            networkManager.ServerManager.RegisterBroadcast<InventoryCommandBroadcast>(
+                OnInventoryCommandReceived,
+                requireAuthentication: true);
+            networkManager.ServerManager.RegisterBroadcast<PlayerActionBroadcast>(
+                OnPlayerActionReceived,
+                requireAuthentication: true);
             networkManager.ClientManager.OnClientConnectionState += OnClientConnectionState;
+            PlayerActionCommandBridge.Sender = this;
             networkCallbackRegistered = true;
         }
 
@@ -135,6 +237,60 @@ namespace MF2.Game.Networking
             return true;
         }
 
+        public bool SendInventoryCommand(InventoryCommand command)
+        {
+            if (networkManager == null || !networkManager.IsClientStarted ||
+                !command.IsStructurallyValid || clientSequence == ulong.MaxValue)
+            {
+                return false;
+            }
+
+            clientSequence++;
+            networkManager.ClientManager.Broadcast(
+                InventoryCommandBroadcast.FromCommand(command, clientSequence),
+                Channel.Reliable);
+            return true;
+        }
+
+        public bool SendDash()
+        {
+            if (!TryBeginClientCommand(out var sequence))
+                return false;
+            networkManager.ClientManager.Broadcast(
+                PlayerActionBroadcast.Dash(sequence),
+                Channel.Reliable);
+            return true;
+        }
+
+        public bool SendAttack(float directionX, float directionZ)
+        {
+            var direction = new Vector2(directionX, directionZ);
+            if (direction.sqrMagnitude < 0.25f || direction.sqrMagnitude > 2.25f ||
+                float.IsNaN(directionX) || float.IsInfinity(directionX) ||
+                float.IsNaN(directionZ) || float.IsInfinity(directionZ) ||
+                !TryBeginClientCommand(out var sequence))
+            {
+                return false;
+            }
+            direction.Normalize();
+            networkManager.ClientManager.Broadcast(
+                PlayerActionBroadcast.Attack(sequence, direction.x, direction.y),
+                Channel.Reliable);
+            return true;
+        }
+
+        private bool TryBeginClientCommand(out ulong sequence)
+        {
+            sequence = 0;
+            if (networkManager == null || !networkManager.IsClientStarted ||
+                clientSequence == ulong.MaxValue)
+            {
+                return false;
+            }
+            sequence = ++clientSequence;
+            return true;
+        }
+
         public bool TryRegisterConnection(int connectionId, out PlayerId playerId)
         {
             if (playerIdsByConnection.TryGetValue(connectionId, out playerId))
@@ -152,6 +308,7 @@ namespace MF2.Game.Networking
                 return false;
 
             playerIdsByConnection.Add(connectionId, playerId);
+            ConnectionMapped?.Invoke(connectionId, playerId);
             return true;
         }
 
@@ -183,6 +340,7 @@ namespace MF2.Game.Networking
 
             playerIdsByConnection.Add(connectionId, restoredPlayerId);
             playerId = restoredPlayerId;
+            ConnectionMapped?.Invoke(connectionId, playerId);
             return true;
         }
 
@@ -193,7 +351,10 @@ namespace MF2.Game.Networking
         public bool ReleaseConnectionMapping(int connectionId)
         {
             commandGuard.Release(connectionId);
-            return playerIdsByConnection.Remove(connectionId);
+            if (!playerIdsByConnection.Remove(connectionId, out var playerId))
+                return false;
+            ConnectionUnmapped?.Invoke(connectionId, playerId);
+            return true;
         }
 
         public bool UnregisterConnection(int connectionId)
@@ -201,6 +362,7 @@ namespace MF2.Game.Networking
             commandGuard.Release(connectionId);
             if (!playerIdsByConnection.Remove(connectionId, out var playerId))
                 return false;
+            ConnectionUnmapped?.Invoke(connectionId, playerId);
             if (coordinator.TryGetSession(out var session))
                 session.UnregisterPlayer(playerId);
             return true;
@@ -208,6 +370,19 @@ namespace MF2.Game.Networking
 
         public bool TryGetPlayerId(int connectionId, out PlayerId playerId) =>
             playerIdsByConnection.TryGetValue(connectionId, out playerId);
+
+        public bool TryGetConnectionId(PlayerId playerId, out int connectionId)
+        {
+            foreach (var pair in playerIdsByConnection)
+            {
+                if (pair.Value != playerId)
+                    continue;
+                connectionId = pair.Key;
+                return true;
+            }
+            connectionId = -1;
+            return false;
+        }
 
         public bool TryEnqueueWorldCommand(
             int connectionId,
@@ -243,6 +418,116 @@ namespace MF2.Game.Networking
             }
 
             session.SubmitCommand(playerId, GameCommand.ApplyWorld(command));
+        }
+
+        private void OnInventoryCommandReceived(
+            NetworkConnection connection,
+            InventoryCommandBroadcast message,
+            Channel channel)
+        {
+            if (channel != Channel.Reliable ||
+                !message.TryToCommand(out var command) ||
+                !TryAcceptEnvelope(
+                    connection.ClientId,
+                    message.Sequence,
+                    out var playerId,
+                    out var session))
+            {
+                return;
+            }
+
+            session.SubmitCommand(playerId, GameCommand.ApplyInventory(command));
+        }
+
+        private void OnPlayerActionReceived(
+            NetworkConnection connection,
+            PlayerActionBroadcast message,
+            Channel channel)
+        {
+            if (channel != Channel.Reliable ||
+                !TryAcceptEnvelope(
+                    connection.ClientId,
+                    message.Sequence,
+                    out var playerId,
+                    out var session))
+            {
+                return;
+            }
+
+            var kind = (PlayerActionCommandKind)message.Kind;
+            if (kind == PlayerActionCommandKind.Dash)
+            {
+                session.SubmitCommand(
+                    playerId,
+                    GameCommand.ApplyPlayerAction(PlayerActionCommand.Dash()));
+                return;
+            }
+            if (kind != PlayerActionCommandKind.Attack ||
+                !message.TryGetDirection(out var direction) ||
+                !TryResolveMeleeTarget(playerId, direction.normalized, out var target))
+            {
+                return;
+            }
+
+            session.SubmitCommand(
+                playerId,
+                GameCommand.ApplyPlayerAction(PlayerActionCommand.Attack(target)));
+        }
+
+        private static bool TryResolveMeleeTarget(
+            PlayerId attackerId,
+            Vector3 direction,
+            out PlayerId targetId)
+        {
+            targetId = default;
+            BlockPlayerController attacker = null;
+            var controllers = FindObjectsByType<BlockPlayerController>(
+                FindObjectsInactive.Exclude,
+                FindObjectsSortMode.None);
+            for (var i = 0; i < controllers.Length; i++)
+            {
+                if (controllers[i].TryGetPlayerId(out var id) && id == attackerId)
+                {
+                    attacker = controllers[i];
+                    break;
+                }
+            }
+            if (attacker == null)
+                return false;
+
+            var origin = attacker.transform.position + Vector3.up * 0.8f;
+            const float maximumDistance = 2.5f;
+            var bestDistance = maximumDistance + 0.01f;
+            BlockPlayerController best = null;
+            for (var i = 0; i < controllers.Length; i++)
+            {
+                var candidate = controllers[i];
+                if (candidate == attacker || !candidate.TryGetPlayerId(out var candidateId))
+                    continue;
+                var offset = candidate.transform.position + Vector3.up * 0.8f - origin;
+                var planar = Vector3.ProjectOnPlane(offset, Vector3.up);
+                var distance = offset.magnitude;
+                if (distance > maximumDistance || planar.sqrMagnitude < 0.001f ||
+                    Vector3.Dot(direction, planar.normalized) < 0.55f ||
+                    distance >= bestDistance)
+                {
+                    continue;
+                }
+                if (UnityEngine.Physics.Linecast(
+                        origin,
+                        origin + offset,
+                        out var hit,
+                        UnityEngine.Physics.AllLayers,
+                        QueryTriggerInteraction.Ignore) &&
+                    hit.collider.GetComponentInParent<BlockPlayerController>() != candidate)
+                {
+                    continue;
+                }
+                best = candidate;
+                bestDistance = distance;
+                targetId = candidateId;
+            }
+            return best != null;
         }
 
         private bool TryAcceptEnvelope(
@@ -294,9 +579,17 @@ namespace MF2.Game.Networking
             {
                 networkManager.ServerManager.UnregisterBroadcast<WorldCommandBroadcast>(
                     OnWorldCommandReceived);
+                networkManager.ServerManager.UnregisterBroadcast<InventoryCommandBroadcast>(
+                    OnInventoryCommandReceived);
+                networkManager.ServerManager.UnregisterBroadcast<PlayerActionBroadcast>(
+                    OnPlayerActionReceived);
                 networkManager.ClientManager.OnClientConnectionState -= OnClientConnectionState;
             }
+            if (ReferenceEquals(PlayerActionCommandBridge.Sender, this))
+                PlayerActionCommandBridge.Sender = null;
             networkCallbackRegistered = false;
+            ConnectionMapped = null;
+            ConnectionUnmapped = null;
         }
     }
 }

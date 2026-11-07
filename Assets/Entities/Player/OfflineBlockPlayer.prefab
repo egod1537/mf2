@@ -337,6 +337,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: MF2.Entities.Player::MF2.Entities.Player.BlockPlayerView
   ownerCamera: {fileID: 0}
   ownerAudioListener: {fileID: 0}
+  ownerCameraFollow: {fileID: 0}
   visualRoot: {fileID: 37421000529080155}
   facingRoot: {fileID: 7157891742998828381}
   motionBody: {fileID: 2964570754353002110}

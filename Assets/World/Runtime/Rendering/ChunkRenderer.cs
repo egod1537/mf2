@@ -19,6 +19,8 @@ namespace MF2.World.Rendering
         private MeshCollider meshCollider;
         private Mesh mesh;
         private Mesh colliderMesh;
+        private Mesh occlusionBackingMesh;
+        private MeshRenderer occlusionBackingRenderer;
         private ChunkReadiness readiness;
         private readonly int[][] baseIndices = new int[BaseRenderSubmeshCount][];
         private readonly List<int>[] routedIndices =
@@ -31,6 +33,14 @@ namespace MF2.World.Rendering
         private readonly List<int> occlusionIndices = new List<int>();
         private readonly List<Vector3> vertexPositions = new List<Vector3>();
         private readonly List<Vector3> vertexNormals = new List<Vector3>();
+        private readonly List<Vector2> vertexUvs = new List<Vector2>();
+        private readonly HashSet<int> visibleBlockFaces = new HashSet<int>();
+        private readonly Dictionary<int3, Vector2[]> blockFaceUvs =
+            new Dictionary<int3, Vector2[]>();
+        private readonly List<Vector3> backingVertices = new List<Vector3>();
+        private readonly List<Vector3> backingNormals = new List<Vector3>();
+        private readonly List<Vector2> backingUvs = new List<Vector2>();
+        private readonly List<int> backingIndices = new List<int>();
         private readonly HashSet<int3> ditheredBlocks = new HashSet<int3>();
         private bool hasBaseGeometry;
 
@@ -64,6 +74,15 @@ namespace MF2.World.Rendering
             }
         }
 
+        public Mesh OcclusionBackingMesh
+        {
+            get
+            {
+                EnsureInitialized();
+                return occlusionBackingMesh;
+            }
+        }
+
         public void Configure(int3 chunkCoordinate, Material[] sharedMaterials)
         {
             EnsureInitialized();
@@ -73,6 +92,10 @@ namespace MF2.World.Rendering
                 chunkCoordinate.y * (float)ChunkCoordinates.Size,
                 chunkCoordinate.z * (float)ChunkCoordinates.Size);
             meshRenderer.sharedMaterials = sharedMaterials;
+            occlusionBackingRenderer.sharedMaterial =
+                sharedMaterials != null && sharedMaterials.Length > OcclusionSubmeshIndex
+                    ? sharedMaterials[OcclusionSubmeshIndex]
+                    : null;
             gameObject.name = $"Chunk ({chunkCoordinate.x}, {chunkCoordinate.y}, {chunkCoordinate.z})";
         }
 
@@ -80,6 +103,7 @@ namespace MF2.World.Rendering
         {
             EnsureInitialized();
             meshRenderer.enabled = enabled;
+            occlusionBackingRenderer.enabled = enabled && backingIndices.Count > 0;
         }
 
         public bool Apply(WorldCore world, ChunkMeshBuildRequest request)
@@ -115,6 +139,10 @@ namespace MF2.World.Rendering
                 mesh.Clear(false);
             if (colliderMesh != null)
                 colliderMesh.Clear(false);
+            if (occlusionBackingMesh != null)
+                occlusionBackingMesh.Clear(false);
+            if (occlusionBackingRenderer != null)
+                occlusionBackingRenderer.enabled = false;
             if (meshCollider != null)
                 meshCollider.enabled = false;
             ClearCachedGeometry();
@@ -145,8 +173,10 @@ namespace MF2.World.Rendering
         {
             DestroyOwnedMesh(mesh);
             DestroyOwnedMesh(colliderMesh);
+            DestroyOwnedMesh(occlusionBackingMesh);
             mesh = null;
             colliderMesh = null;
+            occlusionBackingMesh = null;
         }
 
         private void EnsureInitialized()
@@ -181,6 +211,25 @@ namespace MF2.World.Rendering
                 hideFlags = HideFlags.DontSave
             };
             colliderMesh.MarkDynamic();
+
+            var backingObject = new GameObject("Occlusion Backing")
+            {
+                hideFlags = HideFlags.DontSave
+            };
+            backingObject.transform.SetParent(transform, false);
+            var backingFilter = backingObject.AddComponent<MeshFilter>();
+            occlusionBackingRenderer = backingObject.AddComponent<MeshRenderer>();
+            occlusionBackingRenderer.shadowCastingMode = ShadowCastingMode.Off;
+            occlusionBackingRenderer.receiveShadows = false;
+            occlusionBackingRenderer.enabled = false;
+            occlusionBackingMesh = new Mesh
+            {
+                name = "Chunk Occlusion Backing Mesh",
+                indexFormat = IndexFormat.UInt32,
+                hideFlags = HideFlags.DontSave
+            };
+            occlusionBackingMesh.MarkDynamic();
+            backingFilter.sharedMesh = occlusionBackingMesh;
         }
 
         private void CaptureBaseGeometry()
@@ -189,6 +238,25 @@ namespace MF2.World.Rendering
             vertexNormals.Clear();
             mesh.GetVertices(vertexPositions);
             mesh.GetNormals(vertexNormals);
+            mesh.GetUVs(0, vertexUvs);
+            visibleBlockFaces.Clear();
+            blockFaceUvs.Clear();
+            for (var vertex = 0; vertex + 3 < vertexPositions.Count; vertex += 4)
+            {
+                var block = ResolveTriangleBlock(vertex, vertex + 1, vertex + 2);
+                var face = ResolveFace(vertexNormals[vertex]);
+                visibleBlockFaces.Add(EncodeFace(block, face));
+                if (!blockFaceUvs.ContainsKey(block))
+                {
+                    blockFaceUvs.Add(block, new[]
+                    {
+                        vertexUvs[vertex],
+                        vertexUvs[vertex + 1],
+                        vertexUvs[vertex + 2],
+                        vertexUvs[vertex + 3]
+                    });
+                }
+            }
             for (var submesh = 0; submesh < BaseRenderSubmeshCount; submesh++)
                 baseIndices[submesh] = mesh.GetIndices(submesh);
             hasBaseGeometry = true;
@@ -231,6 +299,129 @@ namespace MF2.World.Rendering
                 MeshTopology.Triangles,
                 OcclusionSubmeshIndex,
                 false);
+            RebuildOcclusionBacking();
+        }
+
+        private void RebuildOcclusionBacking()
+        {
+            backingVertices.Clear();
+            backingNormals.Clear();
+            backingUvs.Clear();
+            backingIndices.Clear();
+
+            foreach (var block in ditheredBlocks)
+            {
+                if (!blockFaceUvs.TryGetValue(block, out var uv))
+                    continue;
+
+                for (var face = 0; face < 6; face++)
+                {
+                    if (visibleBlockFaces.Contains(EncodeFace(block, face)) ||
+                        ditheredBlocks.Contains(block + FaceOffset(face)))
+                    {
+                        continue;
+                    }
+                    AddBackingFace(block, face, uv);
+                }
+            }
+
+            occlusionBackingMesh.Clear(false);
+            if (backingIndices.Count == 0)
+            {
+                occlusionBackingRenderer.enabled = false;
+                return;
+            }
+
+            occlusionBackingMesh.SetVertices(backingVertices);
+            occlusionBackingMesh.SetNormals(backingNormals);
+            occlusionBackingMesh.SetUVs(0, backingUvs);
+            occlusionBackingMesh.SetTriangles(backingIndices, 0, false);
+            occlusionBackingMesh.bounds = mesh.bounds;
+            occlusionBackingRenderer.enabled = meshRenderer.enabled;
+        }
+
+        private void AddBackingFace(int3 block, int face, Vector2[] uv)
+        {
+            var center = new Vector3(block.x, block.y, block.z);
+            var normal = FaceNormal(face);
+            GetFaceCorners(face, out var p0, out var p1, out var p2, out var p3);
+            var first = backingVertices.Count;
+            backingVertices.Add(center + p0);
+            backingVertices.Add(center + p1);
+            backingVertices.Add(center + p2);
+            backingVertices.Add(center + p3);
+            for (var i = 0; i < 4; i++)
+                backingNormals.Add(normal);
+            backingUvs.AddRange(uv);
+            backingIndices.Add(first);
+            backingIndices.Add(first + 1);
+            backingIndices.Add(first + 2);
+            backingIndices.Add(first);
+            backingIndices.Add(first + 2);
+            backingIndices.Add(first + 3);
+        }
+
+        private static int EncodeFace(int3 block, int face) =>
+            ((block.x + ChunkCoordinates.Size *
+              (block.y + ChunkCoordinates.Size * block.z)) * 6) + face;
+
+        private static int ResolveFace(Vector3 normal)
+        {
+            if (normal.z < -0.5f) return 0;
+            if (normal.z > 0.5f) return 1;
+            if (normal.x > 0.5f) return 2;
+            if (normal.x < -0.5f) return 3;
+            return normal.y > 0.5f ? 4 : 5;
+        }
+
+        private static int3 FaceOffset(int face)
+        {
+            switch (face)
+            {
+                case 0: return new int3(0, 0, -1);
+                case 1: return new int3(0, 0, 1);
+                case 2: return new int3(1, 0, 0);
+                case 3: return new int3(-1, 0, 0);
+                case 4: return new int3(0, 1, 0);
+                default: return new int3(0, -1, 0);
+            }
+        }
+
+        private static Vector3 FaceNormal(int face)
+        {
+            var offset = FaceOffset(face);
+            return new Vector3(offset.x, offset.y, offset.z);
+        }
+
+        private static void GetFaceCorners(
+            int face,
+            out Vector3 p0,
+            out Vector3 p1,
+            out Vector3 p2,
+            out Vector3 p3)
+        {
+            const float half = 0.5f;
+            switch (face)
+            {
+                case 0:
+                    p0 = new Vector3(-half, -half, -half); p1 = new Vector3(-half, half, -half);
+                    p2 = new Vector3(half, half, -half); p3 = new Vector3(half, -half, -half); break;
+                case 1:
+                    p0 = new Vector3(half, -half, half); p1 = new Vector3(half, half, half);
+                    p2 = new Vector3(-half, half, half); p3 = new Vector3(-half, -half, half); break;
+                case 2:
+                    p0 = new Vector3(half, -half, -half); p1 = new Vector3(half, half, -half);
+                    p2 = new Vector3(half, half, half); p3 = new Vector3(half, -half, half); break;
+                case 3:
+                    p0 = new Vector3(-half, -half, half); p1 = new Vector3(-half, half, half);
+                    p2 = new Vector3(-half, half, -half); p3 = new Vector3(-half, -half, -half); break;
+                case 4:
+                    p0 = new Vector3(-half, half, -half); p1 = new Vector3(-half, half, half);
+                    p2 = new Vector3(half, half, half); p3 = new Vector3(half, half, -half); break;
+                default:
+                    p0 = new Vector3(-half, -half, half); p1 = new Vector3(-half, -half, -half);
+                    p2 = new Vector3(half, -half, -half); p3 = new Vector3(half, -half, half); break;
+            }
         }
 
         private int3 ResolveTriangleBlock(int index0, int index1, int index2)
@@ -256,6 +447,13 @@ namespace MF2.World.Rendering
             occlusionIndices.Clear();
             vertexPositions.Clear();
             vertexNormals.Clear();
+            vertexUvs.Clear();
+            visibleBlockFaces.Clear();
+            blockFaceUvs.Clear();
+            backingVertices.Clear();
+            backingNormals.Clear();
+            backingUvs.Clear();
+            backingIndices.Clear();
             ditheredBlocks.Clear();
             hasBaseGeometry = false;
         }

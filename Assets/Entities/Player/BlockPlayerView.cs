@@ -8,6 +8,7 @@ namespace MF2.Entities.Player
         [Header("Owner Presentation")]
         [SerializeField] private Camera ownerCamera;
         [SerializeField] private AudioListener ownerAudioListener;
+        [SerializeField] private PlayerCameraFollow ownerCameraFollow;
 
         [Header("Entity Visual")]
         [SerializeField] private GameObject visualRoot;
@@ -26,6 +27,8 @@ namespace MF2.Entities.Player
         private PlayerPresentationState presentationState;
         private bool hasPresentation;
         private float stepCycle;
+        private float attackPresentationTime;
+        private float dashPresentationTime;
 
         public Camera OwnerCamera => ownerCamera;
         public bool HasPresentation => hasPresentation;
@@ -47,6 +50,9 @@ namespace MF2.Entities.Player
         {
             ownerCamera = camera;
             ownerAudioListener = listener;
+            ownerCameraFollow = camera != null
+                ? camera.GetComponent<PlayerCameraFollow>()
+                : null;
         }
 
         public Transform ConfigureVisual(GameObject root, Rigidbody body)
@@ -83,14 +89,22 @@ namespace MF2.Entities.Player
                 }
             }
 
+            if (!active)
+                ownerCameraFollow?.RestoreAuthoredParent();
             if (ownerCamera != null)
                 ownerCamera.gameObject.SetActive(active);
             if (ownerAudioListener != null)
                 ownerAudioListener.enabled = active;
+            if (active)
+                ownerCameraFollow?.SnapNextFrame();
         }
 
         public void Apply(in PlayerPresentationState state)
         {
+            if (hasPresentation && state.AttackSequence > presentationState.AttackSequence)
+                attackPresentationTime = 0.22f;
+            if (hasPresentation && state.DashSequence > presentationState.DashSequence)
+                dashPresentationTime = 0.18f;
             presentationState = state;
             hasPresentation = true;
             if (visualRoot != null)
@@ -102,6 +116,8 @@ namespace MF2.Entities.Player
             presentationState = default;
             hasPresentation = false;
             stepCycle = 0f;
+            attackPresentationTime = 0f;
+            dashPresentationTime = 0f;
             SetLimbRotation(leftArmPivot, Quaternion.identity, 1f);
             SetLimbRotation(rightArmPivot, Quaternion.identity, 1f);
             SetLimbRotation(leftLegPivot, Quaternion.identity, 1f);
@@ -125,6 +141,11 @@ namespace MF2.Entities.Player
             EnsureFacingRoot();
         }
 
+        private void OnDestroy()
+        {
+            ownerCameraFollow?.RestoreAuthoredParent();
+        }
+
         private void LateUpdate()
         {
             if (!hasPresentation || motionBody == null)
@@ -132,6 +153,8 @@ namespace MF2.Entities.Player
 
             var velocity = motionBody.linearVelocity;
             var horizontalSpeed = Mathf.Sqrt(velocity.x * velocity.x + velocity.z * velocity.z);
+            attackPresentationTime = Mathf.Max(0f, attackPresentationTime - Time.deltaTime);
+            dashPresentationTime = Mathf.Max(0f, dashPresentationTime - Time.deltaTime);
             AnimateRig(
                 Mathf.Clamp01(horizontalSpeed / Mathf.Max(0.01f, maximumMoveSpeed)),
                 Time.deltaTime);
@@ -142,9 +165,14 @@ namespace MF2.Entities.Player
             if (moveAmount > 0.01f)
                 stepCycle += deltaTime * limbSwingSpeed;
             var swing = Mathf.Sin(stepCycle) * limbSwingAngle * moveAmount;
+            if (dashPresentationTime > 0f)
+                swing *= 1.7f;
             var blend = 1f - Mathf.Exp(-12f * deltaTime);
             SetLimbRotation(leftArmPivot, Quaternion.Euler(swing, 0f, 0f), blend);
-            SetLimbRotation(rightArmPivot, Quaternion.Euler(-swing, 0f, 0f), blend);
+            var rightArm = attackPresentationTime > 0f
+                ? Quaternion.Euler(-105f, 0f, -18f)
+                : Quaternion.Euler(-swing, 0f, 0f);
+            SetLimbRotation(rightArmPivot, rightArm, blend);
             SetLimbRotation(leftLegPivot, Quaternion.Euler(-swing, 0f, 0f), blend);
             SetLimbRotation(rightLegPivot, Quaternion.Euler(swing, 0f, 0f), blend);
         }

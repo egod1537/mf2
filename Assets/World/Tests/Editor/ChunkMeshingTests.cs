@@ -385,6 +385,10 @@ namespace MF2.World.Tests
                             renderer.ColliderMesh.GetIndexCount(0),
                             Is.EqualTo(originalColliderIndexCount),
                             "Presentation dithering must never alter solid collision geometry.");
+                        Assert.That(
+                            renderer.OcclusionBackingMesh.GetIndexCount(0),
+                            Is.EqualTo(6),
+                            "The culled solid-solid face must exist in a visual-only backing mesh.");
 
                         var materials = renderer.GetComponent<MeshRenderer>().sharedMaterials;
                         var dither = materials[ChunkRenderer.OcclusionSubmeshIndex];
@@ -396,7 +400,52 @@ namespace MF2.World.Tests
                         Assert.That(
                             renderer.Mesh.GetIndexCount(ChunkRenderer.OcclusionSubmeshIndex),
                             Is.Zero);
+                        Assert.That(renderer.OcclusionBackingMesh.GetIndexCount(0), Is.Zero);
                         Assert.That(renderer.Mesh.GetIndexCount(0), Is.EqualTo(60));
+                    }
+                }
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(root);
+            }
+        }
+
+        [Test]
+        public void PlayerOcclusion_SelectedChunkBoundaryNeighborsDoNotDuplicateBackingFace()
+        {
+            var root = new GameObject("Player Occlusion Boundary Test");
+            try
+            {
+                var materialSet = AssetDatabase.LoadAssetAtPath<ChunkMaterialSet>(
+                    "Assets/World/Rendering/ChunkMaterialSetProPixelizer.asset");
+                using (var table = CreateTable(1))
+                using (var world = new WorldCore())
+                using (var pool = new ChunkRendererPool(root.transform, materialSet))
+                {
+                    var leftPosition = new int3(15, 0, 0);
+                    var rightPosition = new int3(16, 0, 0);
+                    world.Enqueue(WorldCommand.SetBlock(leftPosition, new Block(1)));
+                    world.Enqueue(WorldCommand.SetBlock(rightPosition, new Block(1)));
+                    world.Flush();
+                    world.TryGetChunkHandle(new int3(0, 0, 0), out var leftHandle);
+                    world.TryGetChunkHandle(new int3(1, 0, 0), out var rightHandle);
+                    using (var leftRequest = Schedule(world, leftHandle, table))
+                    using (var rightRequest = Schedule(world, rightHandle, table))
+                    {
+                        var left = pool.GetOrCreate(new int3(0, 0, 0));
+                        var right = pool.GetOrCreate(new int3(1, 0, 0));
+                        Assert.That(left.Apply(world, leftRequest), Is.True);
+                        Assert.That(right.Apply(world, rightRequest), Is.True);
+
+                        pool.SetDitheredBlocks(new[] { leftPosition, rightPosition });
+
+                        Assert.That(left.OcclusionBackingMesh.GetIndexCount(0), Is.Zero);
+                        Assert.That(right.OcclusionBackingMesh.GetIndexCount(0), Is.Zero);
+                        Assert.That(left.Mesh.GetIndexCount(ChunkRenderer.OcclusionSubmeshIndex),
+                            Is.EqualTo(30));
+                        Assert.That(right.Mesh.GetIndexCount(ChunkRenderer.OcclusionSubmeshIndex),
+                            Is.EqualTo(30));
                     }
                 }
             }

@@ -183,12 +183,34 @@ namespace MF2.Game.Persistence
                         throw new SessionStorageException("Player metadata is invalid.");
                     }
 
+                    var inventory = source.Bag == null &&
+                                    source.Quickbar == null &&
+                                    source.Equipment == null
+                        ? new InventoryState()
+                        : new InventoryState(
+                            ReadItemStacks(source.Bag, InventoryState.BagSlotCount, "bag"),
+                            ReadItemStacks(source.Quickbar, InventoryState.QuickbarSlotCount, "quickbar"),
+                            ReadItemStacks(source.Equipment, InventoryState.EquipmentSlotCount, "equipment"),
+                            source.SelectedQuickbarSlot);
+
+                    var actions = source.HasActionState
+                        ? new PlayerActionState(
+                            source.DashCharges,
+                            source.NextDashRechargeTick,
+                            source.LastDashTick,
+                            source.LastAttackTick,
+                            source.DashSequence,
+                            source.AttackSequence)
+                        : PlayerActionState.Default;
+
                     players[i] = new PlayerModel(
                         new PlayerId(playerGuid),
                         source.Health,
                         source.MaximumHealth,
                         (PlayerLifeState)source.LifeState,
-                        source.Revision);
+                        source.Revision,
+                        inventory,
+                        actions);
                 }
 
                 return new SessionArchiveSnapshot(
@@ -442,6 +464,40 @@ namespace MF2.Game.Persistence
             File.Replace(temporaryPath, path, backupPath, true);
         }
 
+        private static ItemStack[] ReadItemStacks(
+            ItemStackDto[] source,
+            int expectedLength,
+            string name)
+        {
+            if (source == null || source.Length != expectedLength)
+                throw new SessionStorageException($"Player {name} slots are invalid.");
+            var result = new ItemStack[source.Length];
+            for (var i = 0; i < source.Length; i++)
+            {
+                var item = source[i];
+                if (item == null || (item.ItemId == 0 && item.Count == 0))
+                    continue;
+                if (!ItemCatalog.IsKnown(item.ItemId))
+                    throw new SessionStorageException($"Player {name} contains an unknown item id.");
+                result[i] = new ItemStack(item.ItemId, item.Count);
+            }
+            return result;
+        }
+
+        private static ItemStackDto[] WriteItemStacks(ItemStack[] source)
+        {
+            var result = new ItemStackDto[source.Length];
+            for (var i = 0; i < source.Length; i++)
+            {
+                result[i] = new ItemStackDto
+                {
+                    ItemId = source[i].ItemId,
+                    Count = source[i].Count
+                };
+            }
+            return result;
+        }
+
         private sealed class PointerDto
         {
             public int FormatVersion;
@@ -476,7 +532,21 @@ namespace MF2.Game.Persistence
                         Health = source.Health,
                         MaximumHealth = source.MaximumHealth,
                         LifeState = (int)source.LifeState,
-                        Revision = source.Revision
+                        Revision = source.Revision,
+                        SelectedQuickbarSlot = source.Inventory.SelectedQuickbarSlot,
+                        Bag = WriteItemStacks(source.Inventory.CaptureSlots(
+                            InventoryContainerKind.Bag)),
+                        Quickbar = WriteItemStacks(source.Inventory.CaptureSlots(
+                            InventoryContainerKind.Quickbar)),
+                        Equipment = WriteItemStacks(source.Inventory.CaptureSlots(
+                            InventoryContainerKind.Equipment)),
+                        HasActionState = true,
+                        DashCharges = source.Actions.DashCharges,
+                        NextDashRechargeTick = source.Actions.NextDashRechargeTick,
+                        LastDashTick = source.Actions.LastDashTick,
+                        LastAttackTick = source.Actions.LastAttackTick,
+                        DashSequence = source.Actions.DashSequence,
+                        AttackSequence = source.Actions.AttackSequence
                     };
                 }
 
@@ -503,6 +573,23 @@ namespace MF2.Game.Persistence
             public int MaximumHealth;
             public int LifeState;
             public long Revision;
+            public int SelectedQuickbarSlot;
+            public ItemStackDto[] Bag;
+            public ItemStackDto[] Quickbar;
+            public ItemStackDto[] Equipment;
+            public bool HasActionState;
+            public int DashCharges;
+            public long NextDashRechargeTick;
+            public long LastDashTick;
+            public long LastAttackTick;
+            public long DashSequence;
+            public long AttackSequence;
+        }
+
+        private sealed class ItemStackDto
+        {
+            public uint ItemId;
+            public int Count;
         }
     }
 

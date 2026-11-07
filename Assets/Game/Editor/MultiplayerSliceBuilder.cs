@@ -6,6 +6,7 @@ using FishNet.Managing.Object;
 using FishNet.Object;
 using FishNet.Transporting.Tugboat;
 using MF2.Entities.Player;
+using MF2.Game.Domain;
 using MF2.Game.Lifecycle;
 using MF2.Game.Networking;
 using MF2.Game.Presentation;
@@ -137,6 +138,8 @@ namespace MF2.Editor
                 var ownerCamera = cameraRig.AddComponent<Camera>();
                 ConfigurePixelStableGameCamera(ownerCamera);
                 ownerCamera.tag = "MainCamera";
+                var cameraFollow = cameraRig.AddComponent<PlayerCameraFollow>();
+                cameraFollow.Configure(visual);
                 var occlusionDither = cameraRig.AddComponent<PlayerOcclusionDither>();
                 occlusionDither.Configure(root.transform);
                 var listener = cameraRig.AddComponent<AudioListener>();
@@ -185,6 +188,8 @@ namespace MF2.Editor
                 var camera = root.GetComponentInChildren<Camera>(true);
                 if (camera != null)
                 {
+                    var follow = GetOrAdd<PlayerCameraFollow>(camera.gameObject);
+                    follow.Configure(visual != null ? visual : root.transform);
                     var listener = camera.GetComponent<AudioListener>();
                     view.ConfigureOwnerCamera(camera, listener);
                     input.ConfigureMovementCamera(camera);
@@ -205,7 +210,13 @@ namespace MF2.Editor
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
             scene.name = "Title";
 
-            var networkRoot = new GameObject("NetworkBootstrap");
+            var sceneContextRoot = CreateRoleRoot("10_SceneContext");
+            var gameplayRoot = CreateRoleRoot("30_Gameplay");
+            var uiRoot = CreateRoleRoot("40_UI");
+
+            // DontDestroyOnLoad only accepts a root GameObject, so the application role and the
+            // bootstrap are intentionally represented by this single root.
+            var networkRoot = new GameObject("00_Application NetworkBootstrap");
             networkRoot.AddComponent<Tugboat>();
             var applicationScope = networkRoot.AddComponent<ApplicationLifetimeScope>();
             applicationScope.ConfigureBlockRegistry(
@@ -222,16 +233,19 @@ namespace MF2.Editor
             var playerPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(PlayerPrefabPath).GetComponent<NetworkObject>();
             networkRoot.GetComponent<PlayerSpawner>().Configure(playerPrefab);
 
-            var controller = new GameObject("TitleController").AddComponent<TitleController>();
+            var controllerObject = new GameObject("TitleController");
+            controllerObject.transform.SetParent(gameplayRoot, false);
+            var controller = controllerObject.AddComponent<TitleController>();
             var panel = CreateCanvasWithPanel("TitleCanvas", new Vector2(680f, 420f));
+            panel.transform.root.SetParent(uiRoot, false);
             CreateText(panel, "MF2 MULTIPLAYER", 42, TextAnchor.MiddleCenter, 90f);
             CreateText(panel, "FishNet Rigidbody Prediction Test", 20, TextAnchor.MiddleCenter, 55f);
             var start = CreateButton(panel, "Start", 64f);
             var quit = CreateButton(panel, "Quit", 64f);
             UnityEventTools.AddPersistentListener(start.onClick, controller.StartGame);
             UnityEventTools.AddPersistentListener(quit.onClick, controller.QuitGame);
-            CreateEventSystem();
-            CreateSceneScope(scene);
+            CreateEventSystem(uiRoot);
+            CreateSceneScope(scene, sceneContextRoot);
 
             EditorSceneManager.SaveScene(scene, TitlePath);
         }
@@ -241,17 +255,26 @@ namespace MF2.Editor
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
             scene.name = "Outgame";
 
+            var sceneContextRoot = CreateRoleRoot("10_SceneContext");
+            var gameplayRoot = CreateRoleRoot("30_Gameplay");
+            var presentationRoot = CreateRoleRoot("40_Presentation");
+            var uiRoot = CreateRoleRoot("50_UI");
+
             var camera = CreateMinecraftMapCamera("Minecraft Map Camera");
+            camera.transform.SetParent(presentationRoot, false);
             camera.transform.position = new Vector3(-8f, 9.68f, -15f);
             camera.transform.rotation = new Quaternion(
                 0.27984816f,
                 0.3647052f,
                 -0.1159169f,
                 0.8804763f);
-            CreateMinecraftMapPostProcessing();
+            CreateMinecraftMapPostProcessing().transform.SetParent(presentationRoot, false);
 
-            var controller = new GameObject("OutgameController").AddComponent<OutgameController>();
+            var controllerObject = new GameObject("OutgameController");
+            controllerObject.transform.SetParent(gameplayRoot, false);
+            var controller = controllerObject.AddComponent<OutgameController>();
             var panel = CreateCanvasWithPanel("OutgameCanvas", new Vector2(820f, 780f));
+            panel.transform.root.SetParent(uiRoot, false);
             CreateText(panel, "OUTGAME / LOBBY", 36, TextAnchor.MiddleCenter, 70f);
             var status = CreateText(panel, "Disconnected", 22, TextAnchor.MiddleLeft, 70f);
 
@@ -284,8 +307,8 @@ namespace MF2.Editor
             SetObjectReference(controller, "disconnectButton", disconnect);
             SetObjectReference(controller, "startTestButton", test);
             SetObjectReference(controller, "startIngameButton", ingame);
-            CreateEventSystem();
-            CreateSceneScope(scene);
+            CreateEventSystem(uiRoot);
+            CreateSceneScope(scene, sceneContextRoot);
 
             EditorSceneManager.SaveScene(scene, OutgamePath);
         }
@@ -295,14 +318,24 @@ namespace MF2.Editor
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
             scene.name = displayName;
 
+            var sceneContextRoot = CreateRoleRoot("10_SceneContext");
+            var worldRoot = CreateRoleRoot("20_World");
+            var gameplayRoot = CreateRoleRoot("30_Gameplay");
+            var presentationRoot = CreateRoleRoot("40_Presentation");
+            var uiRoot = CreateRoleRoot("50_UI");
+            var debugRoot = expandedTestScene ? CreateRoleRoot("90_Debug") : gameplayRoot;
+
             var ground = GameObject.CreatePrimitive(PrimitiveType.Plane);
             ground.name = "Ground";
+            ground.transform.SetParent(worldRoot, false);
             ground.transform.localScale = expandedTestScene ? new Vector3(4f, 1f, 4f) : new Vector3(2f, 1f, 2f);
 
             var light = new GameObject("Directional Light").AddComponent<Light>();
+            light.transform.SetParent(presentationRoot, false);
             ConfigureGameSceneLighting(light);
 
             var overview = new GameObject("Overview Camera").AddComponent<Camera>();
+            overview.transform.SetParent(presentationRoot, false);
             overview.transform.position = new Vector3(10f, 12f, -10f);
             overview.transform.rotation = Quaternion.Euler(36f, -45f, 0f);
             overview.fieldOfView = 55f;
@@ -315,11 +348,13 @@ namespace MF2.Editor
             for (var i = 0; i < spawnPositions.Length; i++)
             {
                 var point = new GameObject($"Spawn Point {i + 1}");
+                point.transform.SetParent(worldRoot, false);
                 point.transform.position = spawnPositions[i];
                 point.AddComponent<SpawnPoint>();
             }
 
             var worldHost = new GameObject("World").AddComponent<WorldHost>();
+            worldHost.transform.SetParent(worldRoot, false);
             worldHost.gameObject.AddComponent<WorldViewBridge>();
             worldHost.ConfigureAssets(
                 LoadRequiredAsset<BlockRegistryManifest>(BlockRegistryManifestPath),
@@ -328,18 +363,24 @@ namespace MF2.Editor
 
             var debugInput = new GameObject("WorldCommandDebugInput")
                 .AddComponent<WorldCommandDebugInput>();
+            debugInput.transform.SetParent(debugRoot, false);
             debugInput.Configure(
                 LoadRequiredAsset<BlockRegistryManifest>(BlockRegistryManifestPath),
                 Vector3Int.zero);
 
             var hud = new GameObject("NetworkSceneHud").AddComponent<NetworkSceneHud>();
+            hud.transform.SetParent(uiRoot, false);
             var canvas = CreateCanvas("HUD Canvas");
+            canvas.transform.SetParent(uiRoot, false);
             var status = CreateAnchoredText(canvas.transform, "Status", new Vector2(18f, -18f), new Vector2(520f, 96f));
             var disconnect = CreateAnchoredButton(canvas.transform, "Disconnect / Lobby", new Vector2(-18f, -18f), new Vector2(240f, 54f));
             SetObjectReference(hud, "statusText", status);
             SetObjectReference(hud, "disconnectButton", disconnect);
-            CreateEventSystem();
-            CreateSceneScope(scene);
+            CreateInventoryHud(canvas);
+            CreateReplicaMinimap(canvas);
+            CreateMinecraftMapPostProcessing().transform.SetParent(presentationRoot, false);
+            CreateEventSystem(uiRoot);
+            CreateSceneScope(scene, sceneContextRoot);
 
             EditorSceneManager.SaveScene(scene, path);
         }
@@ -368,7 +409,6 @@ namespace MF2.Editor
         private static ChunkMaterialSet ConfigureGameSceneRendering(Camera camera)
         {
             ConfigurePixelStableGameCamera(camera);
-            CreateMinecraftMapPostProcessing();
             return LoadRequiredAsset<ChunkMaterialSet>(ProPixelizerChunkMaterialSetPath);
         }
 
@@ -464,7 +504,7 @@ namespace MF2.Editor
             cameraData.allowHDROutput = true;
         }
 
-        private static void CreateMinecraftMapPostProcessing()
+        private static Volume CreateMinecraftMapPostProcessing()
         {
             var volume = new GameObject("Minecraft Map Post Processing").AddComponent<Volume>();
             volume.isGlobal = true;
@@ -473,13 +513,18 @@ namespace MF2.Editor
             volume.weight = 1f;
             volume.sharedProfile = LoadRequiredAsset<VolumeProfile>(
                 MinecraftMapVolumeProfilePath);
+            return volume;
         }
 
-        private static void CreateSceneScope(Scene scene)
+        private static void CreateSceneScope(Scene scene, Transform contextRoot)
         {
             var scope = new GameObject("SceneLifetimeScope").AddComponent<SceneLifetimeScope>();
-            scope.ConfigureSceneRoots(scene.GetRootGameObjects());
+            scope.transform.SetParent(contextRoot, false);
+            scope.ConfigureSceneRoots(scene.GetRootGameObjects().Where(
+                root => root != contextRoot.gameObject));
         }
+
+        private static Transform CreateRoleRoot(string name) => new GameObject(name).transform;
 
         private static void ConfigureBuildSettings()
         {
@@ -640,9 +685,167 @@ namespace MF2.Editor
             return button;
         }
 
-        private static void CreateEventSystem()
+        private static void CreateInventoryHud(Canvas canvas)
+        {
+            var controller = canvas.gameObject.AddComponent<InventoryHudController>();
+            var health = CreateText(canvas.gameObject, "HP -- / --", 22, TextAnchor.MiddleLeft, 42f);
+            health.gameObject.name = "PlayerStatus";
+            health.raycastTarget = false;
+            var healthRect = (RectTransform)health.transform;
+            healthRect.anchorMin = healthRect.anchorMax = new Vector2(0f, 0f);
+            healthRect.pivot = new Vector2(0f, 0f);
+            healthRect.anchoredPosition = new Vector2(22f, 22f);
+            healthRect.sizeDelta = new Vector2(320f, 42f);
+
+            var hotbar = new GameObject(
+                "Hotbar",
+                typeof(RectTransform),
+                typeof(UnityEngine.UI.Image),
+                typeof(UnityEngine.UI.HorizontalLayoutGroup));
+            hotbar.transform.SetParent(canvas.transform, false);
+            var hotbarRect = (RectTransform)hotbar.transform;
+            hotbarRect.anchorMin = hotbarRect.anchorMax = new Vector2(0.5f, 0f);
+            hotbarRect.pivot = new Vector2(0.5f, 0f);
+            hotbarRect.anchoredPosition = new Vector2(0f, 22f);
+            hotbarRect.sizeDelta = new Vector2(526f, 70f);
+            hotbar.GetComponent<UnityEngine.UI.Image>().color =
+                new Color(0.025f, 0.035f, 0.05f, 0.88f);
+            var hotbarLayout = hotbar.GetComponent<UnityEngine.UI.HorizontalLayoutGroup>();
+            hotbarLayout.padding = new RectOffset(8, 8, 8, 8);
+            hotbarLayout.spacing = 6f;
+            hotbarLayout.childAlignment = TextAnchor.MiddleCenter;
+            hotbarLayout.childControlHeight = false;
+            hotbarLayout.childControlWidth = false;
+            var quickbar = new InventorySlotButton[InventoryState.QuickbarSlotCount];
+            for (var i = 0; i < quickbar.Length; i++)
+                quickbar[i] = CreateInventorySlot(hotbar.transform, $"QuickbarSlot {i + 1}", 62f);
+
+            var panel = new GameObject(
+                "InventoryPanel",
+                typeof(RectTransform),
+                typeof(UnityEngine.UI.Image));
+            panel.transform.SetParent(canvas.transform, false);
+            var panelRect = (RectTransform)panel.transform;
+            panelRect.anchorMin = panelRect.anchorMax = panelRect.pivot = new Vector2(0.5f, 0.5f);
+            panelRect.sizeDelta = new Vector2(720f, 650f);
+            panel.GetComponent<UnityEngine.UI.Image>().color =
+                new Color(0.025f, 0.035f, 0.05f, 0.97f);
+
+            var title = CreateText(panel, "INVENTORY  [E]", 28, TextAnchor.MiddleCenter, 52f);
+            title.gameObject.name = "InventoryTitle";
+            title.raycastTarget = false;
+            var titleRect = (RectTransform)title.transform;
+            titleRect.anchorMin = new Vector2(0f, 1f);
+            titleRect.anchorMax = new Vector2(1f, 1f);
+            titleRect.pivot = new Vector2(0.5f, 1f);
+            titleRect.anchoredPosition = new Vector2(0f, -18f);
+            titleRect.sizeDelta = new Vector2(-36f, 52f);
+
+            var bagGrid = CreateInventoryGrid(
+                panel.transform, "BagGrid", new Vector2(0f, 24f), new Vector2(492f, 410f), 6);
+            var bag = new InventorySlotButton[InventoryState.BagSlotCount];
+            for (var i = 0; i < bag.Length; i++)
+                bag[i] = CreateInventorySlot(bagGrid, $"BagSlot {i + 1}", 74f);
+
+            var equipmentGrid = CreateInventoryGrid(
+                panel.transform, "EquipmentGrid", new Vector2(272f, 24f), new Vector2(154f, 410f), 2);
+            var equipment = new InventorySlotButton[InventoryState.EquipmentSlotCount];
+            for (var i = 0; i < equipment.Length; i++)
+                equipment[i] = CreateInventorySlot(equipmentGrid, $"EquipmentSlot {i + 1}", 74f);
+
+            controller.Configure(panel, quickbar, bag, equipment, health);
+            panel.SetActive(false);
+        }
+
+        private static void CreateReplicaMinimap(Canvas canvas)
+        {
+            var root = new GameObject(
+                "Replica Minimap",
+                typeof(RectTransform),
+                typeof(UnityEngine.UI.Image),
+                typeof(ReplicaMinimapController));
+            root.transform.SetParent(canvas.transform, false);
+            var rootRect = (RectTransform)root.transform;
+            rootRect.anchorMin = rootRect.anchorMax = rootRect.pivot = new Vector2(1f, 1f);
+            rootRect.anchoredPosition = new Vector2(-22f, -22f);
+            rootRect.sizeDelta = new Vector2(222f, 246f);
+            root.GetComponent<UnityEngine.UI.Image>().color =
+                new Color(0.025f, 0.035f, 0.05f, 0.9f);
+
+            var title = CreateText(root, "LOCAL MAP", 18, TextAnchor.MiddleCenter, 28f);
+            title.raycastTarget = false;
+            var titleRect = (RectTransform)title.transform;
+            titleRect.anchorMin = new Vector2(0f, 1f);
+            titleRect.anchorMax = new Vector2(1f, 1f);
+            titleRect.pivot = new Vector2(0.5f, 1f);
+            titleRect.anchoredPosition = new Vector2(0f, -4f);
+            titleRect.sizeDelta = new Vector2(-12f, 28f);
+
+            var imageObject = new GameObject("Map", typeof(RectTransform), typeof(UnityEngine.UI.RawImage));
+            imageObject.transform.SetParent(root.transform, false);
+            var imageRect = (RectTransform)imageObject.transform;
+            imageRect.anchorMin = imageRect.anchorMax = imageRect.pivot = new Vector2(0.5f, 0.5f);
+            imageRect.anchoredPosition = new Vector2(0f, -10f);
+            imageRect.sizeDelta = new Vector2(198f, 198f);
+            var image = imageObject.GetComponent<UnityEngine.UI.RawImage>();
+            image.color = Color.white;
+            image.raycastTarget = false;
+            root.GetComponent<ReplicaMinimapController>().Configure(image);
+        }
+
+        private static Transform CreateInventoryGrid(
+            Transform parent,
+            string name,
+            Vector2 anchoredPosition,
+            Vector2 size,
+            int columns)
+        {
+            var gameObject = new GameObject(
+                name,
+                typeof(RectTransform),
+                typeof(UnityEngine.UI.GridLayoutGroup));
+            gameObject.transform.SetParent(parent, false);
+            var rect = (RectTransform)gameObject.transform;
+            rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(0.5f, 0.5f);
+            rect.anchoredPosition = anchoredPosition;
+            rect.sizeDelta = size;
+            var grid = gameObject.GetComponent<UnityEngine.UI.GridLayoutGroup>();
+            grid.cellSize = new Vector2(74f, 74f);
+            grid.spacing = new Vector2(8f, 8f);
+            grid.constraint = UnityEngine.UI.GridLayoutGroup.Constraint.FixedColumnCount;
+            grid.constraintCount = columns;
+            grid.childAlignment = TextAnchor.MiddleCenter;
+            return gameObject.transform;
+        }
+
+        private static InventorySlotButton CreateInventorySlot(
+            Transform parent,
+            string name,
+            float size)
+        {
+            var gameObject = new GameObject(
+                name,
+                typeof(RectTransform),
+                typeof(UnityEngine.UI.Image),
+                typeof(InventorySlotButton));
+            gameObject.transform.SetParent(parent, false);
+            ((RectTransform)gameObject.transform).sizeDelta = new Vector2(size, size);
+            var image = gameObject.GetComponent<UnityEngine.UI.Image>();
+            image.color = new Color(0.055f, 0.07f, 0.095f, 0.94f);
+            image.raycastTarget = true;
+            var text = CreateText(gameObject, string.Empty, 13, TextAnchor.MiddleCenter, size);
+            text.raycastTarget = false;
+            var rect = (RectTransform)text.transform;
+            rect.anchorMin = Vector2.zero;
+            rect.anchorMax = Vector2.one;
+            rect.offsetMin = rect.offsetMax = Vector2.zero;
+            return gameObject.GetComponent<InventorySlotButton>();
+        }
+
+        private static void CreateEventSystem(Transform parent)
         {
             var go = new GameObject("EventSystem", typeof(EventSystem), typeof(InputSystemUIInputModule));
+            go.transform.SetParent(parent, false);
             go.GetComponent<InputSystemUIInputModule>().AssignDefaultActions();
         }
 

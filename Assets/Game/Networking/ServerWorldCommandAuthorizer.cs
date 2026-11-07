@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using MF2.Game.Domain;
 using MF2.World.Core;
 using MF2.World.Registry;
+using Unity.Mathematics;
 using VContainer;
 
 namespace MF2.Game.Networking
@@ -57,8 +58,11 @@ namespace MF2.Game.Networking
 
         public bool IsAuthorized(PlayerId sender, in GameCommand command)
         {
-            if (command.Type != GameCommandType.World ||
-                !physics.TryGetBody(sender, out var body))
+            if (command.Type == GameCommandType.Inventory)
+                return command.InventoryCommand.IsStructurallyValid;
+            if (command.Type == GameCommandType.PlayerAction)
+                return IsPlayerActionAuthorized(sender, command.PlayerActionCommand);
+            if (command.Type != GameCommandType.World || !physics.TryGetBody(sender, out var body))
             {
                 return false;
             }
@@ -71,6 +75,31 @@ namespace MF2.Game.Networking
             var y = DistanceToRange(body.Position.y, world.Min.y, world.Max.y);
             var z = DistanceToRange(body.Position.z, world.Min.z, world.Max.z);
             return x * x + y * y + z * z <= reachSquared;
+        }
+
+        private bool IsPlayerActionAuthorized(
+            PlayerId sender,
+            in PlayerActionCommand command)
+        {
+            if (!command.IsStructurallyValid ||
+                !physics.TryGetBody(sender, out var attacker))
+            {
+                return false;
+            }
+            if (command.Kind == PlayerActionCommandKind.Dash)
+                return true;
+            if (command.Kind != PlayerActionCommandKind.Attack ||
+                command.Target == sender ||
+                !physics.TryGetBody(command.Target, out var target))
+            {
+                return false;
+            }
+
+            var distance = math.distance(attacker.Position, target.Position);
+            // The authenticated network ingress performs the collider LOS check before creating
+            // this identity-bearing command. This policy independently fences registered bodies
+            // and authoritative distance without exposing a client-supplied target id.
+            return math.isfinite(distance) && distance > 0.01f && distance <= 2.5f;
         }
 
         private static double DistanceToRange(float value, int minimum, int maximum)

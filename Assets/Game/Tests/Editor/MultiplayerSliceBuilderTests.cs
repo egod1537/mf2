@@ -3,6 +3,7 @@ using System.Linq;
 using FishNet.Managing;
 using FishNet.Object;
 using MF2.Entities.Player;
+using MF2.Game.Domain;
 using MF2.Game.Lifecycle;
 using MF2.Game.Networking;
 using MF2.Game.Presentation;
@@ -132,6 +133,27 @@ namespace MF2.Game.Tests.Editor
             }
         }
 
+        [TestCase("Assets/Scenes/Title.unity", "00_Application NetworkBootstrap", "10_SceneContext", "30_Gameplay", "40_UI")]
+        [TestCase("Assets/Scenes/Outgame.unity", "10_SceneContext", "30_Gameplay", "40_Presentation", "50_UI")]
+        [TestCase("Assets/Scenes/Ingame.unity", "10_SceneContext", "20_World", "30_Gameplay", "40_Presentation", "50_UI")]
+        [TestCase("Assets/Scenes/Test.unity", "10_SceneContext", "20_World", "30_Gameplay", "40_Presentation", "50_UI", "90_Debug")]
+        public void BuilderOutput_UsesRoleBasedTopLevelHierarchy(
+            string scenePath,
+            params string[] expectedRoots)
+        {
+            var scene = EditorSceneManager.OpenPreviewScene(scenePath);
+            try
+            {
+                var roots = scene.GetRootGameObjects().Select(root => root.name).ToArray();
+                foreach (var expected in expectedRoots)
+                    Assert.That(roots, Does.Contain(expected), $"{scenePath}: {expected}");
+            }
+            finally
+            {
+                EditorSceneManager.ClosePreviewScene(scene);
+            }
+        }
+
         [TestCase("Assets/Scenes/Test.unity", 4)]
         [TestCase("Assets/Scenes/Ingame.unity", 2)]
         public void BuilderOutput_GameScenesKeepPresentationOnlyWorldWiring(
@@ -148,6 +170,12 @@ namespace MF2.Game.Tests.Editor
                 Assert.That(FindInScene<NetworkSceneHud>(scene), Is.Not.Null);
                 Assert.That(FindInScene<SceneLifetimeScope>(scene), Is.Not.Null);
                 Assert.That(FindInScene<EventSystem>(scene), Is.Not.Null);
+                Assert.That(FindAllInScene<InventoryHudController>(scene).Count, Is.EqualTo(1));
+                Assert.That(FindAllInScene<ReplicaMinimapController>(scene).Count, Is.EqualTo(1));
+                Assert.That(FindAllInScene<InventorySlotButton>(scene).Count,
+                    Is.EqualTo(InventoryState.QuickbarSlotCount +
+                               InventoryState.BagSlotCount +
+                               InventoryState.EquipmentSlotCount));
                 Assert.That(FindAllInScene<SpawnPoint>(scene).Count, Is.EqualTo(expectedSpawnPoints));
 
                 var light = FindAllInScene<Light>(scene)
@@ -200,6 +228,10 @@ namespace MF2.Game.Tests.Editor
                 playerPrefab.GetComponentInChildren<PlayerOcclusionDither>(true);
             Assert.That(occlusionDither, Is.Not.Null);
             Assert.That(occlusionDither.Target, Is.SameAs(playerPrefab.transform));
+            var cameraFollow =
+                playerPrefab.GetComponentInChildren<PlayerCameraFollow>(true);
+            Assert.That(cameraFollow, Is.Not.Null);
+            Assert.That(cameraFollow.Target, Is.SameAs(playerPrefab.transform.Find("Visual")));
             AssertProPixelizerVisual(playerPrefab, materialPath);
 
             var offlinePlayerPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(

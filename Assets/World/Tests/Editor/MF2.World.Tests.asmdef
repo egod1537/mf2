@@ -3,6 +3,7 @@
     "rootNamespace": "MF2.World.Tests",
     "references": [
         "MF2.World.Editor",
+        "MF2.World.PixelVoxel.Editor",
         "MF2.World.Runtime",
         "Unity.Collections",
         "Unity.Mathematics"

@@ -15,7 +15,8 @@ namespace MF2
                 .AsSelf()
                 .As<IClientReplicatedWorld>()
                 .As<IClientWorldViewSource>()
-                .As<IEntityStateReader>();
+                .As<IEntityStateReader>()
+                .As<ILocalInventoryReader>();
         }
     }
 }

@@ -101,6 +101,17 @@ Region JSON의 `Block(Id, State)`로 그대로 보존된다.
 4. 별도 빌드 또는 ParrelSync clone에서 `127.0.0.1`과 같은 Port로 `Join`한다.
 5. 각 창에서 WASD 이동, Shift 달리기, Space 점프를 확인한다.
 
+추가 조작은 다음과 같다.
+
+- 마우스 이동: 캐릭터가 월드 바닥면의 포인터 방향을 바라본다.
+- 좌클릭: 서버 판정 근접 공격, 우클릭: Prediction 경로의 대시.
+- `E`: 인벤토리 열기/닫기. 열린 동안 이동·점프·공격·대시는 입력되지 않는다.
+- `1`~`7` 또는 마우스 휠: 퀵슬롯 선택.
+- 슬롯 좌클릭: 전체 스택 선택, 우클릭: 절반 선택, Shift+클릭: 빠른 이동.
+
+게임 씬 우측 상단 미니맵은 authoritative snapshot/delta로 만든 client replica만 읽는다.
+서버 `GameSession`이나 서버 `WorldCore`를 직접 참조하지 않는다.
+
 클라이언트가 먼저 Join하여 실패해도 Outgame에서 Host가 준비된 뒤 다시 Join할 수 있다. Disconnect는 플레이어를 서버에서 Despawn하고 Outgame으로 복귀시킨다.
 
 ### Dedicated Server
@@ -108,6 +119,17 @@ Region JSON의 `Block(Id, State)`로 그대로 보존된다.
 Dedicated Server 빌드 타깃 또는 `-batchmode -nographics`로 `Title` 시작 씬을 실행한다. UI, 카메라, 로컬 플레이어는 비활성화되고 서버만 시작한다. Port는 `-port 7770` 또는 `-mf2Port 7770`으로 바꿀 수 있다. 최초 인증 클라이언트가 접속하면 `Test` 씬을 한 번 자동 시작하며, 이후 참가자는 FishNet Global Scene 동기화로 같은 씬에 진입한다.
 
 NAT traversal, relay, matchmaking, room browser는 범위 밖이다. 인터넷 연결 시 Tugboat UDP Port에 대한 방화벽/포트 포워딩을 별도로 설정해야 한다.
+
+### Terrain profile and pixel-to-voxel tool
+
+기본 지형은 기존 `Normal` 프로필이다. 서버/Host 실행 인수에
+`-mf2Terrain amplified`를 추가하면 같은 seed에서 결정적인 Amplified 높이 프로필을 쓴다.
+클라이언트는 지형을 독립 생성하지 않고 서버 snapshot을 받는다.
+
+Unity 메뉴 `Tools > World > Pixel Art to Voxels`는 Texture2D/Sprite의 불투명 픽셀을
+현재 프로젝트 블록 팔레트에 매핑한다. XY/XZ/ZY 평면, pixel scale, depth와 alpha threshold를
+지정할 수 있으며 SceneView preview 후 선택한 Editor `WorldHost`에 한 번의 command batch로
+적용한다. 최대 65,536 블록 제한과 Undo/Redo를 제공한다.
 
 ### 검증
 

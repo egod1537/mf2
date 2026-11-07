@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using MF2.Game.Domain;
 
 namespace MF2.Entities.Player
 {
@@ -9,18 +10,24 @@ namespace MF2.Entities.Player
             Vector2 worldMove,
             Vector2 worldFacing,
             bool sprint,
-            bool jump)
+            bool jump,
+            bool dash,
+            bool attack)
         {
             WorldMove = worldMove;
             WorldFacing = worldFacing;
             Sprint = sprint;
             Jump = jump;
+            Dash = dash;
+            Attack = attack;
         }
 
         public Vector2 WorldMove { get; }
         public Vector2 WorldFacing { get; }
         public bool Sprint { get; }
         public bool Jump { get; }
+        public bool Dash { get; }
+        public bool Attack { get; }
     }
 
     [DisallowMultipleComponent]
@@ -32,6 +39,8 @@ namespace MF2.Entities.Player
         private Vector2 worldFacing = Vector2.up;
         private bool sprintInput;
         private bool jumpQueued;
+        private bool dashQueued;
+        private bool attackQueued;
 
         public Vector2 CurrentWorldFacing => worldFacing;
 
@@ -55,6 +64,15 @@ namespace MF2.Entities.Player
 
         public void Capture()
         {
+            if (GameplayInputGate.IsInventoryOpen || GameplayInputGate.IsPointerOverInterface)
+            {
+                moveInput = Vector2.zero;
+                sprintInput = false;
+                jumpQueued = false;
+                dashQueued = false;
+                attackQueued = false;
+                return;
+            }
             var mouse = Mouse.current;
             if (mouse != null && TryProjectPointerFacing(
                     movementCamera,
@@ -63,6 +81,13 @@ namespace MF2.Entities.Player
                     out var facing))
             {
                 worldFacing = facing;
+            }
+            if (mouse != null)
+            {
+                if (mouse.rightButton.wasPressedThisFrame)
+                    dashQueued = true;
+                if (mouse.leftButton.wasPressedThisFrame)
+                    attackQueued = true;
             }
 
             var keyboard = Keyboard.current;
@@ -95,8 +120,12 @@ namespace MF2.Entities.Player
                 new Vector2(world.x, world.z),
                 worldFacing,
                 sprintInput,
-                jumpQueued);
+                jumpQueued,
+                dashQueued,
+                attackQueued);
             jumpQueued = false;
+            dashQueued = false;
+            attackQueued = false;
             return result;
         }
 

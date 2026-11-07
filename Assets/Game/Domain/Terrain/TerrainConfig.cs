@@ -4,6 +4,12 @@ using MF2.World.Registry;
 
 namespace MF2.Game.Domain
 {
+    public enum TerrainGenerationProfile : byte
+    {
+        Normal,
+        Amplified
+    }
+
     /// <summary>Stable block palette used by layered terrain generation.</summary>
     public readonly struct TerrainSurfacePalette : IEquatable<TerrainSurfacePalette>
     {
@@ -57,7 +63,8 @@ namespace MF2.Game.Domain
             int octaves,
             int seed,
             Block solidBlock,
-            long maximumBlockBudget = DefaultMaximumBlockBudget)
+            long maximumBlockBudget = DefaultMaximumBlockBudget,
+            TerrainGenerationProfile profile = TerrainGenerationProfile.Normal)
             : this(
                 originX,
                 originZ,
@@ -75,6 +82,7 @@ namespace MF2.Game.Domain
                 waterLevel: minimumY,
                 waterEnabled: false,
                 maximumBlockBudget,
+                profile,
                 validateDistinctPalette: false)
         {
         }
@@ -94,7 +102,8 @@ namespace MF2.Game.Domain
             TerrainSurfacePalette palette,
             int dirtDepth,
             int waterLevel,
-            long maximumBlockBudget = DefaultMaximumBlockBudget)
+            long maximumBlockBudget = DefaultMaximumBlockBudget,
+            TerrainGenerationProfile profile = TerrainGenerationProfile.Normal)
             : this(
                 originX,
                 originZ,
@@ -112,6 +121,7 @@ namespace MF2.Game.Domain
                 waterLevel,
                 waterEnabled: true,
                 maximumBlockBudget,
+                profile,
                 validateDistinctPalette: true)
         {
         }
@@ -133,6 +143,7 @@ namespace MF2.Game.Domain
             int waterLevel,
             bool waterEnabled,
             long maximumBlockBudget,
+            TerrainGenerationProfile profile,
             bool validateDistinctPalette)
         {
             if (width <= 0)
@@ -171,6 +182,9 @@ namespace MF2.Game.Domain
             }
             if (maximumBlockBudget <= 0)
                 throw new ArgumentOutOfRangeException(nameof(maximumBlockBudget));
+            if (profile < TerrainGenerationProfile.Normal ||
+                profile > TerrainGenerationProfile.Amplified)
+                throw new ArgumentOutOfRangeException(nameof(profile));
 
             _ = checked(originX + width - 1);
             _ = checked(originZ + depth - 1);
@@ -209,6 +223,7 @@ namespace MF2.Game.Domain
             WaterLevel = waterLevel;
             WaterEnabled = waterEnabled;
             MaximumBlockBudget = maximumBlockBudget;
+            Profile = profile;
         }
 
         public int OriginX { get; }
@@ -232,13 +247,15 @@ namespace MF2.Game.Domain
         public int WaterLevel { get; }
         public bool WaterEnabled { get; }
         public long MaximumBlockBudget { get; }
+        public TerrainGenerationProfile Profile { get; }
         public int MaximumX => checked(OriginX + Width - 1);
         public int MaximumZ => checked(OriginZ + Depth - 1);
 
         public bool ContainsColumn(int x, int z) =>
             x >= OriginX && x <= MaximumX && z >= OriginZ && z <= MaximumZ;
 
-        public static TerrainConfig CreateDefault() => new TerrainConfig(
+        public static TerrainConfig CreateDefault(
+            TerrainGenerationProfile profile = TerrainGenerationProfile.Normal) => new TerrainConfig(
             originX: -32,
             originZ: -32,
             width: 64,
@@ -256,7 +273,8 @@ namespace MF2.Game.Domain
                 new Block(StableBlockId.Compute("minecraft:grass_block")),
                 new Block(BlockTraitsCatalog.WaterStableId)),
             dirtDepth: 3,
-            waterLevel: 7);
+            waterLevel: 7,
+            profile: profile);
 
         public bool Equals(TerrainConfig other) =>
             OriginX == other.OriginX && OriginZ == other.OriginZ &&
@@ -267,6 +285,7 @@ namespace MF2.Game.Domain
             Seed == other.Seed && Palette.Equals(other.Palette) &&
             DirtDepth == other.DirtDepth && WaterLevel == other.WaterLevel &&
             WaterEnabled == other.WaterEnabled &&
+            Profile == other.Profile &&
             MaximumBlockBudget == other.MaximumBlockBudget;
 
         public override bool Equals(object obj) => obj is TerrainConfig other && Equals(other);
@@ -290,6 +309,7 @@ namespace MF2.Game.Domain
                 hash = hash * 397 ^ DirtDepth;
                 hash = hash * 397 ^ WaterLevel;
                 hash = hash * 397 ^ WaterEnabled.GetHashCode();
+                hash = hash * 397 ^ (byte)Profile;
                 return hash * 397 ^ MaximumBlockBudget.GetHashCode();
             }
         }

@@ -22,18 +22,24 @@ namespace MF2.Entities.Player
             public Vector2 WorldFacing;
             public bool Sprint;
             public bool Jump;
+            public bool Dash;
+            public bool Attack;
             private uint tick;
 
             public MoveData(
                 Vector2 worldMove,
                 Vector2 worldFacing,
                 bool sprint,
-                bool jump)
+                bool jump,
+                bool dash,
+                bool attack)
             {
                 WorldMove = worldMove;
                 WorldFacing = worldFacing;
                 Sprint = sprint;
                 Jump = jump;
+                Dash = dash;
+                Attack = attack;
                 tick = 0;
             }
 
@@ -45,11 +51,24 @@ namespace MF2.Entities.Player
         public struct ReconcileData : IReconcileData
         {
             public PredictionRigidbody Body;
+            public int DashCharges;
+            public uint NextDashRechargeTick;
+            public uint LastDashTick;
+            public bool HasDashed;
             private uint tick;
 
-            public ReconcileData(PredictionRigidbody body)
+            public ReconcileData(
+                PredictionRigidbody body,
+                int dashCharges,
+                uint nextDashRechargeTick,
+                uint lastDashTick,
+                bool hasDashed)
             {
                 Body = body;
+                DashCharges = dashCharges;
+                NextDashRechargeTick = nextDashRechargeTick;
+                LastDashTick = lastDashTick;
+                HasDashed = hasDashed;
                 tick = 0;
             }
 
@@ -63,6 +82,7 @@ namespace MF2.Entities.Player
         [SerializeField, Min(0.1f)] private float sprintSpeed = 6f;
         [SerializeField, Min(0.1f)] private float jumpVelocity = 6.5f;
         [SerializeField, Min(0.01f)] private float groundProbeDistance = 0.12f;
+        [SerializeField, Min(0.1f)] private float dashImpulse = 10f;
 
         [Header("MVC")]
         [SerializeField] private BlockPlayerInputSource inputSource;
@@ -75,8 +95,13 @@ namespace MF2.Entities.Player
         private readonly SyncVar<Guid> playerId = new();
         private Rigidbody body;
         private CapsuleCollider capsule;
+        private int predictedDashCharges = PlayerActionState.MaximumDashCharges;
+        private uint nextDashRechargeTick;
+        private uint lastDashTick;
+        private bool hasDashed;
 
         public bool IsGrounded { get; private set; }
+        public Vector2 CurrentWorldFacing => ResolveInput().CurrentWorldFacing;
         public PlayerPresentationBindingGate PresentationBinding => ResolvePresentationBinding();
 
         public void ConfigureRig(
@@ -200,11 +225,19 @@ namespace MF2.Entities.Player
                 return default;
 
             var input = ResolveInput().Consume();
+            if (input.Dash)
+                PlayerActionCommandBridge.Sender?.SendDash();
+            if (input.Attack)
+                PlayerActionCommandBridge.Sender?.SendAttack(
+                    input.WorldFacing.x,
+                    input.WorldFacing.y);
             return new MoveData(
                 input.WorldMove,
                 input.WorldFacing,
                 input.Sprint,
-                input.Jump);
+                input.Jump,
+                input.Dash,
+                input.Attack);
         }
 
         [Replicate]
@@ -219,6 +252,19 @@ namespace MF2.Entities.Player
             var velocity = body.linearVelocity;
             velocity.x = data.WorldMove.x * speed;
             velocity.z = data.WorldMove.y * speed;
+            AdvancePredictedDash(data.GetTick());
+            if (data.Dash && CanPredictedDash(data.GetTick()))
+            {
+                var direction = data.WorldMove.sqrMagnitude > 0.01f
+                    ? data.WorldMove.normalized
+                    : data.WorldFacing.normalized;
+                if (direction.sqrMagnitude > 0.01f)
+                {
+                    velocity.x += direction.x * dashImpulse;
+                    velocity.z += direction.y * dashImpulse;
+                    BeginPredictedDash(data.GetTick());
+                }
+            }
             if (data.Jump && IsGrounded)
                 velocity.y = jumpVelocity;
             predictionBody.Velocity(velocity);
@@ -227,7 +273,12 @@ namespace MF2.Entities.Player
 
         public override void CreateReconcile()
         {
-            PerformReconcile(new ReconcileData(predictionBody));
+            PerformReconcile(new ReconcileData(
+                predictionBody,
+                predictedDashCharges,
+                nextDashRechargeTick,
+                lastDashTick,
+                hasDashed));
         }
 
         [Reconcile]
@@ -236,6 +287,36 @@ namespace MF2.Entities.Player
             Channel channel = Channel.Unreliable)
         {
             predictionBody.Reconcile(data.Body);
+            predictedDashCharges = data.DashCharges;
+            nextDashRechargeTick = data.NextDashRechargeTick;
+            lastDashTick = data.LastDashTick;
+            hasDashed = data.HasDashed;
+        }
+
+        private bool CanPredictedDash(uint tick) =>
+            predictedDashCharges > 0 &&
+            (!hasDashed || tick - lastDashTick >= PlayerActionState.DashCooldownTicks);
+
+        private void BeginPredictedDash(uint tick)
+        {
+            var wasFull = predictedDashCharges == PlayerActionState.MaximumDashCharges;
+            predictedDashCharges--;
+            if (wasFull)
+                nextDashRechargeTick = tick + PlayerActionState.DashRechargeTicks;
+            lastDashTick = tick;
+            hasDashed = true;
+        }
+
+        private void AdvancePredictedDash(uint tick)
+        {
+            while (predictedDashCharges < PlayerActionState.MaximumDashCharges &&
+                   nextDashRechargeTick != 0 && tick >= nextDashRechargeTick)
+            {
+                predictedDashCharges++;
+                nextDashRechargeTick += PlayerActionState.DashRechargeTicks;
+            }
+            if (predictedDashCharges == PlayerActionState.MaximumDashCharges)
+                nextDashRechargeTick = 0;
         }
 
         private bool CheckGrounded()

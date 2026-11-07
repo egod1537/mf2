@@ -149,13 +149,22 @@ namespace MF2.Game.Tests.Editor
         {
             var player = new PlayerId(Guid.NewGuid());
             var gameObject = new GameObject("Command Authorization Body");
+            var targetObject = new GameObject("Command Authorization Target");
             var physics = new UnityPhysicsAdapter();
             try
             {
                 var body = gameObject.AddComponent<Rigidbody>();
+                gameObject.AddComponent<CapsuleCollider>();
                 body.isKinematic = true;
                 body.position = Vector3.zero;
                 physics.TryRegisterBody(player, body);
+                var target = new PlayerId(Guid.NewGuid());
+                var targetBody = targetObject.AddComponent<Rigidbody>();
+                targetObject.AddComponent<CapsuleCollider>();
+                targetBody.isKinematic = true;
+                targetBody.position = new Vector3(1.5f, 30f, 0f);
+                physics.TryRegisterBody(target, targetBody);
+                UnityEngine.Physics.SyncTransforms();
                 var policy = new ServerWorldCommandAuthorizer(
                     physics,
                     new SingleBlockCatalog(10));
@@ -174,11 +183,24 @@ namespace MF2.Game.Tests.Editor
                     player,
                     GameCommand.ApplyWorld(WorldCommand.RemoveBlock(
                         new int3(100, 0, 0)))), Is.False);
+                Assert.That(policy.IsAuthorized(
+                    player,
+                    GameCommand.ApplyInventory(InventoryCommand.SelectQuickbar(1))), Is.True);
+                Assert.That(policy.IsAuthorized(
+                    player,
+                    GameCommand.ApplyPlayerAction(PlayerActionCommand.Dash())), Is.True);
+                gameObject.transform.position = new Vector3(0f, 30f, 0f);
+                targetObject.transform.position = new Vector3(1.5f, 30f, 0f);
+                UnityEngine.Physics.SyncTransforms();
+                Assert.That(policy.IsAuthorized(
+                    player,
+                    GameCommand.ApplyPlayerAction(PlayerActionCommand.Attack(target))), Is.True);
             }
             finally
             {
                 physics.Dispose();
                 UnityEngine.Object.DestroyImmediate(gameObject);
+                UnityEngine.Object.DestroyImmediate(targetObject);
             }
         }
 

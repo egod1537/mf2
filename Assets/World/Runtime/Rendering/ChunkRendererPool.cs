@@ -88,8 +88,10 @@ namespace MF2.World.Rendering
                 throw new ArgumentNullException(nameof(worldPositions));
 
             ditheredBlocks.Clear();
+            var selectedWorld = new HashSet<int3>();
             foreach (var worldPosition in worldPositions)
             {
+                selectedWorld.Add(worldPosition);
                 ChunkCoordinates.Split(worldPosition, out var chunk, out var local);
                 if (!ditheredBlocks.TryGetValue(chunk, out var localBlocks))
                 {
@@ -101,11 +103,39 @@ namespace MF2.World.Rendering
 
             foreach (var pair in active)
             {
-                pair.Value.SetDitheredBlocks(
-                    ditheredBlocks.TryGetValue(pair.Key, out var localBlocks)
-                        ? localBlocks
-                        : NoDitheredBlocks);
+                if (!ditheredBlocks.TryGetValue(pair.Key, out var localBlocks))
+                {
+                    pair.Value.SetDitheredBlocks(NoDitheredBlocks);
+                    continue;
+                }
+
+                // Include selected neighbors just outside this chunk as sentinel local cells.
+                // They are never routed into this renderer's dither submesh, but prevent two
+                // selected boundary blocks from generating duplicate coplanar backing faces.
+                var effective = new HashSet<int3>(localBlocks);
+                foreach (var local in localBlocks)
+                {
+                    var world = pair.Key * ChunkCoordinates.Size + local;
+                    AddSelectedNeighbor(selectedWorld, effective, world, local, new int3(-1, 0, 0));
+                    AddSelectedNeighbor(selectedWorld, effective, world, local, new int3(1, 0, 0));
+                    AddSelectedNeighbor(selectedWorld, effective, world, local, new int3(0, -1, 0));
+                    AddSelectedNeighbor(selectedWorld, effective, world, local, new int3(0, 1, 0));
+                    AddSelectedNeighbor(selectedWorld, effective, world, local, new int3(0, 0, -1));
+                    AddSelectedNeighbor(selectedWorld, effective, world, local, new int3(0, 0, 1));
+                }
+                pair.Value.SetDitheredBlocks(effective);
             }
+        }
+
+        private static void AddSelectedNeighbor(
+            HashSet<int3> selectedWorld,
+            HashSet<int3> effectiveLocal,
+            int3 world,
+            int3 local,
+            int3 offset)
+        {
+            if (selectedWorld.Contains(world + offset))
+                effectiveLocal.Add(local + offset);
         }
 
         public bool Release(int3 chunkCoordinate)

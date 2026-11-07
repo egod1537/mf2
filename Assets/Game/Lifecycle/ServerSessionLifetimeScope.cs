@@ -15,7 +15,8 @@ namespace MF2
             builder.Register<HealthSystem>(Lifetime.Scoped);
             builder.Register<SimulationWorld>(Lifetime.Scoped);
             builder.Register(
-                    _ => new PerlinTerrainGenerator(TerrainConfig.CreateDefault()),
+                    _ => new PerlinTerrainGenerator(TerrainConfig.CreateDefault(
+                        ResolveTerrainProfile(System.Environment.GetCommandLineArgs()))),
                     Lifetime.Scoped)
                 .As<IWorldInitializer>();
             builder.Register<CommandProcessor>(Lifetime.Scoped);
@@ -32,6 +33,22 @@ namespace MF2
                 .As<IGameCommandAuthorizer>();
             builder.Register<GameSession>(Lifetime.Scoped);
             builder.RegisterEntryPoint<ServerSessionRunner>(Lifetime.Scoped);
+        }
+
+        internal static TerrainGenerationProfile ResolveTerrainProfile(string[] arguments)
+        {
+            if (arguments == null)
+                return TerrainGenerationProfile.Normal;
+            for (var i = 0; i + 1 < arguments.Length; i++)
+            {
+                if (!string.Equals(arguments[i], "-mf2Terrain", System.StringComparison.OrdinalIgnoreCase))
+                    continue;
+                return string.Equals(
+                    arguments[i + 1], "amplified", System.StringComparison.OrdinalIgnoreCase)
+                    ? TerrainGenerationProfile.Amplified
+                    : TerrainGenerationProfile.Normal;
+            }
+            return TerrainGenerationProfile.Normal;
         }
     }
 }

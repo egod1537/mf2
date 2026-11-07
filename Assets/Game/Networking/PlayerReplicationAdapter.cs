@@ -20,6 +20,12 @@ namespace MF2.Game.Networking
         public int MaximumHealth;
         public byte LifeState;
         public long Revision;
+        public int DashCharges;
+        public long NextDashRechargeTick;
+        public long LastDashTick;
+        public long LastAttackTick;
+        public long DashSequence;
+        public long AttackSequence;
         public bool Removed;
     }
 
@@ -39,6 +45,25 @@ namespace MF2.Game.Networking
         public ReplicatedPlayerState[] Changes;
     }
 
+    public struct ReplicatedItemStack
+    {
+        public uint ItemId;
+        public int Count;
+    }
+
+    public struct OwnerInventoryBroadcast : IBroadcast
+    {
+        public Guid SessionId;
+        public long Generation;
+        public long TickIndex;
+        public Guid PlayerId;
+        public long Revision;
+        public int SelectedQuickbarSlot;
+        public ReplicatedItemStack[] Bag;
+        public ReplicatedItemStack[] Quickbar;
+        public ReplicatedItemStack[] Equipment;
+    }
+
     /// <summary>
     /// FishNet boundary for authoritative player snapshots and the client-only read replica. It
     /// also binds client-spawned player prefabs after both their domain id and replica are ready.
@@ -51,6 +76,7 @@ namespace MF2.Game.Networking
             new Dictionary<int, PlayerPresentationBindingGate>();
         private NetworkManager networkManager;
         private ServerSessionCoordinator coordinator;
+        private GameCommandNetworkAdapter commandAdapter;
         private ClientPresentationCoordinator clientPresentation;
         private ClientStateCoordinator clientState;
         private GameSession subscribedSession;
@@ -67,6 +93,7 @@ namespace MF2.Game.Networking
         {
             networkManager = GetComponent<NetworkManager>();
             coordinator = GetComponent<ServerSessionCoordinator>();
+            commandAdapter = GetComponent<GameCommandNetworkAdapter>();
         }
 
         private void OnEnable()
@@ -91,11 +118,14 @@ namespace MF2.Game.Networking
 
             networkManager.ClientManager.RegisterBroadcast<PlayerSnapshotBroadcast>(OnSnapshotReceived);
             networkManager.ClientManager.RegisterBroadcast<PlayerDeltaBroadcast>(OnDeltaReceived);
+            networkManager.ClientManager.RegisterBroadcast<OwnerInventoryBroadcast>(
+                OnOwnerInventoryReceived);
             networkManager.ClientManager.OnClientConnectionState += OnClientConnectionState;
             networkManager.ClientManager.Objects.OnSpawnedAdd += OnClientSpawned;
             networkManager.ClientManager.Objects.OnSpawnedRemove += OnClientDespawned;
             networkManager.ClientManager.Objects.OnSpawnedClear += OnClientSpawnedCleared;
             networkManager.ServerManager.OnAuthenticationResult += OnServerAuthenticationResult;
+            commandAdapter.ConnectionMapped += OnConnectionMapped;
             networkCallbacksRegistered = true;
 
             foreach (var pair in networkManager.ClientManager.Objects.Spawned)
@@ -180,6 +210,44 @@ namespace MF2.Game.Networking
                 TickIndex = result.TickIndex,
                 Changes = changes
             });
+
+            for (var i = 0; i < result.PlayerChanges.Count; i++)
+            {
+                var change = result.PlayerChanges[i];
+                if (change.Kind == PlayerStateChangeKind.Upserted &&
+                    commandAdapter.TryGetConnectionId(change.PlayerId, out var connectionId))
+                {
+                    SendOwnerInventory(connectionId, change.Snapshot, result.TickIndex);
+                }
+            }
+        }
+
+        private void OnConnectionMapped(int connectionId, PlayerId playerId)
+        {
+            if (subscribedSession == null ||
+                !subscribedSession.Players.TryGet(playerId, out var model))
+                return;
+            SendOwnerInventory(connectionId, model, subscribedSession.TickIndex);
+        }
+
+        private void SendOwnerInventory(int connectionId, in PlayerModel model, long tickIndex)
+        {
+            if (subscribedSession == null ||
+                !networkManager.ServerManager.Clients.TryGetValue(connectionId, out var connection))
+                return;
+            var inventory = model.Inventory;
+            networkManager.ServerManager.Broadcast(connection, new OwnerInventoryBroadcast
+            {
+                SessionId = subscribedSession.Id.Value,
+                Generation = subscribedSession.Generation,
+                TickIndex = tickIndex,
+                PlayerId = model.Id.Value,
+                Revision = model.Revision,
+                SelectedQuickbarSlot = inventory.SelectedQuickbarSlot,
+                Bag = ToReplicated(inventory.CaptureSlots(InventoryContainerKind.Bag)),
+                Quickbar = ToReplicated(inventory.CaptureSlots(InventoryContainerKind.Quickbar)),
+                Equipment = ToReplicated(inventory.CaptureSlots(InventoryContainerKind.Equipment))
+            });
         }
 
         private void OnSnapshotReceived(PlayerSnapshotBroadcast message, Channel channel)
@@ -230,6 +298,35 @@ namespace MF2.Game.Networking
                 message.Generation,
                 message.TickIndex,
                 changes);
+        }
+
+        private void OnOwnerInventoryReceived(OwnerInventoryBroadcast message, Channel channel)
+        {
+            if (clientState == null || message.SessionId == Guid.Empty ||
+                message.PlayerId == Guid.Empty || message.Generation <= 0 ||
+                !TryCreateStacks(message.Bag, InventoryState.BagSlotCount, out var bag) ||
+                !TryCreateStacks(message.Quickbar, InventoryState.QuickbarSlotCount, out var quickbar) ||
+                !TryCreateStacks(message.Equipment, InventoryState.EquipmentSlotCount, out var equipment))
+                return;
+
+            InventoryState inventory;
+            try
+            {
+                inventory = new InventoryState(
+                    bag, quickbar, equipment, message.SelectedQuickbarSlot);
+            }
+            catch (ArgumentException)
+            {
+                return;
+            }
+
+            clientState.ApplyLocalInventory(
+                new SessionId(message.SessionId),
+                message.Generation,
+                message.TickIndex,
+                new PlayerId(message.PlayerId),
+                message.Revision,
+                inventory);
         }
 
         private void OnClientSpawned(int objectId, NetworkObject networkObject)
@@ -296,8 +393,56 @@ namespace MF2.Game.Networking
                 MaximumHealth = snapshot.MaximumHealth,
                 LifeState = (byte)snapshot.LifeState,
                 Revision = snapshot.Revision,
+                DashCharges = snapshot.Actions.DashCharges,
+                NextDashRechargeTick = snapshot.Actions.NextDashRechargeTick,
+                LastDashTick = snapshot.Actions.LastDashTick,
+                LastAttackTick = snapshot.Actions.LastAttackTick,
+                DashSequence = snapshot.Actions.DashSequence,
+                AttackSequence = snapshot.Actions.AttackSequence,
                 Removed = removed
             };
+
+        private static ReplicatedItemStack[] ToReplicated(ItemStack[] source)
+        {
+            var result = new ReplicatedItemStack[source.Length];
+            for (var i = 0; i < source.Length; i++)
+            {
+                result[i] = new ReplicatedItemStack
+                {
+                    ItemId = source[i].ItemId,
+                    Count = source[i].Count
+                };
+            }
+            return result;
+        }
+
+        private static bool TryCreateStacks(
+            ReplicatedItemStack[] source,
+            int expectedLength,
+            out ItemStack[] result)
+        {
+            result = null;
+            if (source == null || source.Length != expectedLength)
+                return false;
+            result = new ItemStack[source.Length];
+            for (var i = 0; i < source.Length; i++)
+            {
+                var item = source[i];
+                if (item.ItemId == 0 && item.Count == 0)
+                    continue;
+                if (!ItemCatalog.IsKnown(item.ItemId))
+                    return false;
+                try
+                {
+                    result[i] = new ItemStack(item.ItemId, item.Count);
+                }
+                catch (ArgumentOutOfRangeException)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
 
         private static bool TryCreateModel(
             in ReplicatedPlayerState source,
@@ -309,7 +454,12 @@ namespace MF2.Game.Networking
                 source.Health < 0 ||
                 source.Health > source.MaximumHealth ||
                 source.LifeState > (byte)PlayerLifeState.Dead ||
-                source.Revision < 0)
+                source.Revision < 0 ||
+                source.DashCharges < 0 ||
+                source.DashCharges > PlayerActionState.MaximumDashCharges ||
+                source.NextDashRechargeTick < 0 ||
+                source.DashSequence < 0 ||
+                source.AttackSequence < 0)
             {
                 return false;
             }
@@ -319,7 +469,15 @@ namespace MF2.Game.Networking
                 source.Health,
                 source.MaximumHealth,
                 (PlayerLifeState)source.LifeState,
-                source.Revision);
+                source.Revision,
+                null,
+                new PlayerActionState(
+                    source.DashCharges,
+                    source.NextDashRechargeTick,
+                    source.LastDashTick,
+                    source.LastAttackTick,
+                    source.DashSequence,
+                    source.AttackSequence));
             return true;
         }
 
@@ -359,6 +517,8 @@ namespace MF2.Game.Networking
             {
                 clientManager.UnregisterBroadcast<PlayerSnapshotBroadcast>(OnSnapshotReceived);
                 clientManager.UnregisterBroadcast<PlayerDeltaBroadcast>(OnDeltaReceived);
+                clientManager.UnregisterBroadcast<OwnerInventoryBroadcast>(
+                    OnOwnerInventoryReceived);
                 clientManager.OnClientConnectionState -= OnClientConnectionState;
                 var spawnedObjects = clientManager.Objects;
                 if (spawnedObjects != null)
@@ -371,6 +531,8 @@ namespace MF2.Game.Networking
 
             if (networkManager.ServerManager != null)
                 networkManager.ServerManager.OnAuthenticationResult -= OnServerAuthenticationResult;
+            if (commandAdapter != null)
+                commandAdapter.ConnectionMapped -= OnConnectionMapped;
             networkCallbacksRegistered = false;
         }
     }

@@ -171,6 +171,51 @@ namespace MF2.Tests
             Assert.That(first.Signature, Is.Not.EqualTo(second.Signature));
         }
 
+        [Test]
+        public void AmplifiedProfile_IsDeterministicAndHasGreaterHeightRange()
+        {
+            var normalConfig = TerrainConfigTests.CreateConfig(
+                originX: -16, originZ: -16, seed: 9876,
+                width: 32, depth: 32, profile: TerrainGenerationProfile.Normal);
+            var amplifiedConfig = TerrainConfigTests.CreateConfig(
+                originX: -16, originZ: -16, seed: 9876,
+                width: 32, depth: 32, profile: TerrainGenerationProfile.Amplified);
+            var normal = new PerlinTerrainGenerator(normalConfig);
+            var amplified = new PerlinTerrainGenerator(amplifiedConfig);
+            var amplifiedAgain = new PerlinTerrainGenerator(amplifiedConfig);
+            var normalMin = int.MaxValue;
+            var normalMax = int.MinValue;
+            var amplifiedMin = int.MaxValue;
+            var amplifiedMax = int.MinValue;
+            for (var z = -16; z < 16; z++)
+            for (var x = -16; x < 16; x++)
+            {
+                var normalHeight = normal.SampleHeight(x, z);
+                var amplifiedHeight = amplified.SampleHeight(x, z);
+                Assert.That(amplifiedAgain.SampleHeight(x, z), Is.EqualTo(amplifiedHeight));
+                normalMin = math.min(normalMin, normalHeight);
+                normalMax = math.max(normalMax, normalHeight);
+                amplifiedMin = math.min(amplifiedMin, amplifiedHeight);
+                amplifiedMax = math.max(amplifiedMax, amplifiedHeight);
+            }
+            Assert.That(amplifiedMax - amplifiedMin, Is.GreaterThan(normalMax - normalMin));
+        }
+
+        [Test]
+        public void TerrainProfile_ChangesSignatureWithoutChangingBatchInvariance()
+        {
+            var normalConfig = TerrainConfigTests.CreateConfig(profile: TerrainGenerationProfile.Normal);
+            var amplifiedConfig = TerrainConfigTests.CreateConfig(profile: TerrainGenerationProfile.Amplified);
+            using var normalWorld = new SimulationWorld();
+            using var firstWorld = new SimulationWorld();
+            using var secondWorld = new SimulationWorld();
+            var normal = new PerlinTerrainGenerator(normalConfig).Initialize(normalWorld);
+            var first = new PerlinTerrainGenerator(amplifiedConfig, 1).Initialize(firstWorld);
+            var second = new PerlinTerrainGenerator(amplifiedConfig, 7).Initialize(secondWorld);
+            Assert.That(first.Signature, Is.EqualTo(second.Signature));
+            Assert.That(first.Signature, Is.Not.EqualTo(normal.Signature));
+        }
+
         private static void AssertRange(
             SimulationWorld world,
             int x,

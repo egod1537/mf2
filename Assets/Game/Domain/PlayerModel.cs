@@ -18,7 +18,9 @@ namespace MF2.Game.Domain
             int health = DefaultMaximumHealth,
             int maximumHealth = DefaultMaximumHealth,
             PlayerLifeState lifeState = PlayerLifeState.Alive,
-            long revision = 0)
+            long revision = 0,
+            InventoryState inventory = null,
+            PlayerActionState? actions = null)
         {
             if (id.Value == Guid.Empty)
                 throw new ArgumentException("A player snapshot requires a valid id.", nameof(id));
@@ -34,6 +36,8 @@ namespace MF2.Game.Domain
             MaximumHealth = maximumHealth;
             LifeState = lifeState;
             Revision = revision;
+            Inventory = inventory ?? new InventoryState();
+            Actions = actions ?? PlayerActionState.Default;
         }
 
         public PlayerId Id { get; }
@@ -41,6 +45,8 @@ namespace MF2.Game.Domain
         public int MaximumHealth { get; }
         public PlayerLifeState LifeState { get; }
         public long Revision { get; }
+        public InventoryState Inventory { get; }
+        public PlayerActionState Actions { get; }
 
         internal PlayerModel WithHealth(int health)
         {
@@ -50,19 +56,35 @@ namespace MF2.Game.Domain
                 clamped,
                 MaximumHealth,
                 clamped == 0 ? PlayerLifeState.Dead : PlayerLifeState.Alive,
-                checked(Revision + 1));
+                checked(Revision + 1),
+                Inventory,
+                Actions);
         }
+
+        internal PlayerModel WithInventory(InventoryState inventory) => new PlayerModel(
+            Id,
+            Health,
+            MaximumHealth,
+            LifeState,
+            checked(Revision + 1),
+            inventory ?? throw new ArgumentNullException(nameof(inventory)),
+            Actions);
+
+        internal PlayerModel WithActions(PlayerActionState actions) => new PlayerModel(
+            Id, Health, MaximumHealth, LifeState, checked(Revision + 1), Inventory, actions);
 
         public bool Equals(PlayerModel other) =>
             Id == other.Id &&
             Health == other.Health &&
             MaximumHealth == other.MaximumHealth &&
             LifeState == other.LifeState &&
-            Revision == other.Revision;
+            Revision == other.Revision &&
+            Equals(Inventory, other.Inventory) &&
+            Actions == other.Actions;
 
         public override bool Equals(object obj) => obj is PlayerModel other && Equals(other);
         public override int GetHashCode() =>
-            HashCode.Combine(Id, Health, MaximumHealth, (byte)LifeState, Revision);
+            HashCode.Combine(Id, Health, MaximumHealth, (byte)LifeState, Revision, Inventory, Actions);
 
         public static bool operator ==(PlayerModel left, PlayerModel right) => left.Equals(right);
         public static bool operator !=(PlayerModel left, PlayerModel right) => !left.Equals(right);

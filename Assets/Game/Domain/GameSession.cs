@@ -176,14 +176,18 @@ namespace MF2.Game.Domain
                 return CommandResult.Rejected(CommandStatus.UnknownPlayer);
             if (command.Type == GameCommandType.None ||
                 (command.Type == GameCommandType.World &&
-                 !world.CanEnqueue(command.WorldCommand)))
+                 !world.CanEnqueue(command.WorldCommand)) ||
+                (command.Type == GameCommandType.Inventory &&
+                 !command.InventoryCommand.IsStructurallyValid) ||
+                (command.Type == GameCommandType.PlayerAction &&
+                 !command.PlayerActionCommand.IsStructurallyValid))
             {
                 return CommandResult.Rejected(CommandStatus.InvalidCommand);
             }
             if (!authorizer.IsAuthorized(sender, command))
                 return CommandResult.Rejected(CommandStatus.Unauthorized);
 
-            commands.Enqueue(command);
+            commands.Enqueue(sender, command);
             archiveBoundaryStable = false;
             return CommandResult.Accepted();
         }
@@ -191,9 +195,11 @@ namespace MF2.Game.Domain
         public SessionTickResult Step(in SimulationStep step)
         {
             EnsureRunning();
-            var processed = commands.DrainInto(world);
+            var tickIndex = checked(clock.TickIndex + 1);
+            players.AdvanceActions(tickIndex);
+            var processed = commands.DrainInto(world, players, tickIndex);
             var delta = world.FlushAndCapture();
-            var tickIndex = clock.Advance(step);
+            clock.Advance(step);
             var playerChanges = players.CaptureChanges();
             archiveBoundaryStable = true;
             var result = new SessionTickResult(tickIndex, processed, delta, playerChanges);

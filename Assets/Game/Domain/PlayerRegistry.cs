@@ -133,6 +133,67 @@ namespace MF2.Game.Domain
             return true;
         }
 
+        internal bool TryApplyInventory(PlayerId playerId, in InventoryCommand command)
+        {
+            if (!players.TryGetValue(playerId, out var model) ||
+                !model.Inventory.TryApply(command, out var inventory))
+                return false;
+            if (ReferenceEquals(inventory, model.Inventory))
+                return true;
+            var updated = model.WithInventory(inventory);
+            players[playerId] = updated;
+            Publish(PlayerStateChange.Upserted(updated));
+            return true;
+        }
+
+        internal bool TryApplyAction(
+            PlayerId playerId,
+            in PlayerActionCommand command,
+            long tickIndex)
+        {
+            if (!players.TryGetValue(playerId, out var actor) ||
+                actor.LifeState != PlayerLifeState.Alive)
+            {
+                return false;
+            }
+
+            switch (command.Kind)
+            {
+                case PlayerActionCommandKind.Dash:
+                    if (!actor.Actions.TryDash(tickIndex, out var dashed))
+                        return false;
+                    Store(actor.WithActions(dashed));
+                    return true;
+                case PlayerActionCommandKind.Attack:
+                    if (command.Target == playerId ||
+                        !players.TryGetValue(command.Target, out var target) ||
+                        target.LifeState != PlayerLifeState.Alive ||
+                        !actor.Actions.TryAttack(tickIndex, out var attacked))
+                    {
+                        return false;
+                    }
+                    Store(actor.WithActions(attacked));
+                    Store(target.WithHealth(target.Health - 25));
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        internal void AdvanceActions(long tickIndex)
+        {
+            if (players.Count == 0)
+                return;
+            var ids = CapturePlayerIds();
+            for (var i = 0; i < ids.Length; i++)
+            {
+                var model = players[ids[i]];
+                var advanced = model.Actions.Advance(tickIndex);
+                if (advanced != model.Actions)
+                    Store(model.WithActions(advanced));
+            }
+        }
+
         public bool Contains(PlayerId playerId) => players.ContainsKey(playerId);
 
         public void Clear()
@@ -184,6 +245,12 @@ namespace MF2.Game.Domain
         {
             pendingChanges[change.PlayerId] = change;
             PlayerStateChanged?.Invoke(change);
+        }
+
+        private void Store(in PlayerModel model)
+        {
+            players[model.Id] = model;
+            Publish(PlayerStateChange.Upserted(model));
         }
     }
 }

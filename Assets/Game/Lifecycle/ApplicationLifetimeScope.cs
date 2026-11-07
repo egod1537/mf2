@@ -43,7 +43,9 @@ namespace MF2
             builder.RegisterComponent(GetComponent<ClientPresentationCoordinator>());
             builder.RegisterComponent(GetComponent<GameCommandNetworkAdapter>())
                 .AsSelf()
-                .As<IGameCommandSender>();
+                .As<IGameCommandSender>()
+                .As<IInventoryCommandSender>()
+                .As<IPlayerActionCommandSender>();
             builder.RegisterComponent(GetComponent<PlayerReplicationAdapter>());
             builder.RegisterComponent(GetComponent<WorldReplicationAdapter>());
             builder.Register<SessionPersistenceCoordinator>(Lifetime.Singleton);

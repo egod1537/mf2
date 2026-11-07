@@ -1,0 +1,7 @@
+asset_id,source,source_revision,source_path,sha256,license_status,destination,decision
+caveworks-manifest,Steam App 4281980,build-22068264,appmanifest_4281980.acf,B447DEA8D61F4818D8413E778A0403ADF723E9BE0937354C964148DE618B694D,local-install-only,,behavioral inspection only
+caveworks-ui-dll,Steam App 4281980,build-22068264,Cave_Data/Managed/Game.UI.dll,A35BAFC57702093F3CC0C5927AA8860BC8483A3C22F071440189AB7E90FEF01E,redistribution-unverified,,do not copy
+caveworks-item-dll,Steam App 4281980,build-22068264,Cave_Data/Managed/Game.Ingame.Item.dll,E599C50A07C6E1B52A8F3200A5455DDCDB0F5F923380264D5509568DFC6993CD,redistribution-unverified,,do not copy
+minefarm0-green-idol,github egod1537/minefarm0,e096241fbbebe55af23ef72934b7847386a864c1,Assets/Model/Entity/Actor/[0] Player/GreenIdol.fbx,9CADA64ADD073F042F19D5F4114A871711BE022492FA61F37AD6FE92F3BCE768,no-root-license-found,,blocked
+minefarm0-player-prefab,github egod1537/minefarm0,e096241fbbebe55af23ef72934b7847386a864c1,Assets/Model/Entity/Actor/[0] Player/Player.prefab,E2E9F7A33733011B0335139BCC57AFAE6D1E57BE5004713A3D3D9EB3FB4C7618,no-root-license-found,,blocked
+minefarm0-attack-animation,github egod1537/minefarm0,e096241fbbebe55af23ef72934b7847386a864c1,Assets/Model/Entity/Actor/[0] Player/animation/Top/Attack.anim,33F8F6106DA0CA7D765229997405B7FE15461BCCA8107F7D825B2329B69EA992,no-root-license-found,,blocked

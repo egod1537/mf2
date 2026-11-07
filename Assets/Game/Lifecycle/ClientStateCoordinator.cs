@@ -41,6 +41,12 @@ namespace MF2.Game.Lifecycle
         void MarkCollisionUnavailable(WorldCore current);
     }
 
+    public interface ILocalInventoryReader
+    {
+        event Action InventoryChanged;
+        bool TryGetLocalInventory(out PlayerId playerId, out InventoryState inventory);
+    }
+
     /// <summary>
     /// Client-presentation-scope replica. It exposes only value snapshots and owns a client-only
     /// WorldCore; host presentation never reads the server GameSession or PlayerRegistry.
@@ -49,6 +55,7 @@ namespace MF2.Game.Lifecycle
         IClientReplicatedWorld,
         IClientWorldViewSource,
         IEntityStateReader,
+        ILocalInventoryReader,
         IDisposable
     {
         private readonly Dictionary<PlayerId, PlayerModel> players =
@@ -59,6 +66,10 @@ namespace MF2.Game.Lifecycle
         private long worldTickIndex = -1;
         private long playerTickIndex = -1;
         private long collisionReadyTickIndex = -1;
+        private PlayerId localInventoryPlayerId;
+        private InventoryState localInventory;
+        private long localInventoryRevision = -1;
+        private long localInventoryTickIndex = -1;
         private bool hasSession;
         private bool disposed;
 
@@ -68,6 +79,7 @@ namespace MF2.Game.Lifecycle
         public event Action<WorldCore> WorldFlushed;
         public event Action<WorldCore> WorldClearing;
         public event Action<ClientWorldReadiness> WorldCollisionReady;
+        public event Action InventoryChanged;
 
         public bool HasSession => hasSession;
         public SessionId SessionId => sessionId;
@@ -86,6 +98,37 @@ namespace MF2.Game.Lifecycle
         {
             ThrowIfDisposed();
             return players.TryGetValue(playerId, out snapshot);
+        }
+
+        public bool TryGetLocalInventory(out PlayerId playerId, out InventoryState inventory)
+        {
+            ThrowIfDisposed();
+            playerId = localInventoryPlayerId;
+            inventory = localInventory;
+            return inventory != null;
+        }
+
+        public bool ApplyLocalInventory(
+            SessionId id,
+            long sourceGeneration,
+            long sourceTickIndex,
+            PlayerId playerId,
+            long revision,
+            InventoryState inventory)
+        {
+            if (inventory == null)
+                throw new ArgumentNullException(nameof(inventory));
+            ThrowIfDisposed();
+            if (!hasSession || sessionId != id || generation != sourceGeneration ||
+                sourceTickIndex < localInventoryTickIndex || revision < localInventoryRevision)
+                return false;
+            localInventoryPlayerId = playerId;
+            localInventory = inventory;
+            localInventoryRevision = revision;
+            localInventoryTickIndex = sourceTickIndex;
+            InventoryChanged?.Invoke();
+            Changed?.Invoke();
+            return true;
         }
 
         public bool ApplySnapshot(
@@ -278,6 +321,7 @@ namespace MF2.Game.Lifecycle
             WorldFlushed = null;
             WorldClearing = null;
             WorldCollisionReady = null;
+            InventoryChanged = null;
             disposed = true;
         }
 
@@ -340,6 +384,10 @@ namespace MF2.Game.Lifecycle
             worldTickIndex = -1;
             playerTickIndex = -1;
             collisionReadyTickIndex = -1;
+            localInventoryPlayerId = default;
+            localInventory = null;
+            localInventoryRevision = -1;
+            localInventoryTickIndex = -1;
             hasSession = false;
             ReleaseWorld(released);
         }
