@@ -218,6 +218,7 @@ GameObject:
   - component: {fileID: 7143725821712342142}
   - component: {fileID: 574553473075597415}
   - component: {fileID: 5303900896962784245}
+  - component: {fileID: 6478395401259830712}
   m_Layer: 0
   m_Name: OwnerCameraRig
   m_TagString: MainCamera
@@ -362,7 +363,7 @@ MonoBehaviour:
   FixedTargetResolution: 320
   ClampCameraOrthoSize: 0
   Mode: 0
-  PixelSize: 0.032
+  PixelSize: 0.016
   overrideUsePixelExpansion: 0
   UsePixelExpansion: 1
   PixelizationFilter: 0
@@ -370,6 +371,23 @@ MonoBehaviour:
   TargetScale: 1
   FullscreenColorGradingLUT: {fileID: 0}
   EnableProPixelizer: 1
+--- !u!114 &6478395401259830712
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6927308817391362379}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b48c76867fd64c7098ad7ea9b18448f2, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: MF2.Game::MF2.Game.Presentation.PlayerOcclusionDither
+  target: {fileID: 5731946745275697863}
+  targetCenterHeight: 0.96
+  verticalExtent: 0.65
+  horizontalExtent: 0.35
+  maximumOccluders: 64
 --- !u!1 &7785631207564110432
 GameObject:
   m_ObjectHideFlags: 0

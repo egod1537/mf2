@@ -179,6 +179,17 @@ namespace MF2.World.Core
             return world.GetBlockOrAir(worldPosition);
         }
 
+        /// <summary>
+        /// Presentation-only routing for blocks hiding the local player. This changes render
+        /// submeshes only; the borrowed WorldCore and solid collider mesh remain untouched.
+        /// </summary>
+        public void SetDitheredOccluders(IReadOnlyCollection<int3> worldPositions)
+        {
+            if (worldPositions == null)
+                throw new ArgumentNullException(nameof(worldPositions));
+            rendererPool?.SetDitheredBlocks(worldPositions);
+        }
+
         public void DisposeWorld()
         {
             rendererPool?.Dispose();

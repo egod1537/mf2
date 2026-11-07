@@ -150,6 +150,13 @@ namespace MF2.Game.Tests.Editor
                 Assert.That(FindInScene<EventSystem>(scene), Is.Not.Null);
                 Assert.That(FindAllInScene<SpawnPoint>(scene).Count, Is.EqualTo(expectedSpawnPoints));
 
+                var light = FindAllInScene<Light>(scene)
+                    .Single(candidate => candidate.type == LightType.Directional);
+                Assert.That(light.shadows, Is.EqualTo(LightShadows.Soft));
+                Assert.That(light.shadowStrength, Is.EqualTo(1f));
+                Assert.That(light.shadowBias, Is.EqualTo(0.05f).Within(0.001f));
+                Assert.That(light.shadowNormalBias, Is.EqualTo(0.4f).Within(0.001f));
+
                 var serializedWorld = new SerializedObject(world);
                 foreach (var propertyName in new[]
                          {
@@ -189,6 +196,10 @@ namespace MF2.Game.Tests.Editor
             var playerPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(
                 "Assets/Entities/Player/BlockPlayer.prefab");
             AssertPixelStableGameCamera(playerPrefab.GetComponentInChildren<Camera>(true));
+            var occlusionDither =
+                playerPrefab.GetComponentInChildren<PlayerOcclusionDither>(true);
+            Assert.That(occlusionDither, Is.Not.Null);
+            Assert.That(occlusionDither.Target, Is.SameAs(playerPrefab.transform));
             AssertProPixelizerVisual(playerPrefab, materialPath);
 
             var offlinePlayerPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(
@@ -274,6 +285,7 @@ namespace MF2.Game.Tests.Editor
 
             var cameraData = camera.GetComponent<UniversalAdditionalCameraData>();
             Assert.That(cameraData, Is.Not.Null);
+            Assert.That(cameraData.renderShadows, Is.True);
             Assert.That(cameraData.renderPostProcessing, Is.EqualTo(renderPostProcessing));
             Assert.That((cameraData.volumeLayerMask.value & 1) != 0, Is.True);
         }
@@ -287,7 +299,7 @@ namespace MF2.Game.Tests.Editor
             Assert.That(
                 pixelCamera.Mode,
                 Is.EqualTo(ProPixelizerCamera.PixelSizeMode.WorldSpacePixelSize));
-            Assert.That(pixelCamera.PixelSize, Is.EqualTo(0.032f).Within(0.0001f));
+            Assert.That(pixelCamera.PixelSize, Is.EqualTo(0.016f).Within(0.0001f));
             Assert.That(pixelCamera.ClampCameraOrthoSize, Is.False);
             Assert.That(pixelCamera.PixelizationFilter, Is.EqualTo(PixelizationFilter.OnlyProPixelizer));
             Assert.That(pixelCamera.UsePixelArtUpscalingFilter, Is.True);
@@ -305,17 +317,21 @@ namespace MF2.Game.Tests.Editor
             var renderers = visual.GetComponentsInChildren<Renderer>(true);
             Assert.That(renderers, Is.Not.Empty, prefab.name);
             foreach (var renderer in renderers)
-            foreach (var material in renderer.sharedMaterials)
             {
-                Assert.That(material, Is.Not.Null, renderer.name);
-                Assert.That(
-                    AssetDatabase.GetAssetPath(material),
-                    Is.EqualTo(materialPath),
-                    renderer.name);
-                Assert.That(
-                    material.shader.name,
-                    Is.EqualTo("ProPixelizer/ProPixelizerUberShader"),
-                    renderer.name);
+                Assert.That(renderer.shadowCastingMode, Is.EqualTo(ShadowCastingMode.On));
+                Assert.That(renderer.receiveShadows, Is.True);
+                foreach (var material in renderer.sharedMaterials)
+                {
+                    Assert.That(material, Is.Not.Null, renderer.name);
+                    Assert.That(
+                        AssetDatabase.GetAssetPath(material),
+                        Is.EqualTo(materialPath),
+                        renderer.name);
+                    Assert.That(
+                        material.shader.name,
+                        Is.EqualTo("ProPixelizer/ProPixelizerUberShader"),
+                        renderer.name);
+                }
             }
         }
     }

@@ -48,7 +48,7 @@ namespace MF2.Editor
             "Assets/Scenes/MinecraftBlockMap/CM Isometric Camera Profile.asset";
         private const float MinecraftMapOrthographicSize = 8.5f;
         private const float MinecraftMapLensScale = 1.25f;
-        private const float ProPixelizerWorldSpacePixelSize = 0.032f;
+        private const float ProPixelizerWorldSpacePixelSize = 0.016f;
         private const float PixelStableGameOrthographicSize =
             MinecraftMapOrthographicSize / MinecraftMapLensScale;
 
@@ -137,6 +137,8 @@ namespace MF2.Editor
                 var ownerCamera = cameraRig.AddComponent<Camera>();
                 ConfigurePixelStableGameCamera(ownerCamera);
                 ownerCamera.tag = "MainCamera";
+                var occlusionDither = cameraRig.AddComponent<PlayerOcclusionDither>();
+                occlusionDither.Configure(root.transform);
                 var listener = cameraRig.AddComponent<AudioListener>();
                 controller.ConfigureOwnerCamera(ownerCamera, listener);
                 cameraRig.SetActive(false);
@@ -298,9 +300,7 @@ namespace MF2.Editor
             ground.transform.localScale = expandedTestScene ? new Vector3(4f, 1f, 4f) : new Vector3(2f, 1f, 2f);
 
             var light = new GameObject("Directional Light").AddComponent<Light>();
-            light.type = LightType.Directional;
-            light.intensity = 1.15f;
-            light.transform.rotation = Quaternion.Euler(48f, -32f, 0f);
+            ConfigureGameSceneLighting(light);
 
             var overview = new GameObject("Overview Camera").AddComponent<Camera>();
             overview.transform.position = new Vector3(10f, 12f, -10f);
@@ -372,6 +372,21 @@ namespace MF2.Editor
             return LoadRequiredAsset<ChunkMaterialSet>(ProPixelizerChunkMaterialSetPath);
         }
 
+        private static void ConfigureGameSceneLighting(Light light)
+        {
+            if (light == null)
+                throw new ArgumentNullException(nameof(light));
+
+            light.type = LightType.Directional;
+            light.intensity = 1.15f;
+            light.shadows = LightShadows.Soft;
+            light.shadowStrength = 1f;
+            light.shadowBias = 0.05f;
+            light.shadowNormalBias = 0.4f;
+            light.shadowNearPlane = 0.2f;
+            light.transform.rotation = Quaternion.Euler(48f, -32f, 0f);
+        }
+
         private static void ConfigurePixelStableGameCamera(Camera camera)
         {
             ConfigureMinecraftMapCamera(camera);
@@ -410,6 +425,8 @@ namespace MF2.Editor
                 for (var i = 0; i < materials.Length; i++)
                     materials[i] = material;
                 renderer.sharedMaterials = materials;
+                renderer.shadowCastingMode = ShadowCastingMode.On;
+                renderer.receiveShadows = true;
             }
         }
 

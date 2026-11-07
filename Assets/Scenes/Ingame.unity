@@ -423,7 +423,7 @@ MonoBehaviour:
   FixedTargetResolution: 320
   ClampCameraOrthoSize: 0
   Mode: 0
-  PixelSize: 0.032
+  PixelSize: 0.016
   overrideUsePixelExpansion: 0
   UsePixelExpansion: 1
   PixelizationFilter: 0
@@ -526,7 +526,7 @@ Light:
   m_InnerSpotAngle: 21.80208
   m_CookieSize2D: {x: 0.5, y: 0.5}
   m_Shadows:
-    m_Type: 0
+    m_Type: 2
     m_Resolution: -1
     m_CustomResolution: -1
     m_Strength: 1

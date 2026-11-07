@@ -10,6 +10,7 @@ using Unity.Collections;
 using Unity.Mathematics;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace MF2.World.Tests
 {
@@ -347,6 +348,65 @@ namespace MF2.World.Tests
         }
 
         [Test]
+        public void PlayerOcclusion_RoutesOneBlockToProPixelizerDitherWithoutChangingCollider()
+        {
+            var root = new GameObject("Player Occlusion Dither Test");
+            try
+            {
+                var materialSet = AssetDatabase.LoadAssetAtPath<ChunkMaterialSet>(
+                    "Assets/World/Rendering/ChunkMaterialSetProPixelizer.asset");
+                Assert.That(materialSet, Is.Not.Null);
+
+                using (var table = CreateTable(1))
+                using (var world = new WorldCore())
+                using (var pool = new ChunkRendererPool(root.transform, materialSet))
+                {
+                    world.Enqueue(WorldCommand.SetBlock(int3.zero, new Block(1)));
+                    world.Enqueue(WorldCommand.SetBlock(new int3(1, 0, 0), new Block(1)));
+                    world.Flush();
+                    world.TryGetChunkHandle(int3.zero, out var handle);
+                    using (var request = Schedule(world, handle, table))
+                    {
+                        var renderer = pool.GetOrCreate(int3.zero);
+                        Assert.That(renderer.Apply(world, request), Is.True);
+                        var originalColliderIndexCount =
+                            renderer.ColliderMesh.GetIndexCount(0);
+
+                        pool.SetDitheredBlocks(new[] { int3.zero });
+
+                        Assert.That(
+                            renderer.Mesh.subMeshCount,
+                            Is.EqualTo(ChunkRenderer.OcclusionSubmeshIndex + 1));
+                        Assert.That(
+                            renderer.Mesh.GetIndexCount(ChunkRenderer.OcclusionSubmeshIndex),
+                            Is.EqualTo(30),
+                            "Only the five exposed faces of the selected block should dither.");
+                        Assert.That(
+                            renderer.ColliderMesh.GetIndexCount(0),
+                            Is.EqualTo(originalColliderIndexCount),
+                            "Presentation dithering must never alter solid collision geometry.");
+
+                        var materials = renderer.GetComponent<MeshRenderer>().sharedMaterials;
+                        var dither = materials[ChunkRenderer.OcclusionSubmeshIndex];
+                        Assert.That(dither.IsKeywordEnabled("PROPIXELIZER_DITHERING_ON"), Is.True);
+                        Assert.That(dither.GetFloat("PROPIXELIZER_DITHERING"), Is.EqualTo(1f));
+                        Assert.That(dither.GetColor("_BaseColor").a, Is.EqualTo(0.35f).Within(0.001f));
+
+                        pool.SetDitheredBlocks(Array.Empty<int3>());
+                        Assert.That(
+                            renderer.Mesh.GetIndexCount(ChunkRenderer.OcclusionSubmeshIndex),
+                            Is.Zero);
+                        Assert.That(renderer.Mesh.GetIndexCount(0), Is.EqualTo(60));
+                    }
+                }
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(root);
+            }
+        }
+
+        [Test]
         public void ChangedVersion_RejectsStaleScheduledResult()
         {
             var mesh = new Mesh();
@@ -453,6 +513,9 @@ namespace MF2.World.Tests
                 using (var pool = new ChunkRendererPool(root.transform, null))
                 {
                     var first = pool.GetOrCreate(int3.zero);
+                    var meshRenderer = first.GetComponent<MeshRenderer>();
+                    Assert.That(meshRenderer.shadowCastingMode, Is.EqualTo(ShadowCastingMode.On));
+                    Assert.That(meshRenderer.receiveShadows, Is.True);
                     Assert.That(pool.Release(int3.zero), Is.True);
                     var second = pool.GetOrCreate(new int3(-2, 3, 4));
                     Assert.That(second, Is.SameAs(first));

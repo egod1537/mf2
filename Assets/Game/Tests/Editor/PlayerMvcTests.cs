@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using MF2.Entities.Player;
 using MF2.Game.Domain;
+using MF2.Game.Presentation;
 using NUnit.Framework;
+using Unity.Mathematics;
 using UnityEditor;
 using UnityEngine;
 
@@ -280,6 +282,27 @@ namespace MF2.Game.Tests.Editor
             {
                 UnityEngine.Object.DestroyImmediate(cameraObject);
             }
+        }
+
+        [Test]
+        public void OcclusionVoxelTrace_VisitsOnlyCellsBetweenCameraAndPlayer()
+        {
+            var cells = new List<int3>();
+
+            PlayerOcclusionDither.TraceVoxels(
+                new Vector3(-2f, 0f, 0f),
+                new Vector3(2f, 0f, 0f),
+                cells);
+
+            Assert.That(cells, Is.EqualTo(new[]
+            {
+                new int3(-2, 0, 0),
+                new int3(-1, 0, 0),
+                new int3(0, 0, 0),
+                new int3(1, 0, 0)
+            }));
+            Assert.That(cells.Contains(new int3(2, 0, 0)), Is.False,
+                "The player's end voxel must not be treated as an occluder.");
         }
 
         [Test]
