@@ -86,9 +86,14 @@ it rejects aliasing one PlayerId to two live connections.
   collision readiness.
 - Restore increments generation, broadcasts replacement snapshots, despawns old Player objects,
   and respawns them only after the new readiness barrier.
+- Initial/replacement snapshots are split into at most 48 `ReplicatedBlock` records per reliable
+  message and are applied only after Begin/Part/End completeness validation. A normal delta uses
+  the same 48-block payload budget. A larger same-tick change sends a bounded full snapshot instead
+  of exposing partial same-tick state to `ClientStateCoordinator`.
 
-The current snapshot protocol is deliberately complete and sparse rather than streamed. This is a
-known scale boundary, not an implicit promise of chunk streaming.
+The protocol is bounded but still materializes one complete sparse snapshot at each endpoint. It
+is not chunk streaming or interest management; the configured one-million-block ceiling is an
+explicit scale boundary.
 
 ## Player MVC/GameObject binding
 

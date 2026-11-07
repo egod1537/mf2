@@ -109,3 +109,8 @@ for an unrelated archive whose player identities do not match current connection
 | Replication consumer exception | log independently; never repeat WorldCore flush |
 | Old generation/tick/revision | reject message without mutating replica |
 
+Application-lifetime replication adapters treat `OnDisable` as a subscription boundary. Their
+server-session tick/coordinator subscriptions are removed, and re-enable subscribes exactly once.
+World replication publishes a complete bounded base snapshot before later deltas resume, so a
+disabled interval cannot silently retain stale client state.
+

@@ -10,7 +10,8 @@ Unity `6000.3.28f1`, FishNet `4.7.3` 기준의 직접 IP 멀티플레이 수직 
 [`refactor-baseline`](docs/architecture/refactor-baseline.md),
 [`architecture`](docs/architecture/architecture.md),
 [`lifecycle`](docs/architecture/lifecycle.md),
-[`refactor-report`](docs/architecture/refactor-report.md)에서 확인할 수 있다.
+[`refactor-report`](docs/architecture/refactor-report.md),
+[`53fd8bd review`](docs/architecture/refactor-review-53fd8bd.md)에서 확인할 수 있다.
 
 ## Runtime architecture
 
@@ -63,6 +64,8 @@ preview용 `WorldCore`를 소유하지만, PlayMode에서는 client replica의 `
 
 초기 월드 복제는 Tugboat MTU보다 작은 최대 48-block 파트로 전송하고, 모든 파트를 검증한
 뒤 client `WorldCore`를 한 번에 교체한다. collider 재구축 전에는 WorldReady를 보내지 않는다.
+일반 Tick delta도 48 blocks를 넘지 않는다. 그보다 큰 Fill 결과는 같은 bounded snapshot
+경로로 재동기화해 동일 Tick의 일부만 client에 적용되는 상태를 만들지 않는다.
 블록/렌더 manifest를 다시 만들 때는 Unity 메뉴의 다음 항목을 순서대로 실행한다.
 
 1. `Tools > Minecraft > Rebuild Block Registry Manifest`
