@@ -390,6 +390,34 @@ namespace MF2.World.Tests
             }
         }
 
+        [Test]
+        public void RebuildAll_RendersResidentChunkAfterDirtyViewWasCleared()
+        {
+            var root = new GameObject("Chunk Render Attach Test");
+            try
+            {
+                using (var world = new WorldCore())
+                using (var table = CreateTable(1))
+                using (var pool = new ChunkRendererPool(root.transform, null))
+                {
+                    world.Enqueue(WorldCommand.SetBlock(int3.zero, new Block(1, 0)));
+                    world.Flush();
+                    world.Flush();
+                    Assert.That(world.DirtyChunks.Length, Is.Zero);
+
+                    var pipeline = new ChunkRenderPipeline();
+                    Assert.That(pipeline.RebuildDirtyNow(world, table, pool), Is.Zero);
+                    Assert.That(pipeline.RebuildAllNow(world, table, pool), Is.EqualTo(1));
+                    Assert.That(pool.TryGet(int3.zero, out var renderer), Is.True);
+                    Assert.That(renderer.Mesh.vertexCount, Is.EqualTo(24));
+                }
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(root);
+            }
+        }
+
         private static ChunkMeshBuildRequest Schedule(
             WorldCore world,
             ChunkHandle handle,

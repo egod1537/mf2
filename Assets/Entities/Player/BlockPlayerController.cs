@@ -1,15 +1,19 @@
+using System;
 using FishNet.Managing.Timing;
 using FishNet.Object;
 using FishNet.Object.Prediction;
+using FishNet.Object.Synchronizing;
 using FishNet.Transporting;
 using FishNet.Utility.Template;
+using MF2.Game.Domain;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 namespace MF2.Entities.Player
 {
     [DisallowMultipleComponent]
     [RequireComponent(typeof(Rigidbody), typeof(CapsuleCollider), typeof(NetworkObject))]
+    [RequireComponent(typeof(BlockPlayerInputSource), typeof(BlockPlayerView), typeof(EntityViewBinder))]
+    [RequireComponent(typeof(PlayerPresentationBindingGate))]
     public sealed class BlockPlayerController : TickNetworkBehaviour
     {
         public struct MoveData : IReplicateData
@@ -54,41 +58,75 @@ namespace MF2.Entities.Player
         [SerializeField, Min(0.1f)] private float jumpVelocity = 6.5f;
         [SerializeField, Min(0.01f)] private float groundProbeDistance = 0.12f;
 
-        [Header("Owner Presentation")]
-        [SerializeField] private Camera ownerCamera;
-        [SerializeField] private AudioListener ownerAudioListener;
-
-        [Header("Block Rig")]
-        [SerializeField] private Transform leftArmPivot;
-        [SerializeField] private Transform rightArmPivot;
-        [SerializeField] private Transform leftLegPivot;
-        [SerializeField] private Transform rightLegPivot;
-        [SerializeField, Range(0f, 60f)] private float limbSwingAngle = 30f;
-        [SerializeField, Min(0.1f)] private float limbSwingSpeed = 8f;
+        [Header("MVC")]
+        [SerializeField] private BlockPlayerInputSource inputSource;
+        [SerializeField] private BlockPlayerView view;
+        [SerializeField] private EntityViewBinder viewBinder;
+        [SerializeField] private PlayerPresentationBindingGate presentationBinding;
 
         private readonly RaycastHit[] groundHits = new RaycastHit[8];
         private readonly PredictionRigidbody predictionBody = new();
+        private readonly SyncVar<Guid> playerId = new();
         private Rigidbody body;
         private CapsuleCollider capsule;
-        private Vector2 moveInput;
-        private bool sprintInput;
-        private bool jumpQueued;
-        private float stepCycle;
 
         public bool IsGrounded { get; private set; }
+        public PlayerPresentationBindingGate PresentationBinding => ResolvePresentationBinding();
 
-        public void ConfigureRig(Transform leftArm, Transform rightArm, Transform leftLeg, Transform rightLeg)
-        {
-            leftArmPivot = leftArm;
-            rightArmPivot = rightArm;
-            leftLegPivot = leftLeg;
-            rightLegPivot = rightLeg;
-        }
+        public void ConfigureRig(
+            Transform leftArm,
+            Transform rightArm,
+            Transform leftLeg,
+            Transform rightLeg) =>
+            ResolveView().ConfigureRig(leftArm, rightArm, leftLeg, rightLeg);
 
         public void ConfigureOwnerCamera(Camera camera, AudioListener listener)
         {
-            ownerCamera = camera;
-            ownerAudioListener = listener;
+            ResolveView().ConfigureOwnerCamera(camera, listener);
+            ResolveInput().ConfigureMovementCamera(camera);
+        }
+
+        public void ConfigureMvc(
+            BlockPlayerInputSource playerInput,
+            BlockPlayerView playerView,
+            EntityViewBinder binder,
+            PlayerPresentationBindingGate bindingGate)
+        {
+            inputSource = playerInput;
+            view = playerView;
+            viewBinder = binder;
+            presentationBinding = bindingGate;
+            viewBinder.Configure(view);
+            presentationBinding.Configure(viewBinder);
+        }
+
+        public void AssignPlayerId(PlayerId id)
+        {
+            if (id.Value == Guid.Empty)
+                throw new ArgumentException("A network player requires a valid domain id.", nameof(id));
+            if (IsSpawned)
+                throw new InvalidOperationException("The domain id must be assigned before spawning.");
+            playerId.Value = id.Value;
+        }
+
+        public void BindSpawn(in PlayerSpawnContext context)
+        {
+            if (IsSpawned)
+                throw new InvalidOperationException("Spawn context must be bound before network spawn.");
+            transform.SetPositionAndRotation(context.InitialPosition, context.InitialRotation);
+            AssignPlayerId(context.PlayerId);
+        }
+
+        public bool TryGetPlayerId(out PlayerId id)
+        {
+            var value = playerId.Value;
+            if (value == Guid.Empty)
+            {
+                id = default;
+                return false;
+            }
+            id = new PlayerId(value);
+            return true;
         }
 
         private void Awake()
@@ -101,7 +139,12 @@ namespace MF2.Entities.Player
             body.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
             body.constraints = RigidbodyConstraints.FreezeRotation;
             predictionBody.Initialize(body);
-            SetOwnerPresentation(false);
+
+            playerId.OnChange += OnPlayerIdChanged;
+            ResolveInput();
+            ResolveView().SetLocalOwner(false);
+            ResolveBinder().Configure(view);
+            ResolvePresentationBinding().Configure(viewBinder);
         }
 
         public override void OnStartNetwork()
@@ -112,30 +155,23 @@ namespace MF2.Entities.Player
         public override void OnStartClient()
         {
             base.OnStartClient();
-            if (IsOwner && ownerCamera != null)
-            {
-                foreach (var sceneCamera in FindObjectsByType<Camera>(FindObjectsInactive.Include, FindObjectsSortMode.None))
-                {
-                    if (sceneCamera != ownerCamera && sceneCamera.gameObject.scene == gameObject.scene)
-                        sceneCamera.gameObject.SetActive(false);
-                }
-            }
-            SetOwnerPresentation(IsOwner);
+            ResolveBinder().Configure(ResolveView());
+            view.SetLocalOwner(IsOwner, IsOwner);
+            if (TryGetPlayerId(out var id))
+                ResolvePresentationBinding().SetNetworkReady(id);
         }
 
         public override void OnStopClient()
         {
-            SetOwnerPresentation(false);
+            ResolvePresentationBinding().SetNetworkUnavailable();
+            ResolveView().SetLocalOwner(false);
             base.OnStopClient();
         }
 
         private void Update()
         {
             if (IsOwner)
-                ReadInput();
-
-            var horizontal = new Vector3(body.linearVelocity.x, 0f, body.linearVelocity.z).magnitude;
-            AnimateRig(Mathf.Clamp01(horizontal / Mathf.Max(0.01f, sprintSpeed)));
+                ResolveInput().Capture();
         }
 
         protected override void TimeManager_OnTick()
@@ -153,21 +189,15 @@ namespace MF2.Entities.Player
             if (!IsOwner)
                 return default;
 
-            var local = Vector2.ClampMagnitude(moveInput, 1f);
-            var forward = ownerCamera == null
-                ? Vector3.forward
-                : Vector3.ProjectOnPlane(ownerCamera.transform.forward, Vector3.up).normalized;
-            var right = ownerCamera == null
-                ? Vector3.right
-                : Vector3.ProjectOnPlane(ownerCamera.transform.right, Vector3.up).normalized;
-            var world = Vector3.ClampMagnitude(forward * local.y + right * local.x, 1f);
-            var data = new MoveData(new Vector2(world.x, world.z), sprintInput, jumpQueued);
-            jumpQueued = false;
-            return data;
+            var input = ResolveInput().Consume();
+            return new MoveData(input.WorldMove, input.Sprint, input.Jump);
         }
 
         [Replicate]
-        private void PerformReplicate(MoveData data, ReplicateState state = ReplicateState.Invalid, Channel channel = Channel.Unreliable)
+        private void PerformReplicate(
+            MoveData data,
+            ReplicateState state = ReplicateState.Invalid,
+            Channel channel = Channel.Unreliable)
         {
             IsGrounded = CheckGrounded();
             var speed = data.Sprint ? sprintSpeed : walkSpeed;
@@ -186,27 +216,11 @@ namespace MF2.Entities.Player
         }
 
         [Reconcile]
-        private void PerformReconcile(ReconcileData data, Channel channel = Channel.Unreliable)
+        private void PerformReconcile(
+            ReconcileData data,
+            Channel channel = Channel.Unreliable)
         {
             predictionBody.Reconcile(data.Body);
-        }
-
-        private void ReadInput()
-        {
-            var keyboard = Keyboard.current;
-            if (keyboard == null)
-            {
-                moveInput = Vector2.zero;
-                sprintInput = false;
-                return;
-            }
-
-            moveInput = new Vector2(
-                (keyboard.dKey.isPressed ? 1f : 0f) - (keyboard.aKey.isPressed ? 1f : 0f),
-                (keyboard.wKey.isPressed ? 1f : 0f) - (keyboard.sKey.isPressed ? 1f : 0f));
-            sprintInput = keyboard.leftShiftKey.isPressed || keyboard.rightShiftKey.isPressed;
-            if (keyboard.spaceKey.wasPressedThisFrame)
-                jumpQueued = true;
         }
 
         private bool CheckGrounded()
@@ -236,30 +250,33 @@ namespace MF2.Entities.Player
             return false;
         }
 
-        private void SetOwnerPresentation(bool active)
+        private BlockPlayerInputSource ResolveInput() =>
+            inputSource != null ? inputSource : inputSource = GetComponent<BlockPlayerInputSource>();
+
+        private BlockPlayerView ResolveView() =>
+            view != null ? view : view = GetComponent<BlockPlayerView>();
+
+        private EntityViewBinder ResolveBinder() =>
+            viewBinder != null ? viewBinder : viewBinder = GetComponent<EntityViewBinder>();
+
+        private PlayerPresentationBindingGate ResolvePresentationBinding() =>
+            presentationBinding != null
+                ? presentationBinding
+                : presentationBinding = GetComponent<PlayerPresentationBindingGate>();
+
+        private void OnPlayerIdChanged(Guid previous, Guid next, bool asServer)
         {
-            if (ownerCamera != null)
-                ownerCamera.gameObject.SetActive(active);
-            if (ownerAudioListener != null)
-                ownerAudioListener.enabled = active;
+            if (asServer || !IsClientStarted)
+                return;
+            if (next == Guid.Empty)
+                ResolvePresentationBinding().SetNetworkUnavailable();
+            else
+                ResolvePresentationBinding().SetNetworkReady(new PlayerId(next));
         }
 
-        private void AnimateRig(float moveAmount)
+        private void OnDestroy()
         {
-            if (moveAmount > 0.01f)
-                stepCycle += Time.deltaTime * limbSwingSpeed;
-            var swing = Mathf.Sin(stepCycle) * limbSwingAngle * moveAmount;
-            var blend = 1f - Mathf.Exp(-12f * Time.deltaTime);
-            SetLimbRotation(leftArmPivot, Quaternion.Euler(swing, 0f, 0f), blend);
-            SetLimbRotation(rightArmPivot, Quaternion.Euler(-swing, 0f, 0f), blend);
-            SetLimbRotation(leftLegPivot, Quaternion.Euler(-swing, 0f, 0f), blend);
-            SetLimbRotation(rightLegPivot, Quaternion.Euler(swing, 0f, 0f), blend);
-        }
-
-        private static void SetLimbRotation(Transform limb, Quaternion target, float blend)
-        {
-            if (limb != null)
-                limb.localRotation = Quaternion.Slerp(limb.localRotation, target, blend);
+            playerId.OnChange -= OnPlayerIdChanged;
         }
     }
 }

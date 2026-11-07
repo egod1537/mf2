@@ -1,6 +1,7 @@
 using System.Linq;
 using MF2.Game.Networking;
 using UnityEngine;
+using VContainer;
 
 namespace MF2.Game.UI
 {
@@ -9,11 +10,17 @@ namespace MF2.Game.UI
         [SerializeField] private UnityEngine.UI.Text statusText;
         [SerializeField] private UnityEngine.UI.Button disconnectButton;
 
-        private SessionController session;
+        private INetworkSessionFacade session;
+
+        [Inject]
+        private void Construct(INetworkSessionFacade injectedSession)
+        {
+            session = injectedSession;
+        }
 
         private void Start()
         {
-            session = SessionController.Instance;
+            session ??= SessionController.Instance;
             disconnectButton.onClick.AddListener(Disconnect);
         }
 

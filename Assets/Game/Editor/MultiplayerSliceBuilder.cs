@@ -1,13 +1,18 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using FishNet.Managing;
 using FishNet.Managing.Object;
 using FishNet.Object;
 using FishNet.Transporting.Tugboat;
+using MF2.Entities.Player;
+using MF2.Game.Lifecycle;
 using MF2.Game.Networking;
+using MF2.Game.Presentation;
 using MF2.Game.UI;
+using MF2.World.Core;
+using MF2.World.Registry;
+using MF2.World.Rendering;
 using UnityEditor;
 using UnityEditor.Events;
 using UnityEditor.SceneManagement;
@@ -21,10 +26,14 @@ namespace MF2.Editor
     public static class MultiplayerSliceBuilder
     {
         private const string PlayerPrefabPath = "Assets/Entities/Player/BlockPlayer.prefab";
+        private const string OfflinePlayerPrefabPath = "Assets/Entities/Player/OfflineBlockPlayer.prefab";
         private const string TitlePath = "Assets/Scenes/Title.unity";
         private const string OutgamePath = "Assets/Scenes/Outgame.unity";
         private const string TestPath = "Assets/Scenes/Test.unity";
         private const string IngamePath = "Assets/Scenes/Ingame.unity";
+        private const string BlockRegistryManifestPath = "Assets/World/Registry/BlockRegistryManifest.asset";
+        private const string BlockRenderManifestPath = "Assets/World/Rendering/BlockRenderManifest.asset";
+        private const string ChunkMaterialSetPath = "Assets/World/Rendering/ChunkMaterialSet.asset";
 
         [MenuItem("MF2/Build Multiplayer Test Slice")]
         public static void BuildAll()
@@ -33,6 +42,7 @@ namespace MF2.Editor
                 throw new InvalidOperationException("플레이 모드에서는 씬을 생성할 수 없습니다.");
 
             ConfigurePlayerPrefab();
+            ConfigureOfflinePlayerPrefab();
             CreateTitleScene();
             CreateOutgameScene();
             CreateGameScene(TestPath, "Test", true);
@@ -77,8 +87,20 @@ namespace MF2.Editor
                 networkSerialized.FindProperty("_spectatorInterpolation").intValue = 3;
                 networkSerialized.ApplyModifiedPropertiesWithoutUndo();
 
-                var controllerType = Type.GetType("MF2.Entities.Player.BlockPlayerController, Assembly-CSharp", true);
-                var controller = root.GetComponent(controllerType) ?? root.AddComponent(controllerType);
+                var input = GetOrAdd<BlockPlayerInputSource>(root);
+                var view = GetOrAdd<BlockPlayerView>(root);
+                var binder = GetOrAdd<EntityViewBinder>(root);
+                var bindingGate = GetOrAdd<PlayerPresentationBindingGate>(root);
+                var controller = GetOrAdd<BlockPlayerController>(root);
+                controller.ConfigureMvc(input, view, binder, bindingGate);
+                binder.Configure(view);
+                bindingGate.Configure(binder);
+                view.ConfigureVisual(visual.gameObject, rigidbody);
+                view.ConfigureRig(
+                    visual.Find("Left Arm Pivot"),
+                    visual.Find("Right Arm Pivot"),
+                    visual.Find("Left Leg Pivot"),
+                    visual.Find("Right Leg Pivot"));
 
                 var oldRig = root.transform.Find("OwnerCameraRig");
                 if (oldRig != null)
@@ -93,8 +115,7 @@ namespace MF2.Editor
                 ownerCamera.farClipPlane = 250f;
                 ownerCamera.tag = "MainCamera";
                 var listener = cameraRig.AddComponent<AudioListener>();
-                controllerType.GetMethod("ConfigureOwnerCamera", BindingFlags.Instance | BindingFlags.Public)
-                    ?.Invoke(controller, new object[] { ownerCamera, listener });
+                controller.ConfigureOwnerCamera(ownerCamera, listener);
                 cameraRig.SetActive(false);
 
                 PrefabUtility.SaveAsPrefabAsset(root, PlayerPrefabPath);
@@ -107,6 +128,49 @@ namespace MF2.Editor
             AssetDatabase.ImportAsset(PlayerPrefabPath, ImportAssetOptions.ForceUpdate);
         }
 
+        private static void ConfigureOfflinePlayerPrefab()
+        {
+            var root = PrefabUtility.LoadPrefabContents(OfflinePlayerPrefabPath);
+            try
+            {
+                foreach (var binder in root.GetComponents<EntityViewBinder>())
+                    UnityEngine.Object.DestroyImmediate(binder, true);
+
+                var body = GetOrAdd<Rigidbody>(root);
+                var input = GetOrAdd<BlockPlayerInputSource>(root);
+                var view = GetOrAdd<BlockPlayerView>(root);
+                var controller = GetOrAdd<OfflineBlockPlayerController>(root);
+                controller.ConfigureMvc(input, view);
+
+                var visual = root.transform.Find("Visual");
+                if (visual != null)
+                {
+                    view.ConfigureVisual(visual.gameObject, body);
+                    view.ConfigureRig(
+                        visual.Find("Left Arm Pivot"),
+                        visual.Find("Right Arm Pivot"),
+                        visual.Find("Left Leg Pivot"),
+                        visual.Find("Right Leg Pivot"));
+                }
+
+                var camera = root.GetComponentInChildren<Camera>(true);
+                if (camera != null)
+                {
+                    var listener = camera.GetComponent<AudioListener>();
+                    view.ConfigureOwnerCamera(camera, listener);
+                    input.ConfigureMovementCamera(camera);
+                }
+
+                PrefabUtility.SaveAsPrefabAsset(root, OfflinePlayerPrefabPath);
+            }
+            finally
+            {
+                PrefabUtility.UnloadPrefabContents(root);
+            }
+
+            AssetDatabase.ImportAsset(OfflinePlayerPrefabPath, ImportAssetOptions.ForceUpdate);
+        }
+
         private static void CreateTitleScene()
         {
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
@@ -114,6 +178,15 @@ namespace MF2.Editor
 
             var networkRoot = new GameObject("NetworkBootstrap");
             networkRoot.AddComponent<Tugboat>();
+            var applicationScope = networkRoot.AddComponent<ApplicationLifetimeScope>();
+            applicationScope.ConfigureBlockRegistry(
+                LoadRequiredAsset<BlockRegistryManifest>(BlockRegistryManifestPath));
+            networkRoot.AddComponent<ServerSessionCoordinator>();
+            GetOrAdd<ClientPresentationCoordinator>(networkRoot);
+            networkRoot.AddComponent<GameCommandNetworkAdapter>();
+            networkRoot.AddComponent<PlayerReplicationAdapter>();
+            networkRoot.AddComponent<WorldReplicationAdapter>();
+            networkRoot.AddComponent<ServerWorldCollisionBridge>();
             var bootstrap = networkRoot.AddComponent<NetworkBootstrap>();
             var manager = networkRoot.GetComponent<NetworkManager>();
             manager.SpawnablePrefabs = AssetDatabase.LoadAssetAtPath<DefaultPrefabObjects>("Assets/DefaultPrefabObjects.asset");
@@ -129,6 +202,7 @@ namespace MF2.Editor
             UnityEventTools.AddPersistentListener(start.onClick, controller.StartGame);
             UnityEventTools.AddPersistentListener(quit.onClick, controller.QuitGame);
             CreateEventSystem();
+            CreateSceneScope(scene);
 
             EditorSceneManager.SaveScene(scene, TitlePath);
         }
@@ -172,6 +246,7 @@ namespace MF2.Editor
             SetObjectReference(controller, "startTestButton", test);
             SetObjectReference(controller, "startIngameButton", ingame);
             CreateEventSystem();
+            CreateSceneScope(scene);
 
             EditorSceneManager.SaveScene(scene, OutgamePath);
         }
@@ -206,6 +281,19 @@ namespace MF2.Editor
                 point.AddComponent<SpawnPoint>();
             }
 
+            var worldHost = new GameObject("World").AddComponent<WorldHost>();
+            worldHost.gameObject.AddComponent<WorldViewBridge>();
+            worldHost.ConfigureAssets(
+                LoadRequiredAsset<BlockRegistryManifest>(BlockRegistryManifestPath),
+                LoadRequiredAsset<BlockRenderManifest>(BlockRenderManifestPath),
+                LoadRequiredAsset<ChunkMaterialSet>(ChunkMaterialSetPath));
+
+            var debugInput = new GameObject("WorldCommandDebugInput")
+                .AddComponent<WorldCommandDebugInput>();
+            debugInput.Configure(
+                LoadRequiredAsset<BlockRegistryManifest>(BlockRegistryManifestPath),
+                Vector3Int.zero);
+
             var hud = new GameObject("NetworkSceneHud").AddComponent<NetworkSceneHud>();
             var canvas = CreateCanvas("HUD Canvas");
             var status = CreateAnchoredText(canvas.transform, "Status", new Vector2(18f, -18f), new Vector2(520f, 96f));
@@ -213,8 +301,15 @@ namespace MF2.Editor
             SetObjectReference(hud, "statusText", status);
             SetObjectReference(hud, "disconnectButton", disconnect);
             CreateEventSystem();
+            CreateSceneScope(scene);
 
             EditorSceneManager.SaveScene(scene, path);
+        }
+
+        private static void CreateSceneScope(Scene scene)
+        {
+            var scope = new GameObject("SceneLifetimeScope").AddComponent<SceneLifetimeScope>();
+            scope.ConfigureSceneRoots(scene.GetRootGameObjects());
         }
 
         private static void ConfigureBuildSettings()
@@ -384,6 +479,14 @@ namespace MF2.Editor
 
         private static T GetOrAdd<T>(GameObject gameObject) where T : Component =>
             gameObject.GetComponent<T>() ?? gameObject.AddComponent<T>();
+
+        private static T LoadRequiredAsset<T>(string path) where T : UnityEngine.Object
+        {
+            var asset = AssetDatabase.LoadAssetAtPath<T>(path);
+            return asset != null
+                ? asset
+                : throw new InvalidOperationException($"Required asset was not found: {path}");
+        }
 
         private static void SetObjectReference(UnityEngine.Object target, string propertyName, UnityEngine.Object value)
         {

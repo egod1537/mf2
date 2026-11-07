@@ -1,0 +1,19 @@
+{
+  "name": "MF2.Entities.Player",
+  "rootNamespace": "MF2.Entities.Player",
+  "references": [
+    "MF2.Game.Domain",
+    "FishNet.Runtime",
+    "Unity.InputSystem",
+    "Unity.Cinemachine"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

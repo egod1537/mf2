@@ -1,6 +1,7 @@
 using System.Collections;
 using FishNet.Managing;
 using FishNet.Managing.Timing;
+using MF2.Game.Lifecycle;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -8,6 +9,10 @@ namespace MF2.Game.Networking
 {
     [DisallowMultipleComponent]
     [RequireComponent(typeof(NetworkManager), typeof(SessionController), typeof(PlayerSpawner))]
+    [RequireComponent(typeof(ApplicationLifetimeScope), typeof(ServerSessionCoordinator), typeof(GameCommandNetworkAdapter))]
+    [RequireComponent(typeof(ClientPresentationCoordinator))]
+    [RequireComponent(typeof(PlayerReplicationAdapter), typeof(WorldReplicationAdapter))]
+    [RequireComponent(typeof(ServerWorldCollisionBridge))]
     public sealed class NetworkBootstrap : MonoBehaviour
     {
         public static NetworkBootstrap Instance { get; private set; }
@@ -26,7 +31,7 @@ namespace MF2.Game.Networking
 
             Instance = this;
             DontDestroyOnLoad(gameObject);
-            IsDedicated = DetectDedicated();
+            IsDedicated = IsDedicatedProcess();
         }
 
         private IEnumerator Start()
@@ -44,7 +49,7 @@ namespace MF2.Game.Networking
             }
         }
 
-        private static bool DetectDedicated()
+        public static bool IsDedicatedProcess()
         {
 #if UNITY_SERVER
             return true;

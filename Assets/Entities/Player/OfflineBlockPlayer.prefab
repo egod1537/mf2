@@ -185,6 +185,8 @@ GameObject:
   - component: {fileID: 5418092771987369783}
   - component: {fileID: 2964570754353002110}
   - component: {fileID: 3333900933418702991}
+  - component: {fileID: 3915879446983267612}
+  - component: {fileID: 3758883194791467969}
   m_Layer: 0
   m_Name: OfflineBlockPlayer
   m_TagString: Player
@@ -274,13 +276,44 @@ MonoBehaviour:
   sprintSpeed: 6
   jumpVelocity: 6.5
   groundProbeDistance: 0.12
+  inputSource: {fileID: 3915879446983267612}
+  view: {fileID: 3758883194791467969}
+--- !u!114 &3915879446983267612
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9140232507387627146}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec43c4e1367b2fd4686be44aa24b36fb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: MF2.Entities.Player::MF2.Entities.Player.BlockPlayerInputSource
   movementCamera: {fileID: 0}
+--- !u!114 &3758883194791467969
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9140232507387627146}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4cbfd1b425c024b49a6d132e04188490, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: MF2.Entities.Player::MF2.Entities.Player.BlockPlayerView
+  ownerCamera: {fileID: 0}
+  ownerAudioListener: {fileID: 0}
+  visualRoot: {fileID: 37421000529080155}
+  motionBody: {fileID: 2964570754353002110}
   leftArmPivot: {fileID: 7626173582946425620}
   rightArmPivot: {fileID: 2453173024696813229}
   leftLegPivot: {fileID: 653559960010467141}
   rightLegPivot: {fileID: 3789651010079302014}
   limbSwingAngle: 30
   limbSwingSpeed: 8
+  maximumMoveSpeed: 6
 --- !u!1001 &106060652910940456
 PrefabInstance:
   m_ObjectHideFlags: 0

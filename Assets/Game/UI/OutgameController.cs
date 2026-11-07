@@ -1,6 +1,7 @@
 using System.Linq;
 using MF2.Game.Networking;
 using UnityEngine;
+using VContainer;
 
 namespace MF2.Game.UI
 {
@@ -16,11 +17,17 @@ namespace MF2.Game.UI
         [SerializeField] private UnityEngine.UI.Button startTestButton;
         [SerializeField] private UnityEngine.UI.Button startIngameButton;
 
-        private SessionController session;
+        private INetworkSessionFacade session;
+
+        [Inject]
+        private void Construct(INetworkSessionFacade injectedSession)
+        {
+            session = injectedSession;
+        }
 
         private void Start()
         {
-            session = SessionController.Instance;
+            session ??= SessionController.Instance;
             hostInput.text = "127.0.0.1";
             portInput.text = session == null ? "7770" : session.DefaultPort.ToString();
             if (session != null)

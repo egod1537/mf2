@@ -2,7 +2,12 @@
   "name": "MF2.Game",
   "rootNamespace": "MF2",
   "references": [
+    "MF2.Game.Domain",
+    "MF2.Entities.Player",
+    "MF2.World.Runtime",
     "FishNet.Runtime",
+    "VContainer",
+    "Unity.Mathematics",
     "Unity.InputSystem",
     "UnityEngine.UI"
   ],

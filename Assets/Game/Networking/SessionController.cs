@@ -6,11 +6,30 @@ using FishNet.Connection;
 using FishNet.Managing;
 using FishNet.Managing.Scened;
 using FishNet.Transporting;
+using MF2.Game.Lifecycle;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace MF2.Game.Networking
 {
+    public interface INetworkSessionFacade
+    {
+        event Action Changed;
+        SessionStatus Status { get; }
+        string StatusDetail { get; }
+        bool IsBusy { get; }
+        bool IsServer { get; }
+        bool IsClient { get; }
+        bool CanStartScene { get; }
+        ushort DefaultPort { get; }
+        string Role { get; }
+        IReadOnlyList<int> ConnectionIds { get; }
+        bool StartHost(string portText);
+        bool Join(string host, string portText);
+        void DisconnectAndReturnToOutgame();
+        bool StartNetworkScene(string sceneName);
+    }
+
     public enum SessionStatus
     {
         Disconnected,
@@ -21,7 +40,7 @@ namespace MF2.Game.Networking
 
     [DisallowMultipleComponent]
     [RequireComponent(typeof(NetworkManager))]
-    public sealed class SessionController : MonoBehaviour
+    public sealed class SessionController : MonoBehaviour, INetworkSessionFacade
     {
         public const string OutgameScene = "Outgame";
         public const string TestScene = "Test";
@@ -68,6 +87,7 @@ namespace MF2.Game.Networking
         private NetworkManager networkManager;
         private Transport transport;
         private Coroutine activeOperation;
+        private ServerSessionCoordinator sessionCoordinator;
         private bool callbacksRegistered;
         private bool returnToOutgameOnStop;
         private bool dedicatedSceneStarted;
@@ -82,6 +102,7 @@ namespace MF2.Game.Networking
 
             Instance = this;
             networkManager = GetComponent<NetworkManager>();
+            sessionCoordinator = GetComponent<ServerSessionCoordinator>();
         }
 
         private IEnumerator Start()
@@ -98,6 +119,9 @@ namespace MF2.Game.Networking
                 return Fail(error);
             if (IsBusy || IsServer || IsClient)
                 return Fail("이미 연결 중이거나 연결되어 있습니다.");
+            transport ??= networkManager.TransportManager.Transport;
+            if (transport == null)
+                return Fail("Transport가 아직 준비되지 않았습니다.");
 
             activeOperation = StartCoroutine(StartHostRoutine(port));
             return true;
@@ -109,6 +133,9 @@ namespace MF2.Game.Networking
                 return Fail(error);
             if (IsBusy || IsServer || IsClient)
                 return Fail("이미 연결 중이거나 연결되어 있습니다.");
+            transport ??= networkManager.TransportManager.Transport;
+            if (transport == null)
+                return Fail("Transport가 아직 준비되지 않았습니다.");
 
             IsBusy = true;
             Status = SessionStatus.Connecting;
@@ -137,6 +164,9 @@ namespace MF2.Game.Networking
 
             IsBusy = true;
             returnToOutgameOnStop = true;
+            // Domain shutdown is an explicit operation. The FishNet stopped callback remains an
+            // idempotent safety net, but is not the primary session-lifetime trigger.
+            sessionCoordinator?.EndServerSession();
             if (networkManager.ClientManager.Started)
                 networkManager.ClientManager.StopConnection();
             if (networkManager.ServerManager.Started)
@@ -196,6 +226,10 @@ namespace MF2.Game.Networking
                 IsBusy = false;
                 Fail("Dedicated server 시작에 실패했습니다.");
             }
+            else
+            {
+                sessionCoordinator.BeginServerSession();
+            }
             NotifyChanged();
         }
 
@@ -227,6 +261,7 @@ namespace MF2.Game.Networking
                 yield break;
             }
 
+            sessionCoordinator.BeginServerSession();
             activeOperation = StartCoroutine(ConnectionTimeoutRoutine());
         }
 
@@ -288,6 +323,7 @@ namespace MF2.Game.Networking
             networkManager.ClientManager.OnRemoteConnectionState += OnClientRosterChanged;
             networkManager.ServerManager.OnServerConnectionState += OnServerConnectionState;
             networkManager.ServerManager.OnRemoteConnectionState += OnServerRemoteConnectionState;
+            networkManager.ServerManager.OnAuthenticationResult += OnServerAuthenticationResult;
         }
 
         private void OnClientConnectionState(ClientConnectionStateArgs args)
@@ -318,6 +354,11 @@ namespace MF2.Game.Networking
 
         private void OnServerConnectionState(ServerConnectionStateArgs args)
         {
+            if (args.ConnectionState == LocalConnectionState.Started)
+                sessionCoordinator.BeginServerSession();
+            else if (args.ConnectionState == LocalConnectionState.Stopped)
+                sessionCoordinator.EndServerSession();
+
             if (args.ConnectionState == LocalConnectionState.Started && IsDedicated)
             {
                 Status = SessionStatus.Connected;
@@ -335,17 +376,11 @@ namespace MF2.Game.Networking
         private void OnServerRemoteConnectionState(NetworkConnection connection, RemoteConnectionStateArgs args)
         {
             NotifyChanged();
-            if (IsDedicated && !dedicatedSceneStarted && args.ConnectionState == RemoteConnectionState.Started)
-                StartCoroutine(StartDedicatedTestWhenAuthenticated(connection));
         }
 
-        private IEnumerator StartDedicatedTestWhenAuthenticated(NetworkConnection connection)
+        private void OnServerAuthenticationResult(NetworkConnection connection, bool authenticated)
         {
-            var deadline = Time.realtimeSinceStartup + 10f;
-            while (connection.IsActive && !connection.IsAuthenticated && Time.realtimeSinceStartup < deadline)
-                yield return null;
-
-            if (!dedicatedSceneStarted && connection.IsActive && connection.IsAuthenticated)
+            if (IsDedicated && authenticated && !dedicatedSceneStarted)
             {
                 dedicatedSceneStarted = true;
                 StartNetworkScene(TestScene);
@@ -372,9 +407,11 @@ namespace MF2.Game.Networking
                 networkManager.ClientManager.OnRemoteConnectionState -= OnClientRosterChanged;
                 networkManager.ServerManager.OnServerConnectionState -= OnServerConnectionState;
                 networkManager.ServerManager.OnRemoteConnectionState -= OnServerRemoteConnectionState;
+                networkManager.ServerManager.OnAuthenticationResult -= OnServerAuthenticationResult;
             }
             if (Instance == this)
                 Instance = null;
+            sessionCoordinator?.EndServerSession();
         }
     }
 }

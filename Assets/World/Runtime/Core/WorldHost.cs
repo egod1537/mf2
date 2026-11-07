@@ -35,11 +35,14 @@ namespace MF2.World.Core
         private ChunkRenderPipeline renderPipeline;
         private GameObject rendererRoot;
         private bool reinitializeRequested;
+        private bool ownsWorld;
 
         public BlockRegistryManifest BlockRegistryManifest => blockRegistryManifest;
         public BlockRenderManifest BlockRenderManifest => blockRenderManifest;
         public ChunkMaterialSet ChunkMaterialSet => chunkMaterialSet;
         public bool IsInitialized => world != null;
+        public bool OwnsWorld => world != null && ownsWorld;
+        public bool IsRuntimeView => world != null && !ownsWorld;
         public int SerializedBlockCount => serializedBlocks != null ? serializedBlocks.Count : 0;
         public int DirtyStorageChunkCount => storageSession.DirtyChunkCount;
         internal int PendingCommandCount
@@ -95,13 +98,13 @@ namespace MF2.World.Core
 
         public void Enqueue(WorldCommand command)
         {
-            EnsureInitialized();
+            EnsureAuthoringWorld();
             world.Enqueue(command);
         }
 
         public FlushResult Flush()
         {
-            EnsureInitialized();
+            EnsureAuthoringWorld();
             var result = world.Flush();
             storageSession.TrackDirty(world);
             ApplySerializedChanges();
@@ -116,7 +119,7 @@ namespace MF2.World.Core
         /// </summary>
         public WorldSaveResult SaveWorld(string directory)
         {
-            EnsureInitialized();
+            EnsureAuthoringWorld();
             var storage = new RegionJsonWorldStorage(
                 directory,
                 StoredBlockValidator.FromManifest(blockRegistryManifest));
@@ -129,7 +132,7 @@ namespace MF2.World.Core
         /// </summary>
         public WorldStorageSnapshot LoadWorld(string directory)
         {
-            EnsureInitialized();
+            EnsureAuthoringWorld();
             var storage = new RegionJsonWorldStorage(
                 directory,
                 StoredBlockValidator.FromManifest(blockRegistryManifest));
@@ -140,6 +143,7 @@ namespace MF2.World.Core
                 DisposeWorld();
                 ReplaceSerializedBlocks(snapshot);
                 world = replacement;
+                ownsWorld = true;
                 replacement = null;
                 CreateRenderOwnership();
                 if (renderTable != null && rendererPool != null && world.DirtyChunks.Length > 0)
@@ -181,9 +185,52 @@ namespace MF2.World.Core
 
             renderTable?.Dispose();
             renderTable = null;
-            world?.Dispose();
+            var releasedWorld = world;
+            var disposeReleasedWorld = ownsWorld;
             world = null;
+            ownsWorld = false;
             storageSession.Clear();
+            if (disposeReleasedWorld)
+                releasedWorld?.Dispose();
+        }
+
+        /// <summary>
+        /// Attaches a replicated runtime world as a borrowed scene view. The host never disposes
+        /// the borrowed WorldCore.
+        /// </summary>
+        public void AttachRuntimeWorld(WorldCore runtimeWorld)
+        {
+            if (runtimeWorld == null)
+                throw new ArgumentNullException(nameof(runtimeWorld));
+            if (ReferenceEquals(world, runtimeWorld) && !ownsWorld)
+                return;
+
+            DisposeWorld();
+            world = runtimeWorld;
+            ownsWorld = false;
+            CreateRenderOwnership();
+            if (renderTable != null && rendererPool != null)
+            {
+                renderPipeline.RebuildAllNow(world, renderTable, rendererPool);
+                Physics.SyncTransforms();
+            }
+        }
+
+        public void RefreshRuntimeWorld(WorldCore runtimeWorld)
+        {
+            if (!ReferenceEquals(world, runtimeWorld) || ownsWorld)
+                return;
+            if (renderTable != null && rendererPool != null)
+            {
+                renderPipeline.RebuildDirtyNow(world, renderTable, rendererPool);
+                Physics.SyncTransforms();
+            }
+        }
+
+        public void DetachRuntimeWorld(WorldCore runtimeWorld)
+        {
+            if (ReferenceEquals(world, runtimeWorld) && !ownsWorld)
+                DisposeWorld();
         }
 
         internal void ConfigureAssets(
@@ -211,7 +258,8 @@ namespace MF2.World.Core
             if (!ActiveHosts.Contains(this))
                 ActiveHosts.Add(this);
             reinitializeRequested = false;
-            EnsureInitialized();
+            if (!Application.isPlaying)
+                EnsureInitialized();
         }
 
         private void OnDisable()
@@ -233,19 +281,35 @@ namespace MF2.World.Core
 
         private void Update()
         {
-            if (reinitializeRequested && isActiveAndEnabled)
+            if (!Application.isPlaying && reinitializeRequested && isActiveAndEnabled)
                 Reinitialize();
+        }
+
+        private void EnsureAuthoringWorld()
+        {
+            EnsureInitialized();
+            if (!ownsWorld)
+            {
+                throw new InvalidOperationException(
+                    "A runtime WorldHost is a borrowed view. Mutate and persist through GameSession.");
+            }
         }
 
         private void EnsureInitialized()
         {
             if (world != null)
                 return;
+            if (Application.isPlaying)
+            {
+                throw new InvalidOperationException(
+                    "The runtime WorldHost is waiting for a replicated client world.");
+            }
 
             NormalizeSerializedBlocks();
             world = new WorldCore(
                 initialChunkCapacity: Math.Max(4, serializedBlocks.Count / ChunkCoordinates.Volume + 1),
                 initialCommandCapacity: Math.Max(64, serializedBlocks.Count));
+            ownsWorld = true;
             try
             {
                 CreateRenderOwnership();

@@ -75,6 +75,8 @@ namespace MF2.World.Core
             }
         }
 
+        public int MaxFillBlocksPerCommand => maxFillBlocksPerCommand;
+
         /// <summary>
         /// One original/final record per cell touched by the most recent Flush.
         /// The view remains valid only until the next Flush or Dispose.
@@ -104,6 +106,17 @@ namespace MF2.World.Core
         public void Enqueue(WorldCommand command)
         {
             ThrowIfDisposed();
+            ValidateCommand(command);
+            commands.Add(command);
+        }
+
+        /// <summary>
+        /// Validates a command using the exact limits enforced by <see cref="Enqueue"/>.
+        /// This lets an authority boundary reject bad input before it enters a tick queue.
+        /// </summary>
+        public void ValidateCommand(WorldCommand command)
+        {
+            ThrowIfDisposed();
             if (command.Type == WorldCommandType.None)
                 throw new ArgumentException("An empty world command cannot be enqueued.", nameof(command));
             if (command.Block.Id == 0 && command.Block.State != 0)
@@ -118,8 +131,6 @@ namespace MF2.World.Core
                     $"FillRegion expands to {expandedCount} blocks; the configured limit is " +
                     $"{maxFillBlocksPerCommand}.");
             }
-
-            commands.Add(command);
         }
 
         /// <summary>
@@ -192,6 +203,16 @@ namespace MF2.World.Core
         {
             ThrowIfDisposed();
             return chunks.TryGetValue(chunkCoordinate, out handle) && pool.IsValid(handle);
+        }
+
+        /// <summary>
+        /// Returns a caller-owned snapshot of the currently loaded handles. Presentation uses
+        /// this when a scene view attaches after the world's most recent dirty view has expired.
+        /// </summary>
+        public NativeArray<ChunkHandle> GetLoadedChunkHandles(Allocator allocator)
+        {
+            ThrowIfDisposed();
+            return chunks.GetValueArray(allocator);
         }
 
         public bool IsChunkHandleValid(ChunkHandle handle)

@@ -84,6 +84,79 @@ namespace MF2.World.Rendering
             }
         }
 
+        /// <summary>Builds every resident chunk when a new scene-side view attaches.</summary>
+        public int RebuildAllNow(
+            WorldCore world,
+            BlockRenderTable renderTable,
+            ChunkRendererPool rendererPool,
+            Allocator allocator = Allocator.TempJob)
+        {
+            if (world == null)
+                throw new ArgumentNullException(nameof(world));
+            if (renderTable == null)
+                throw new ArgumentNullException(nameof(renderTable));
+            if (rendererPool == null)
+                throw new ArgumentNullException(nameof(rendererPool));
+
+            requests.Clear();
+            scheduled.Clear();
+            var handles = world.GetLoadedChunkHandles(Allocator.Temp);
+            try
+            {
+                for (var i = 0; i < handles.Length; i++)
+                {
+                    var handle = handles[i];
+                    if (!world.TryGetChunkCoordinate(handle, out var coordinate) ||
+                        !world.TryGetChunkVersion(handle, out var version))
+                    {
+                        continue;
+                    }
+                    if (acceptedBuilds.TryGetValue(coordinate, out var accepted) &&
+                        accepted.Handle == handle &&
+                        accepted.Version == version)
+                    {
+                        continue;
+                    }
+                    if (!scheduled.Add(handle))
+                        continue;
+                    if (ChunkMeshBuilder.TrySchedule(
+                            world,
+                            handle,
+                            renderTable,
+                            out var request,
+                            allocator))
+                    {
+                        requests.Add(request);
+                    }
+                }
+
+                var appliedCount = 0;
+                for (var i = 0; i < requests.Count; i++)
+                {
+                    var request = requests[i];
+                    if (!world.IsChunkVersionCurrent(request.Handle, request.Version))
+                        continue;
+                    var renderer = rendererPool.GetOrCreate(request.ChunkCoordinate);
+                    if (!renderer.Apply(world, request))
+                        continue;
+
+                    acceptedBuilds[request.ChunkCoordinate] =
+                        new AcceptedBuild(request.Handle, request.Version);
+                    appliedCount++;
+                }
+
+                return appliedCount;
+            }
+            finally
+            {
+                handles.Dispose();
+                for (var i = 0; i < requests.Count; i++)
+                    requests[i].Dispose();
+                requests.Clear();
+                scheduled.Clear();
+            }
+        }
+
         public void Forget(int3 chunkCoordinate)
         {
             acceptedBuilds.Remove(chunkCoordinate);

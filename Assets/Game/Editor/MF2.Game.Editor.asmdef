@@ -3,7 +3,10 @@
   "rootNamespace": "MF2.Editor",
   "references": [
     "MF2.Game",
+    "MF2.Entities.Player",
+    "MF2.World.Runtime",
     "FishNet.Runtime",
+    "VContainer",
     "Unity.InputSystem",
     "UnityEngine.UI"
   ],

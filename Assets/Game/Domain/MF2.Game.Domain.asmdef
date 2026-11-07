@@ -1,0 +1,18 @@
+{
+  "name": "MF2.Game.Domain",
+  "rootNamespace": "MF2.Game.Domain",
+  "references": [
+    "MF2.World.Runtime",
+    "Unity.Collections",
+    "Unity.Mathematics"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

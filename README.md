@@ -4,6 +4,68 @@
 
 Unity `6000.3.28f1`, FishNet `4.7.3` 기준의 직접 IP 멀티플레이 수직 슬라이스다. 시작 씬은 `Assets/Scenes/Title.unity`이며 네트워크 게임 씬 전환은 서버가 FishNet Global Scene으로 수행한다.
 
+규범적 아키텍처 결정, 비목표, 현재 검증 기록은
+[`docs/07_TECHNICAL_DECISIONS.md`](docs/07_TECHNICAL_DECISIONS.md)에 정리되어 있다.
+
+## Runtime architecture
+
+```text
+ApplicationLifetimeScope                 persistent NetworkBootstrap infrastructure
+├── ServerSessionLifetimeScope           server/host authority only
+│   ├── GameSession + PlayerRegistry
+│   ├── SimulationWorld (authoritative WorldCore owner)
+│   ├── domain systems / command authorization
+│   └── Unity physics + FishNet server adapters
+└── ClientPresentationLifetimeScope      client/host local presentation only
+    ├── ClientStateCoordinator           read-only replicated player/world state
+    └── SceneLifetimeScope               Test/Ingame scene views and input
+        ├── Player View/Binder context
+        └── WorldViewBridge + chunk renderer projection
+```
+
+Host에서도 server scope와 client-presentation scope는 형제다. View/Binder는
+`ClientStateCoordinator`만 읽으며 authoritative `GameSession`이나 서버 `PlayerRegistry`를
+resolve하지 않는다. Dedicated Server는 client-presentation/scene scope를 만들지 않는다.
+
+Player의 GameObject 책임은 다음과 같이 나뉜다.
+
+- `PlayerModel`/`PlayerRegistry`: Session이 소유하는 health/life-state struct 원본.
+- `BlockPlayerController`: FishNet `Replicate`/`Reconcile`과 `PredictionRigidbody` 접착제.
+- `BlockPlayerInputSource`: local owner 입력을 수집하고 prediction tick에서 atomic consume.
+- `BlockPlayerView`: limb animation, visual root, owner camera/audio만 제어.
+- `EntityViewBinder`: `PlayerId`로 client replica를 읽어 View에 즉시/변경 시 투영.
+- `PlayerPresentationBindingGate`: client replica dependency와 replicated `PlayerId`가 모두
+  준비된 뒤 Bind하고 despawn/pool reuse에서 이전 구독과 ID를 제거.
+
+Dynamic Player transform의 원본은 Unity `Rigidbody`와 FishNet prediction이다. Domain
+`PlayerModel`에는 별도 mutable position을 두지 않으며 Binder가 Transform을 쓰지 않는다.
+`NetworkBootstrap`이 `PhysicsMode.TimeManager`를 설정하고, 프로젝트 코드는 별도
+`Physics.Simulate`를 호출하지 않는다. Domain tick은 FishNet post-physics tick에서 한 번만
+실행된다.
+
+World는 block별 GameObject/Binder를 만들지 않는다. EditMode의 `WorldHost`는 authoring과
+preview용 `WorldCore`를 소유하지만, PlayMode에서는 client replica의 `WorldCore`를 빌려
+기존 chunk mesh pipeline에 dirty chunk를 투영한다. Authoritative PlayMode `WorldCore`의
+단일 소유자는 server `SimulationWorld`다.
+
+### Startup and scene lifecycle
+
+1. `Title`의 persistent `NetworkBootstrap`이 application scope와 FishNet infrastructure를
+   만든다.
+2. 서버/Host 시작 시 server session scope가 match당 한 번 생성된다.
+3. 일반 client/Host는 별도의 client-presentation scope를 만든다.
+4. `Test`/`Ingame`의 `SceneLifetimeScope`가 scene root를 주입한다. Scene unload는 View만
+   제거하며 server session을 종료하지 않는다.
+5. 서버 `PlayerSpawner`는 connection을 stable `PlayerId`로 매핑하고 Rigidbody와 현재
+   `NetworkObject`를 session map에 등록한다. Network scene 교체에서는 같은 ID를 유지한다.
+6. client spawn에서는 `PlayerId` sync와 replica 준비 순서에 관계없이 gate가 둘을 기다린
+   뒤 Binder를 연결한다. Despawn/disconnect/reconnect는 중복 안전하게 Unbind한다.
+
+서버 world command는 인증된 FishNet connection에서만 받고, 서버가 생성한 `PlayerId`,
+등록된 Rigidbody, block manifest, interaction reach를 검증한 뒤 `GameSession`에 제출한다.
+`Test`/`Ingame`에서는 F6으로 근처 debug block을 toggle하여 command → replication →
+`WorldViewBridge` → chunk renderer 경로를 확인할 수 있다.
+
 ### Editor Host + Client
 
 1. `Title` 씬에서 Play 후 `Start`를 누른다.
@@ -22,8 +84,15 @@ NAT traversal, relay, matchmaking, room browser는 범위 밖이다. 인터넷 �
 
 ### 검증
 
-- EditMode 순수 로직 테스트: Endpoint 입력 검증, Connection별 중복 Spawn 가드.
-- 수동: Host + 1 Client, Dedicated + 2 Clients, 실패 후 재접속, Client/Host 종료 정리, Test/Ingame 전환.
+- EditMode: Domain snapshot copy, command validation, client snapshot/delta ordering,
+  Binder immediate render/rebind/unbind, scope topology, spawn reuse, physics/network maps,
+  WorldHost ownership, chunk/native memory 회귀 테스트.
+- 수동: Host + 1 Client에서 이동/달리기/점프/owner camera/remote animation, Test↔Ingame
+  전환, disconnect/rejoin, F6 world replication을 확인한다.
+- Dedicated + 2 Clients에서 renderer/UI 없이 physics와 authoritative session이 유지되는지,
+  client별 PlayerId/명령 권한과 late-join full snapshot을 확인한다.
+- PlayMode stop/start와 Builder 재생성 뒤에도 Prefab component/reference, SceneScope,
+  SpawnPoint/HUD/EventSystem, network prefab registry가 동일한지 확인한다.
 - 씬/Prefab 재생성이 필요하면 Unity 메뉴 `MF2 > Build Multiplayer Test Slice`를 사용한다.
 
 `BlockPlayer`는 `NetworkObject + Rigidbody + CapsuleCollider`이며 FishNet `Replicate`, `Reconcile`, `PredictionRigidbody`와 TimeManager 물리 틱을 사용한다. 같은 오브젝트에 NetworkTransform은 두지 않는다.

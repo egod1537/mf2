@@ -1,7 +1,15 @@
 {
   "name": "MF2.Game.Tests",
   "rootNamespace": "MF2.Tests",
-  "references": ["MF2.Game"],
+  "references": [
+    "MF2.Game",
+    "MF2.Game.Domain",
+    "MF2.Entities.Player",
+    "MF2.World.Runtime",
+    "FishNet.Runtime",
+    "VContainer",
+    "Unity.Mathematics"
+  ],
   "includePlatforms": ["Editor"],
   "excludePlatforms": [],
   "allowUnsafeCode": false,

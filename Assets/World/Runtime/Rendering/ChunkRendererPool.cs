@@ -11,6 +11,7 @@ namespace MF2.World.Rendering
         private readonly Transform parent;
         private readonly Material[] sharedMaterials;
         private readonly HideFlags createdHideFlags;
+        private readonly bool renderingEnabled;
         private readonly Dictionary<int3, ChunkRenderer> active =
             new Dictionary<int3, ChunkRenderer>();
         private readonly Stack<ChunkRenderer> inactive = new Stack<ChunkRenderer>();
@@ -20,10 +21,12 @@ namespace MF2.World.Rendering
         public ChunkRendererPool(
             Transform parent,
             ChunkMaterialSet materialSet,
-            HideFlags createdHideFlags = HideFlags.None)
+            HideFlags createdHideFlags = HideFlags.None,
+            bool renderingEnabled = true)
         {
             this.parent = parent;
             this.createdHideFlags = createdHideFlags;
+            this.renderingEnabled = renderingEnabled;
             sharedMaterials = materialSet != null
                 ? materialSet.CreateSharedMaterialArray()
                 : new Material[3];
@@ -95,6 +98,7 @@ namespace MF2.World.Rendering
             if (parent != null)
                 gameObject.transform.SetParent(parent, false);
             var renderer = gameObject.AddComponent<ChunkRenderer>();
+            renderer.SetRenderingEnabled(renderingEnabled);
             created.Add(renderer);
             return renderer;
         }
