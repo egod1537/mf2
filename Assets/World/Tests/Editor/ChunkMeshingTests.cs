@@ -418,6 +418,56 @@ namespace MF2.World.Tests
             }
         }
 
+        [Test]
+        public void CollisionReadiness_RequiresCurrentHandleAndVersionToBeApplied()
+        {
+            var root = new GameObject("Chunk Collision Readiness Test");
+            try
+            {
+                using (var world = new WorldCore())
+                using (var table = CreateTable(1))
+                using (var pool = new ChunkRendererPool(root.transform, null))
+                {
+                    var pipeline = new ChunkRenderPipeline();
+                    Assert.That(
+                        pipeline.AreAllLoadedChunkCollidersReady(world, pool),
+                        Is.True,
+                        "An empty world has no missing collision projections.");
+
+                    world.Enqueue(WorldCommand.SetBlock(int3.zero, new Block(1, 0)));
+                    world.Flush();
+                    Assert.That(pipeline.AreAllLoadedChunkCollidersReady(world, pool), Is.False);
+
+                    Assert.That(pipeline.RebuildDirtyNow(world, table, pool), Is.EqualTo(1));
+                    Assert.That(pipeline.AreAllLoadedChunkCollidersReady(world, pool), Is.True);
+
+                    world.Enqueue(WorldCommand.SetBlock(new int3(1, 0, 0), new Block(1, 0)));
+                    world.Flush();
+                    Assert.That(
+                        pipeline.AreAllLoadedChunkCollidersReady(world, pool),
+                        Is.False,
+                        "A previous collider version must not release the readiness barrier.");
+
+                    Assert.That(pipeline.RebuildDirtyNow(world, table, pool), Is.EqualTo(1));
+                    Assert.That(pipeline.AreAllLoadedChunkCollidersReady(world, pool), Is.True);
+
+                    Assert.That(world.TryUnloadChunk(int3.zero), Is.True);
+                    world.Enqueue(WorldCommand.SetBlock(int3.zero, new Block(1, 0)));
+                    world.Flush();
+                    Assert.That(pipeline.AreAllLoadedChunkCollidersReady(world, pool), Is.False);
+                    Assert.That(pipeline.RebuildDirtyNow(world, table, pool), Is.EqualTo(1));
+                    Assert.That(
+                        pipeline.AreAllLoadedChunkCollidersReady(world, pool),
+                        Is.True,
+                        "A pooled renderer must reset readiness for a recycled handle generation.");
+                }
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(root);
+            }
+        }
+
         private static ChunkMeshBuildRequest Schedule(
             WorldCore world,
             ChunkHandle handle,

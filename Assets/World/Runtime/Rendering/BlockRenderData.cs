@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.InteropServices;
+using MF2.World.Registry;
 using Unity.Mathematics;
 
 namespace MF2.World.Rendering
@@ -18,7 +19,8 @@ namespace MF2.World.Rendering
     {
         Opaque = 0,
         Cutout = 1,
-        Transparent = 2
+        Transparent = 2,
+        Water = 3
     }
 
     public enum BlockGeometryKind : byte
@@ -68,6 +70,7 @@ namespace MF2.World.Rendering
     {
         public uint Id;
         public BlockGeometryKind GeometryKind;
+        public BlockTraitsKind TraitsKind;
         public BlockFaceRenderDefinition North;
         public BlockFaceRenderDefinition South;
         public BlockFaceRenderDefinition East;

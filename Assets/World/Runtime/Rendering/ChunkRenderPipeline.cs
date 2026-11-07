@@ -167,6 +167,43 @@ namespace MF2.World.Rendering
             acceptedBuilds.Clear();
         }
 
+        /// <summary>
+        /// Returns true only when every currently loaded chunk has a collider projection for its
+        /// current handle generation and data version. An empty world is collision-ready.
+        /// </summary>
+        public bool AreAllLoadedChunkCollidersReady(
+            WorldCore world,
+            ChunkRendererPool rendererPool)
+        {
+            if (world == null || rendererPool == null)
+                return false;
+
+            var handles = world.GetLoadedChunkHandles(Allocator.Temp);
+            try
+            {
+                for (var i = 0; i < handles.Length; i++)
+                {
+                    var handle = handles[i];
+                    if (!world.TryGetChunkCoordinate(handle, out var coordinate) ||
+                        !world.TryGetChunkVersion(handle, out var version) ||
+                        !acceptedBuilds.TryGetValue(coordinate, out var accepted) ||
+                        accepted.Handle != handle ||
+                        accepted.Version != version ||
+                        !rendererPool.TryGet(coordinate, out var renderer) ||
+                        !renderer.IsCollisionReadyFor(handle, version))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+            finally
+            {
+                handles.Dispose();
+            }
+        }
+
         private readonly struct AcceptedBuild
         {
             public readonly ChunkHandle Handle;

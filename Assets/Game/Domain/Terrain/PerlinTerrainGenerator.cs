@@ -86,6 +86,17 @@ namespace MF2.Game.Domain
             var queuedColumns = 0;
             var flushCount = 0;
             var signature = 14695981039346656037UL;
+            signature = Hash(signature, config.StoneBlock.Id);
+            signature = Hash(signature, config.StoneBlock.State);
+            signature = Hash(signature, config.DirtBlock.Id);
+            signature = Hash(signature, config.DirtBlock.State);
+            signature = Hash(signature, config.GrassBlock.Id);
+            signature = Hash(signature, config.GrassBlock.State);
+            signature = Hash(signature, config.WaterBlock.Id);
+            signature = Hash(signature, config.WaterBlock.State);
+            signature = Hash(signature, config.DirtDepth);
+            signature = Hash(signature, config.WaterLevel);
+            signature = Hash(signature, config.WaterEnabled ? 1 : 0);
 
             for (var zOffset = 0; zOffset < config.Depth; zOffset++)
             {
@@ -94,16 +105,90 @@ namespace MF2.Game.Domain
                 {
                     var x = checked(config.OriginX + xOffset);
                     var height = SampleHeight(x, z);
-                    world.Enqueue(WorldCommand.FillRegion(
-                        new int3(x, config.MinimumY, z),
-                        new int3(x, height, z),
-                        config.SolidBlock));
+                    if (!config.WaterEnabled)
+                    {
+                        EnqueueSpan(world, x, z, config.MinimumY, height, config.SolidBlock);
+                        generatedBlocks += (long)height - config.MinimumY + 1L;
+                        signature = HashSpan(
+                            signature,
+                            config.MinimumY,
+                            height,
+                            config.SolidBlock);
+                    }
+                    else
+                    {
+                        var dirtStart = Math.Max(config.MinimumY, height - config.DirtDepth);
+                        var stoneEnd = dirtStart - 1;
+                        if (stoneEnd >= config.MinimumY)
+                        {
+                            EnqueueSpan(
+                                world,
+                                x,
+                                z,
+                                config.MinimumY,
+                                stoneEnd,
+                                config.StoneBlock);
+                            generatedBlocks += (long)stoneEnd - config.MinimumY + 1L;
+                            signature = HashSpan(
+                                signature,
+                                config.MinimumY,
+                                stoneEnd,
+                                config.StoneBlock);
+                        }
+
+                        if (height < config.WaterLevel)
+                        {
+                            EnqueueSpan(world, x, z, dirtStart, height, config.DirtBlock);
+                            generatedBlocks += (long)height - dirtStart + 1L;
+                            signature = HashSpan(
+                                signature,
+                                dirtStart,
+                                height,
+                                config.DirtBlock);
+
+                            var waterStart = height + 1;
+                            EnqueueSpan(
+                                world,
+                                x,
+                                z,
+                                waterStart,
+                                config.WaterLevel,
+                                config.WaterBlock);
+                            generatedBlocks += (long)config.WaterLevel - waterStart + 1L;
+                            signature = HashSpan(
+                                signature,
+                                waterStart,
+                                config.WaterLevel,
+                                config.WaterBlock);
+                        }
+                        else
+                        {
+                            if (dirtStart <= height - 1)
+                            {
+                                EnqueueSpan(
+                                    world,
+                                    x,
+                                    z,
+                                    dirtStart,
+                                    height - 1,
+                                    config.DirtBlock);
+                                generatedBlocks += (long)height - dirtStart;
+                                signature = HashSpan(
+                                    signature,
+                                    dirtStart,
+                                    height - 1,
+                                    config.DirtBlock);
+                            }
+
+                            EnqueueSpan(world, x, z, height, height, config.GrassBlock);
+                            generatedBlocks++;
+                            signature = HashSpan(signature, height, height, config.GrassBlock);
+                        }
+                    }
                     queuedColumns++;
-                    generatedBlocks += (long)height - config.MinimumY + 1L;
                     signature = Hash(signature, x);
                     signature = Hash(signature, z);
                     signature = Hash(signature, height);
-                    signature = Hash(signature, config.SolidBlock.Id);
 
                     if (queuedColumns < columnsPerBatch)
                         continue;
@@ -120,6 +205,31 @@ namespace MF2.Game.Domain
             }
 
             return new TerrainGenerationResult(config, generatedBlocks, flushCount, signature);
+        }
+
+        private static void EnqueueSpan(
+            SimulationWorld world,
+            int x,
+            int z,
+            int minimumY,
+            int maximumY,
+            Block block)
+        {
+            if (minimumY > maximumY)
+                return;
+
+            world.Enqueue(WorldCommand.FillRegion(
+                new int3(x, minimumY, z),
+                new int3(x, maximumY, z),
+                block));
+        }
+
+        private static ulong HashSpan(ulong hash, int minimumY, int maximumY, Block block)
+        {
+            hash = Hash(hash, minimumY);
+            hash = Hash(hash, maximumY);
+            hash = Hash(hash, block.Id);
+            return Hash(hash, block.State);
         }
 
         private static ulong Hash(ulong hash, int value) => Hash(hash, unchecked((uint)value));

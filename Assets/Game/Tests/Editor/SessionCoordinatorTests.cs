@@ -1,6 +1,7 @@
 using FishNet.Managing;
 using MF2.Game.Domain;
 using MF2.Game.Lifecycle;
+using MF2.Game.Networking;
 using MF2.World.Core;
 using Unity.Mathematics;
 using NUnit.Framework;
@@ -163,6 +164,64 @@ namespace MF2.Tests
                 application?.DisposeCore();
                 Object.DestroyImmediate(coordinatorObject);
                 Object.DestroyImmediate(networkObject);
+                if (application != null)
+                    Object.DestroyImmediate(application.gameObject);
+            }
+        }
+
+        [Test]
+        public void RestoredPlayerConnectionMap_RebindsWithoutDuplicatingOrRemovingDomainPlayer()
+        {
+            var root = new GameObject("Restored Connection Map Test");
+            var networkManager = root.AddComponent<NetworkManager>();
+            var coordinator = root.AddComponent<ServerSessionCoordinator>();
+            var adapter = root.AddComponent<GameCommandNetworkAdapter>();
+            LifetimeScope application = null;
+
+            try
+            {
+                application = LifetimeScope.Create(
+                    builder =>
+                    {
+                        builder.RegisterInstance(networkManager);
+                        builder.RegisterInstance<IBlockIdCatalog>(new PermissiveBlockCatalog());
+                    },
+                    "Restored Connection Map Application Scope Test");
+                if (application.Container == null)
+                    application.Build();
+                application.Container.Inject(coordinator);
+
+                var session = coordinator.BeginServerSession();
+                var restoredPlayer = new PlayerId(System.Guid.NewGuid());
+                Assert.That(session.TryRegisterPlayer(restoredPlayer), Is.True);
+                Assert.That(
+                    adapter.TryRestoreConnection(
+                        16,
+                        new PlayerId(System.Guid.NewGuid()),
+                        out _),
+                    Is.False,
+                    "A connection cannot claim an identity absent from the restored registry.");
+
+                Assert.That(
+                    adapter.TryRestoreConnection(17, restoredPlayer, out var mapped),
+                    Is.True);
+                Assert.That(mapped, Is.EqualTo(restoredPlayer));
+                Assert.That(adapter.MappedConnectionCount, Is.EqualTo(1));
+                Assert.That(
+                    adapter.TryRestoreConnection(18, restoredPlayer, out _),
+                    Is.False,
+                    "A restored identity must not be mapped to two live connections.");
+
+                Assert.That(adapter.ReleaseConnectionMapping(17), Is.True);
+                Assert.That(adapter.MappedConnectionCount, Is.Zero);
+                Assert.That(session.Players.Contains(restoredPlayer), Is.True,
+                    "Releasing a transient connection map must preserve restored model state.");
+            }
+            finally
+            {
+                coordinator.EndServerSession();
+                application?.DisposeCore();
+                Object.DestroyImmediate(root);
                 if (application != null)
                     Object.DestroyImmediate(application.gameObject);
             }

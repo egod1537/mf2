@@ -23,6 +23,7 @@ namespace MF2.Game.Networking
         private readonly Dictionary<int, NetworkObject> players = new();
         private readonly ConnectionSpawnGuard spawnGuard = new();
         private readonly Dictionary<int, PendingSpawn> pendingSpawns = new();
+        private readonly Dictionary<int, PendingSpawn> sessionRespawns = new();
         private GameCommandNetworkAdapter commandAdapter;
         private NetworkManager networkManager;
         private ServerSessionCoordinator sessionCoordinator;
@@ -49,6 +50,8 @@ namespace MF2.Game.Networking
             networkManager.ServerManager.OnRemoteConnectionState += OnRemoteConnectionState;
             worldReplication.ConnectionWorldReady += OnConnectionWorldReady;
             serverCollision.ReadinessChanged += OnServerCollisionReadinessChanged;
+            sessionCoordinator.SessionStarted += OnSessionStarted;
+            sessionCoordinator.SessionStopping += OnSessionStopping;
         }
 
         private void OnClientPresenceChanged(ClientPresenceChangeEventArgs args)
@@ -60,6 +63,7 @@ namespace MF2.Game.Networking
             else
             {
                 pendingSpawns.Remove(args.Connection.ClientId);
+                sessionRespawns.Remove(args.Connection.ClientId);
                 worldReplication.InvalidateConnectionWorldReady(args.Connection);
                 Despawn(
                     args.Connection.ClientId,
@@ -76,12 +80,22 @@ namespace MF2.Game.Networking
                 !worldReplication.IsConnectionWorldReady(connection, activeSession) ||
                 !serverCollision.IsReadyFor(activeSession))
             {
-                pendingSpawns[connection.ClientId] = new PendingSpawn(connection, scene);
+                var preferredPlayerId = pendingSpawns.TryGetValue(
+                    connection.ClientId,
+                    out var existing)
+                    ? existing.PreferredPlayerId
+                    : default;
+                pendingSpawns[connection.ClientId] = new PendingSpawn(
+                    connection,
+                    scene,
+                    preferredPlayerId);
                 return;
             }
 
-            pendingSpawns.Remove(connection.ClientId);
-            SpawnFor(connection, scene);
+            var pending = pendingSpawns.Remove(connection.ClientId, out var ready)
+                ? ready
+                : new PendingSpawn(connection, scene);
+            SpawnFor(connection, scene, pending.PreferredPlayerId);
         }
 
         private void OnServerCollisionReadinessChanged()
@@ -102,7 +116,10 @@ namespace MF2.Game.Networking
             SpawnWhenWorldReady(connection, pending.Scene);
         }
 
-        private void SpawnFor(NetworkConnection connection, UnityEngine.SceneManagement.Scene scene)
+        private void SpawnFor(
+            NetworkConnection connection,
+            UnityEngine.SceneManagement.Scene scene,
+            PlayerId preferredPlayerId = default)
         {
             if (playerPrefab == null || !connection.IsActive || !connection.IsAuthenticated)
                 return;
@@ -122,7 +139,14 @@ namespace MF2.Game.Networking
             var hadDomainPlayer = commandAdapter.TryGetPlayerId(
                 connection.ClientId,
                 out _);
-            if (!commandAdapter.TryRegisterConnection(connection.ClientId, out var playerId))
+            var playerId = default(PlayerId);
+            var restoredMapping = preferredPlayerId.Value != System.Guid.Empty &&
+                                  commandAdapter.TryRestoreConnection(
+                                      connection.ClientId,
+                                      preferredPlayerId,
+                                      out playerId);
+            if (!restoredMapping &&
+                !commandAdapter.TryRegisterConnection(connection.ClientId, out playerId))
             {
                 spawnGuard.Release(connection.ClientId);
                 Debug.LogError($"[MF2] Domain player registration failed for connection {connection.ClientId}.");
@@ -198,7 +222,12 @@ namespace MF2.Game.Networking
                 if (bodyRegistered)
                     physicsBodies?.UnregisterBody(playerId, registeredBody);
                 if (!hadDomainPlayer)
-                    commandAdapter.UnregisterConnection(connection.ClientId);
+                {
+                    if (restoredMapping)
+                        commandAdapter.ReleaseConnectionMapping(connection.ClientId);
+                    else
+                        commandAdapter.UnregisterConnection(connection.ClientId);
+                }
                 spawnGuard.Release(connection.ClientId);
                 if (instance != null)
                     Destroy(instance.gameObject);
@@ -211,7 +240,55 @@ namespace MF2.Game.Networking
             if (args.ConnectionState != RemoteConnectionState.Stopped)
                 return;
             pendingSpawns.Remove(connection.ClientId);
+            sessionRespawns.Remove(connection.ClientId);
             Despawn(connection.ClientId, unregisterDomainPlayer: true);
+        }
+
+        private void OnSessionStopping(GameSession endingSession)
+        {
+            sessionRespawns.Clear();
+            foreach (var pair in players.ToArray())
+            {
+                var player = pair.Value;
+                if (player == null ||
+                    !player.TryGetComponent<BlockPlayerController>(out var controller) ||
+                    !controller.TryGetPlayerId(out var playerId))
+                {
+                    Despawn(pair.Key, unregisterDomainPlayer: false);
+                    continue;
+                }
+
+                var connection = player.Owner;
+                var scene = player.gameObject.scene;
+                if (connection != null && connection.IsActive && connection.IsAuthenticated &&
+                    scene.IsValid() && scene.isLoaded && IsPlayerScene(scene.name))
+                {
+                    sessionRespawns[pair.Key] = new PendingSpawn(
+                        connection,
+                        scene,
+                        playerId);
+                }
+                Despawn(pair.Key, unregisterDomainPlayer: false);
+            }
+        }
+
+        private void OnSessionStarted(GameSession startedSession)
+        {
+            foreach (var pending in sessionRespawns.Values.ToArray())
+            {
+                if (pending.Connection == null ||
+                    !pending.Connection.IsActive ||
+                    !pending.Connection.IsAuthenticated ||
+                    !pending.Scene.IsValid() ||
+                    !pending.Scene.isLoaded)
+                {
+                    continue;
+                }
+
+                pendingSpawns[pending.Connection.ClientId] = pending;
+                SpawnWhenWorldReady(pending.Connection, pending.Scene);
+            }
+            sessionRespawns.Clear();
         }
 
         private void Despawn(
@@ -275,6 +352,11 @@ namespace MF2.Game.Networking
                 worldReplication.ConnectionWorldReady -= OnConnectionWorldReady;
             if (serverCollision != null)
                 serverCollision.ReadinessChanged -= OnServerCollisionReadinessChanged;
+            if (sessionCoordinator != null)
+            {
+                sessionCoordinator.SessionStarted -= OnSessionStarted;
+                sessionCoordinator.SessionStopping -= OnSessionStopping;
+            }
             foreach (var pair in players.ToArray())
             {
                 UnregisterRuntimeBindings(pair.Key, pair.Value);
@@ -282,6 +364,7 @@ namespace MF2.Game.Networking
             }
             spawnGuard.Clear();
             pendingSpawns.Clear();
+            sessionRespawns.Clear();
             players.Clear();
         }
 
@@ -289,14 +372,17 @@ namespace MF2.Game.Networking
         {
             public PendingSpawn(
                 NetworkConnection connection,
-                UnityEngine.SceneManagement.Scene scene)
+                UnityEngine.SceneManagement.Scene scene,
+                PlayerId preferredPlayerId = default)
             {
                 Connection = connection;
                 Scene = scene;
+                PreferredPlayerId = preferredPlayerId;
             }
 
             public NetworkConnection Connection { get; }
             public UnityEngine.SceneManagement.Scene Scene { get; }
+            public PlayerId PreferredPlayerId { get; }
         }
     }
 }

@@ -24,7 +24,7 @@ namespace MF2.World.Editor.Registry
             if (prefabPaths.Length == 0)
                 throw new InvalidOperationException("No Minecraft block prefabs were found.");
 
-            var entries = new BlockRegistryManifest.Entry[prefabPaths.Length];
+            var entries = new BlockRegistryManifest.Entry[prefabPaths.Length + 1];
             for (var i = 0; i < prefabPaths.Length; i++)
             {
                 var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPaths[i]);
@@ -35,6 +35,21 @@ namespace MF2.World.Editor.Registry
                 StableBlockId.ValidateCanonicalName(canonicalName);
                 entries[i] = new BlockRegistryManifest.Entry(canonicalName, prefab);
             }
+
+            if (entries.Take(prefabPaths.Length).Any(entry =>
+                    string.Equals(
+                        entry.CanonicalName,
+                        BlockTraitsCatalog.WaterCanonicalName,
+                        StringComparison.Ordinal)))
+            {
+                throw new InvalidOperationException(
+                    $"'{BlockTraitsCatalog.WaterCanonicalName}' is a built-in data block and " +
+                    "must not also be authored as a prefab.");
+            }
+
+            entries[entries.Length - 1] = new BlockRegistryManifest.Entry(
+                BlockTraitsCatalog.WaterCanonicalName,
+                prefab: null);
 
             // Build once before touching the asset so duplicates, ID zero, and collisions fail
             // atomically and name validation is identical to the runtime table.

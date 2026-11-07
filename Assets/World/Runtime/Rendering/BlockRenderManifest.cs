@@ -50,22 +50,26 @@ namespace MF2.World.Rendering
             [SerializeField] private string canonicalName;
             [SerializeField] private uint stableId;
             [SerializeField] private BlockGeometryKind geometryKind;
+            [SerializeField] private BlockTraitsKind traitsKind;
             [SerializeField] private Face[] faces = Array.Empty<Face>();
 
             public string CanonicalName => canonicalName;
             public uint StableId => stableId;
             public BlockGeometryKind GeometryKind => geometryKind;
+            public BlockTraitsKind TraitsKind => traitsKind;
             public IReadOnlyList<Face> Faces => faces;
 
             internal Entry(
                 string canonicalName,
                 uint stableId,
                 BlockGeometryKind geometryKind,
+                BlockTraitsKind traitsKind,
                 Face[] faces)
             {
                 this.canonicalName = canonicalName;
                 this.stableId = stableId;
                 this.geometryKind = geometryKind;
+                this.traitsKind = traitsKind;
                 this.faces = faces;
             }
 
@@ -78,6 +82,7 @@ namespace MF2.World.Rendering
                 {
                     Id = stableId,
                     GeometryKind = geometryKind,
+                    TraitsKind = traitsKind,
                     North = faces[(int)BlockFace.North].ToRuntime(),
                     South = faces[(int)BlockFace.South].ToRuntime(),
                     East = faces[(int)BlockFace.East].ToRuntime(),

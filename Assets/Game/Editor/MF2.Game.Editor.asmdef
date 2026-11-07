@@ -6,6 +6,7 @@
     "MF2.Entities.Player",
     "MF2.World.Runtime",
     "FishNet.Runtime",
+    "ProPixelizer",
     "VContainer",
     "Unity.InputSystem",
     "UnityEngine.UI",

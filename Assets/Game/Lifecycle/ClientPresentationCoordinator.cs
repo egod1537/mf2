@@ -55,7 +55,7 @@ namespace MF2.Game.Lifecycle
                 presentationScope = createdScope;
                 state = createdState;
                 State = ClientPresentationCoordinatorState.Running;
-                PresentationReady?.Invoke(createdState);
+                PublishPresentationEvent(PresentationReady, createdState);
             }
             catch
             {
@@ -79,7 +79,7 @@ namespace MF2.Game.Lifecycle
             presentationScope = null;
             try
             {
-                PresentationStopping?.Invoke(endingState);
+                PublishPresentationEvent(PresentationStopping, endingState);
             }
             finally
             {
@@ -103,6 +103,32 @@ namespace MF2.Game.Lifecycle
                 Destroy(scope.gameObject);
             else
                 DestroyImmediate(scope.gameObject);
+        }
+
+        private static void PublishPresentationEvent(
+            Action<ClientStateCoordinator> handlers,
+            ClientStateCoordinator value)
+        {
+            if (handlers == null)
+                return;
+            foreach (Action<ClientStateCoordinator> handler in handlers.GetInvocationList())
+            {
+                try
+                {
+                    handler(value);
+                }
+                catch (Exception exception)
+                {
+                    Debug.LogException(exception);
+                }
+            }
+        }
+
+        private void OnDestroy()
+        {
+            EndClientPresentation();
+            PresentationReady = null;
+            PresentationStopping = null;
         }
     }
 }

@@ -4,6 +4,41 @@ using MF2.World.Registry;
 
 namespace MF2.Game.Domain
 {
+    /// <summary>Stable block palette used by layered terrain generation.</summary>
+    public readonly struct TerrainSurfacePalette : IEquatable<TerrainSurfacePalette>
+    {
+        public TerrainSurfacePalette(Block stone, Block dirt, Block grass, Block water)
+        {
+            Stone = stone;
+            Dirt = dirt;
+            Grass = grass;
+            Water = water;
+        }
+
+        public Block Stone { get; }
+        public Block Dirt { get; }
+        public Block Grass { get; }
+        public Block Water { get; }
+
+        public bool Equals(TerrainSurfacePalette other) =>
+            Stone == other.Stone && Dirt == other.Dirt &&
+            Grass == other.Grass && Water == other.Water;
+
+        public override bool Equals(object obj) =>
+            obj is TerrainSurfacePalette other && Equals(other);
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hash = Stone.GetHashCode();
+                hash = hash * 397 ^ Dirt.GetHashCode();
+                hash = hash * 397 ^ Grass.GetHashCode();
+                return hash * 397 ^ Water.GetHashCode();
+            }
+        }
+    }
+
     /// <summary>Validated, finite bootstrap bounds for the authoritative block world.</summary>
     public readonly struct TerrainConfig : IEquatable<TerrainConfig>
     {
@@ -23,6 +58,82 @@ namespace MF2.Game.Domain
             int seed,
             Block solidBlock,
             long maximumBlockBudget = DefaultMaximumBlockBudget)
+            : this(
+                originX,
+                originZ,
+                width,
+                depth,
+                minimumY,
+                maximumY,
+                baseHeight,
+                amplitude,
+                frequency,
+                octaves,
+                seed,
+                new TerrainSurfacePalette(solidBlock, solidBlock, solidBlock, default),
+                dirtDepth: 0,
+                waterLevel: minimumY,
+                waterEnabled: false,
+                maximumBlockBudget,
+                validateDistinctPalette: false)
+        {
+        }
+
+        public TerrainConfig(
+            int originX,
+            int originZ,
+            int width,
+            int depth,
+            int minimumY,
+            int maximumY,
+            int baseHeight,
+            float amplitude,
+            float frequency,
+            int octaves,
+            int seed,
+            TerrainSurfacePalette palette,
+            int dirtDepth,
+            int waterLevel,
+            long maximumBlockBudget = DefaultMaximumBlockBudget)
+            : this(
+                originX,
+                originZ,
+                width,
+                depth,
+                minimumY,
+                maximumY,
+                baseHeight,
+                amplitude,
+                frequency,
+                octaves,
+                seed,
+                palette,
+                dirtDepth,
+                waterLevel,
+                waterEnabled: true,
+                maximumBlockBudget,
+                validateDistinctPalette: true)
+        {
+        }
+
+        private TerrainConfig(
+            int originX,
+            int originZ,
+            int width,
+            int depth,
+            int minimumY,
+            int maximumY,
+            int baseHeight,
+            float amplitude,
+            float frequency,
+            int octaves,
+            int seed,
+            TerrainSurfacePalette palette,
+            int dirtDepth,
+            int waterLevel,
+            bool waterEnabled,
+            long maximumBlockBudget,
+            bool validateDistinctPalette)
         {
             if (width <= 0)
                 throw new ArgumentOutOfRangeException(nameof(width));
@@ -38,8 +149,26 @@ namespace MF2.Game.Domain
                 throw new ArgumentOutOfRangeException(nameof(frequency));
             if (octaves <= 0 || octaves > 8)
                 throw new ArgumentOutOfRangeException(nameof(octaves));
-            if (solidBlock.IsAir)
-                throw new ArgumentException("Generated terrain requires a non-air block.", nameof(solidBlock));
+            if (palette.Stone.IsAir || palette.Dirt.IsAir || palette.Grass.IsAir)
+                throw new ArgumentException("Generated terrain requires non-air solid palette blocks.", nameof(palette));
+            if (waterEnabled && palette.Water.IsAir)
+                throw new ArgumentException("Enabled terrain water requires a non-air block.", nameof(palette));
+            if (dirtDepth < 0 || dirtDepth > 16)
+                throw new ArgumentOutOfRangeException(nameof(dirtDepth));
+            if (waterEnabled && (waterLevel < minimumY || waterLevel > maximumY))
+                throw new ArgumentOutOfRangeException(nameof(waterLevel));
+            if (validateDistinctPalette &&
+                (palette.Stone.Id == palette.Dirt.Id ||
+                 palette.Stone.Id == palette.Grass.Id ||
+                 palette.Stone.Id == palette.Water.Id ||
+                 palette.Dirt.Id == palette.Grass.Id ||
+                 palette.Dirt.Id == palette.Water.Id ||
+                 palette.Grass.Id == palette.Water.Id))
+            {
+                throw new ArgumentException(
+                    "Layered terrain palette block IDs must be distinct.",
+                    nameof(palette));
+            }
             if (maximumBlockBudget <= 0)
                 throw new ArgumentOutOfRangeException(nameof(maximumBlockBudget));
 
@@ -75,7 +204,10 @@ namespace MF2.Game.Domain
             Frequency = frequency;
             Octaves = octaves;
             Seed = seed;
-            SolidBlock = solidBlock;
+            Palette = palette;
+            DirtDepth = dirtDepth;
+            WaterLevel = waterLevel;
+            WaterEnabled = waterEnabled;
             MaximumBlockBudget = maximumBlockBudget;
         }
 
@@ -90,7 +222,15 @@ namespace MF2.Game.Domain
         public float Frequency { get; }
         public int Octaves { get; }
         public int Seed { get; }
-        public Block SolidBlock { get; }
+        public TerrainSurfacePalette Palette { get; }
+        public Block StoneBlock => Palette.Stone;
+        public Block DirtBlock => Palette.Dirt;
+        public Block GrassBlock => Palette.Grass;
+        public Block WaterBlock => Palette.Water;
+        public Block SolidBlock => StoneBlock;
+        public int DirtDepth { get; }
+        public int WaterLevel { get; }
+        public bool WaterEnabled { get; }
         public long MaximumBlockBudget { get; }
         public int MaximumX => checked(OriginX + Width - 1);
         public int MaximumZ => checked(OriginZ + Depth - 1);
@@ -110,7 +250,13 @@ namespace MF2.Game.Domain
             frequency: 0.025f,
             octaves: 3,
             seed: 12345,
-            solidBlock: new Block(StableBlockId.Compute("minecraft:stone")));
+            palette: new TerrainSurfacePalette(
+                new Block(StableBlockId.Compute("minecraft:stone")),
+                new Block(StableBlockId.Compute("minecraft:dirt")),
+                new Block(StableBlockId.Compute("minecraft:grass_block")),
+                new Block(StableBlockId.Compute("minecraft:water"))),
+            dirtDepth: 3,
+            waterLevel: 7);
 
         public bool Equals(TerrainConfig other) =>
             OriginX == other.OriginX && OriginZ == other.OriginZ &&
@@ -118,7 +264,9 @@ namespace MF2.Game.Domain
             MinimumY == other.MinimumY && MaximumY == other.MaximumY &&
             BaseHeight == other.BaseHeight && Amplitude.Equals(other.Amplitude) &&
             Frequency.Equals(other.Frequency) && Octaves == other.Octaves &&
-            Seed == other.Seed && SolidBlock == other.SolidBlock &&
+            Seed == other.Seed && Palette.Equals(other.Palette) &&
+            DirtDepth == other.DirtDepth && WaterLevel == other.WaterLevel &&
+            WaterEnabled == other.WaterEnabled &&
             MaximumBlockBudget == other.MaximumBlockBudget;
 
         public override bool Equals(object obj) => obj is TerrainConfig other && Equals(other);
@@ -138,7 +286,10 @@ namespace MF2.Game.Domain
                 hash = hash * 397 ^ Frequency.GetHashCode();
                 hash = hash * 397 ^ Octaves;
                 hash = hash * 397 ^ Seed;
-                hash = hash * 397 ^ SolidBlock.GetHashCode();
+                hash = hash * 397 ^ Palette.GetHashCode();
+                hash = hash * 397 ^ DirtDepth;
+                hash = hash * 397 ^ WaterLevel;
+                hash = hash * 397 ^ WaterEnabled.GetHashCode();
                 return hash * 397 ^ MaximumBlockBudget.GetHashCode();
             }
         }

@@ -232,18 +232,18 @@ namespace MF2.Game.Tests.Editor
                 "Assets/Entities/Player/PlayerNoFriction.physicMaterial");
             Assert.That(material, Is.Not.Null);
 
-            var scene = SceneManager.CreateScene(
-                "Player Wall Slide Regression",
-                new CreateSceneParameters(LocalPhysicsMode.Physics3D));
+            GameObject wall = null;
+            GameObject player = null;
+            var scene = UnityEditor.SceneManagement.EditorSceneManager.NewPreviewScene();
             try
             {
-                var wall = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                wall = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 wall.name = "Wall";
                 wall.transform.SetPositionAndRotation(new Vector3(0f, 3f, 0f), Quaternion.identity);
                 wall.transform.localScale = new Vector3(1f, 10f, 10f);
                 SceneManager.MoveGameObjectToScene(wall, scene);
 
-                var player = new GameObject("Player");
+                player = new GameObject("Player");
                 SceneManager.MoveGameObjectToScene(player, scene);
                 player.transform.position = new Vector3(-0.82f, 3f, 0f);
                 var capsule = player.AddComponent<CapsuleCollider>();
@@ -257,6 +257,7 @@ namespace MF2.Game.Tests.Editor
                 body.constraints = RigidbodyConstraints.FreezeRotation;
                 body.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
 
+                UnityEngine.Physics.SyncTransforms();
                 var physicsScene = scene.GetPhysicsScene();
                 Assert.That(physicsScene.IsValid(), Is.True);
                 var initialY = player.transform.position.y;
@@ -275,7 +276,9 @@ namespace MF2.Game.Tests.Editor
             }
             finally
             {
-                UnityEditor.SceneManagement.EditorSceneManager.CloseScene(scene, true);
+                UnityEngine.Object.DestroyImmediate(player);
+                UnityEngine.Object.DestroyImmediate(wall);
+                UnityEditor.SceneManagement.EditorSceneManager.ClosePreviewScene(scene);
             }
         }
 

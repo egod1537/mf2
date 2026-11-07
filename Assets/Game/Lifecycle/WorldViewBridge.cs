@@ -43,25 +43,30 @@ namespace MF2.Game.Lifecycle
             if (clientState.TryGetWorld(out var current))
             {
                 host.AttachRuntimeWorld(current);
-                if (host.HasEditorAssets)
-                    clientState.MarkCollisionReady(current);
+                PublishCollisionReadiness(current);
             }
         }
 
         private void OnWorldReplaced(WorldCore replacement)
         {
             host.AttachRuntimeWorld(replacement);
-            if (host.HasEditorAssets)
-                clientState.MarkCollisionReady(replacement);
+            PublishCollisionReadiness(replacement);
         }
 
         private void OnWorldFlushed(WorldCore current)
         {
             host.RefreshRuntimeWorld(current);
-            if (host.HasEditorAssets)
-                clientState.MarkCollisionReady(current);
+            PublishCollisionReadiness(current);
         }
         private void OnWorldClearing(WorldCore released) => host.DetachRuntimeWorld(released);
+
+        private void PublishCollisionReadiness(WorldCore current)
+        {
+            if (host.IsCollisionReadyFor(current))
+                clientState.MarkCollisionReady(current);
+            else
+                clientState.MarkCollisionUnavailable(current);
+        }
 
         private void OnDestroy()
         {

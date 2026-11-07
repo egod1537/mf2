@@ -49,6 +49,45 @@ namespace MF2.Tests
                 Throws.TypeOf<ArgumentOutOfRangeException>());
         }
 
+        [Test]
+        public void InvalidLayers_AreRejected_AndLegacySolidConfigRemainsAvailable()
+        {
+            var validPalette = new TerrainSurfacePalette(
+                new Block(1),
+                new Block(2),
+                new Block(3),
+                new Block(4));
+
+            Assert.That(
+                () => CreateLayeredConfig(palette: validPalette, dirtDepth: -1),
+                Throws.TypeOf<ArgumentOutOfRangeException>());
+            Assert.That(
+                () => CreateLayeredConfig(palette: validPalette, dirtDepth: 17),
+                Throws.TypeOf<ArgumentOutOfRangeException>());
+            Assert.That(
+                () => CreateLayeredConfig(palette: validPalette, waterLevel: -1),
+                Throws.TypeOf<ArgumentOutOfRangeException>());
+            Assert.That(
+                () => CreateLayeredConfig(palette: validPalette, waterLevel: 17),
+                Throws.TypeOf<ArgumentOutOfRangeException>());
+            Assert.That(
+                () => CreateLayeredConfig(
+                    palette: new TerrainSurfacePalette(default, new Block(2), new Block(3), new Block(4))),
+                Throws.ArgumentException);
+            Assert.That(
+                () => CreateLayeredConfig(
+                    palette: new TerrainSurfacePalette(new Block(1), new Block(1), new Block(3), new Block(4))),
+                Throws.ArgumentException);
+            Assert.That(
+                () => CreateLayeredConfig(
+                    palette: new TerrainSurfacePalette(new Block(1), new Block(2), new Block(3), new Block(3))),
+                Throws.ArgumentException);
+
+            var legacy = CreateConfig();
+            Assert.That(legacy.WaterEnabled, Is.False);
+            Assert.That(legacy.SolidBlock, Is.EqualTo(new Block(1)));
+        }
+
         internal static TerrainConfig CreateConfig(
             int originX = 0,
             int originZ = 0,
@@ -68,5 +107,37 @@ namespace MF2.Tests
                 octaves: 3,
                 seed,
                 new Block(1));
+
+        internal static TerrainConfig CreateLayeredConfig(
+            int originX = 0,
+            int originZ = 0,
+            int width = 1,
+            int depth = 1,
+            int minimumY = 0,
+            int maximumY = 16,
+            int baseHeight = 12,
+            int seed = 123,
+            TerrainSurfacePalette? palette = null,
+            int dirtDepth = 3,
+            int waterLevel = 7) =>
+            new TerrainConfig(
+                originX,
+                originZ,
+                width,
+                depth,
+                minimumY,
+                maximumY,
+                baseHeight,
+                amplitude: 0.5f,
+                frequency: 0.08f,
+                octaves: 1,
+                seed,
+                palette ?? new TerrainSurfacePalette(
+                    new Block(1),
+                    new Block(2),
+                    new Block(3),
+                    new Block(4)),
+                dirtDepth,
+                waterLevel);
     }
 }

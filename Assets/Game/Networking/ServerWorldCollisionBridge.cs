@@ -30,7 +30,8 @@ namespace MF2.Game.Networking
         public bool IsReadyFor(GameSession candidate) =>
             !dedicated ||
             candidate != null && ReferenceEquals(candidate, session) && world != null &&
-            rendererPool != null;
+            rendererPool != null && renderPipeline != null &&
+            renderPipeline.AreAllLoadedChunkCollidersReady(world, rendererPool);
 
         private void Awake()
         {
@@ -81,6 +82,8 @@ namespace MF2.Game.Networking
                 return;
             }
             renderPipeline.RebuildDirtyNow(world, renderTable, rendererPool);
+            UnityEngine.Physics.SyncTransforms();
+            ReadinessChanged?.Invoke();
         }
 
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
@@ -139,7 +142,8 @@ namespace MF2.Game.Networking
             renderPipeline.RebuildAllNow(world, renderTable, rendererPool);
             UnityEngine.Physics.SyncTransforms();
             Debug.Log(
-                $"[MF2] Dedicated collision ready: {rendererPool.ActiveCount} chunk colliders.");
+                $"[MF2] Dedicated collision projection built: {rendererPool.ActiveCount} chunks, " +
+                $"ready={renderPipeline.AreAllLoadedChunkCollidersReady(world, rendererPool)}.");
             ReadinessChanged?.Invoke();
         }
 

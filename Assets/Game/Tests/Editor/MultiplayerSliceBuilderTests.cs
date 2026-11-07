@@ -10,6 +10,7 @@ using MF2.Game.UI;
 using MF2.World.Core;
 using MF2.World.Rendering;
 using NUnit.Framework;
+using ProPixelizer;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -168,7 +169,7 @@ namespace MF2.Game.Tests.Editor
         }
 
         [Test]
-        public void BuilderOutput_IngameAndOutgameMatchMinecraftMapRenderingStyle()
+        public void BuilderOutput_GameScenesAndOutgameMatchMinecraftMapRenderingStyle()
         {
             const string profilePath =
                 "Assets/Scenes/MinecraftBlockMap/CM Isometric Camera Profile.asset";
@@ -182,10 +183,12 @@ namespace MF2.Game.Tests.Editor
             Assert.That(AssetDatabase.GetAssetPath(materialSet.Opaque), Is.EqualTo(materialPath));
             Assert.That(materialSet.Cutout, Is.SameAs(materialSet.Opaque));
             Assert.That(materialSet.Transparent, Is.SameAs(materialSet.Opaque));
+            Assert.That(materialSet.Opaque.HasProperty("_PixelSize"), Is.True);
+            Assert.That(materialSet.Opaque.GetFloat("_PixelSize"), Is.EqualTo(5f));
 
             var playerPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(
                 "Assets/Entities/Player/BlockPlayer.prefab");
-            AssertMinecraftMapCamera(playerPrefab.GetComponentInChildren<Camera>(true));
+            AssertPixelStableGameCamera(playerPrefab.GetComponentInChildren<Camera>(true));
             AssertProPixelizerVisual(playerPrefab, materialPath);
 
             var offlinePlayerPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(
@@ -194,6 +197,7 @@ namespace MF2.Game.Tests.Editor
 
             foreach (var scenePath in new[]
                      {
+                         "Assets/Scenes/Test.unity",
                          "Assets/Scenes/Ingame.unity",
                          "Assets/Scenes/Outgame.unity"
                      })
@@ -201,7 +205,11 @@ namespace MF2.Game.Tests.Editor
                 var scene = EditorSceneManager.OpenPreviewScene(scenePath);
                 try
                 {
-                    AssertMinecraftMapCamera(FindInScene<Camera>(scene));
+                    var camera = FindInScene<Camera>(scene);
+                    if (scenePath.EndsWith("Outgame.unity"))
+                        AssertMinecraftMapCamera(camera);
+                    else
+                        AssertPixelStableGameCamera(camera);
                     var volume = FindInScene<Volume>(scene);
                     Assert.That(volume, Is.Not.Null, scenePath);
                     Assert.That(volume.isGlobal, Is.True, scenePath);
@@ -211,7 +219,7 @@ namespace MF2.Game.Tests.Editor
                         Is.EqualTo(profilePath),
                         scenePath);
 
-                    if (scenePath.EndsWith("Ingame.unity"))
+                    if (!scenePath.EndsWith("Outgame.unity"))
                     {
                         var world = FindInScene<WorldHost>(scene);
                         var serializedWorld = new SerializedObject(world);
@@ -248,7 +256,10 @@ namespace MF2.Game.Tests.Editor
             return methods.ToArray();
         }
 
-        private static void AssertMinecraftMapCamera(Camera camera)
+        private static void AssertMinecraftMapCamera(
+            Camera camera,
+            float orthographicSize = 8.5f,
+            bool renderPostProcessing = true)
         {
             Assert.That(camera, Is.Not.Null);
             Assert.That(camera.clearFlags, Is.EqualTo(CameraClearFlags.SolidColor));
@@ -256,15 +267,33 @@ namespace MF2.Game.Tests.Editor
             Assert.That(camera.backgroundColor.g, Is.EqualTo(0.69f).Within(0.001f));
             Assert.That(camera.backgroundColor.b, Is.EqualTo(0.92f).Within(0.001f));
             Assert.That(camera.orthographic, Is.True);
-            Assert.That(camera.orthographicSize, Is.EqualTo(8.5f).Within(0.001f));
+            Assert.That(camera.orthographicSize, Is.EqualTo(orthographicSize).Within(0.001f));
             Assert.That(camera.nearClipPlane, Is.EqualTo(0.1f).Within(0.001f));
             Assert.That(camera.farClipPlane, Is.EqualTo(160f).Within(0.001f));
             Assert.That(camera.allowHDR, Is.False);
 
             var cameraData = camera.GetComponent<UniversalAdditionalCameraData>();
             Assert.That(cameraData, Is.Not.Null);
-            Assert.That(cameraData.renderPostProcessing, Is.True);
+            Assert.That(cameraData.renderPostProcessing, Is.EqualTo(renderPostProcessing));
             Assert.That((cameraData.volumeLayerMask.value & 1) != 0, Is.True);
+        }
+
+        private static void AssertPixelStableGameCamera(Camera camera)
+        {
+            AssertMinecraftMapCamera(camera, 6.8f, false);
+
+            var pixelCamera = camera.GetComponent<ProPixelizerCamera>();
+            Assert.That(pixelCamera, Is.Not.Null);
+            Assert.That(
+                pixelCamera.Mode,
+                Is.EqualTo(ProPixelizerCamera.PixelSizeMode.WorldSpacePixelSize));
+            Assert.That(pixelCamera.PixelSize, Is.EqualTo(0.032f).Within(0.0001f));
+            Assert.That(pixelCamera.ClampCameraOrthoSize, Is.False);
+            Assert.That(pixelCamera.PixelizationFilter, Is.EqualTo(PixelizationFilter.OnlyProPixelizer));
+            Assert.That(pixelCamera.UsePixelArtUpscalingFilter, Is.True);
+            Assert.That(pixelCamera.EnableProPixelizer, Is.True);
+            Assert.That(pixelCamera.overrideUsePixelExpansion, Is.False);
+            Assert.That(pixelCamera.HasSubCamera, Is.False);
         }
 
         private static void AssertProPixelizerVisual(GameObject prefab, string materialPath)

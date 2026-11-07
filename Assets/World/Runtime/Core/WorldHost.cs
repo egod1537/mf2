@@ -58,6 +58,14 @@ namespace MF2.World.Core
             blockRenderManifest != null &&
             chunkMaterialSet != null;
 
+        public bool IsCollisionReadyFor(WorldCore candidate) =>
+            candidate != null &&
+            ReferenceEquals(world, candidate) &&
+            !ownsWorld &&
+            renderPipeline != null &&
+            rendererPool != null &&
+            renderPipeline.AreAllLoadedChunkCollidersReady(world, rendererPool);
+
         public bool IsGridTransformValid =>
             Quaternion.Angle(transform.rotation, Quaternion.identity) < 0.001f &&
             ApproximatelyOne(transform.lossyScale.x) &&

@@ -28,6 +28,13 @@ namespace MF2.World.Editor.Registry
         public const string OpaqueMaterialPath = RenderFolder + "/MinecraftChunkOpaque.mat";
         public const string CutoutMaterialPath = RenderFolder + "/MinecraftChunkCutout.mat";
         public const string TransparentMaterialPath = RenderFolder + "/MinecraftChunkTransparent.mat";
+        public const string WaterMaterialPath = RenderFolder + "/MinecraftChunkWater.mat";
+        public const string ProPixelizerMaterialSetPath =
+            RenderFolder + "/ChunkMaterialSetProPixelizer.asset";
+        public const string ProPixelizerSourceMaterialPath =
+            "Assets/Minecraft/Materials/MinecraftBlockAtlas_ProPixelizer.mat";
+        public const string ProPixelizerWaterMaterialPath =
+            RenderFolder + "/MinecraftChunkWaterProPixelizer.mat";
 
         [MenuItem("Tools/Minecraft/Rebuild Block Render Manifest")]
         public static BlockRenderManifest RebuildFromRegistryManifest()
@@ -50,6 +57,15 @@ namespace MF2.World.Editor.Registry
                 for (var i = 0; i < registryManifest.Entries.Count; i++)
                 {
                     var registryEntry = registryManifest.Entries[i];
+                    if (string.Equals(
+                            registryEntry.CanonicalName,
+                            BlockTraitsCatalog.WaterCanonicalName,
+                            StringComparison.Ordinal))
+                    {
+                        entries[i] = CreateWaterEntry();
+                        continue;
+                    }
+
                     var meshFilter = registryEntry.Prefab != null
                         ? registryEntry.Prefab.GetComponentInChildren<MeshFilter>(true)
                         : null;
@@ -79,6 +95,7 @@ namespace MF2.World.Editor.Registry
                         registryEntry.CanonicalName,
                         StableBlockId.Compute(registryEntry.CanonicalName),
                         BlockGeometryKind.Cube,
+                        BlockTraitsKind.SolidOpaque,
                         faces);
                 }
 
@@ -111,6 +128,12 @@ namespace MF2.World.Editor.Registry
                     sourceMaterial,
                     atlas,
                     BlockRenderPass.Transparent);
+                var water = CreateOrUpdateMaterial(
+                    WaterMaterialPath,
+                    "MinecraftChunkWater",
+                    sourceMaterial,
+                    atlas: null,
+                    BlockRenderPass.Water);
 
                 var manifest = AssetDatabase.LoadAssetAtPath<BlockRenderManifest>(RenderManifestPath);
                 if (manifest == null)
@@ -133,8 +156,10 @@ namespace MF2.World.Editor.Registry
                     AssetDatabase.CreateAsset(materialSet, MaterialSetPath);
                 }
 
-                materialSet.Configure(atlas, opaque, cutout, transparent);
+                materialSet.Configure(atlas, opaque, cutout, transparent, water);
                 EditorUtility.SetDirty(materialSet);
+
+                ConfigureProPixelizerWater(atlas);
                 AssetDatabase.SaveAssets();
                 Debug.Log(
                     $"Block render manifest exported {entries.Length} cube definitions " +
@@ -146,6 +171,51 @@ namespace MF2.World.Editor.Registry
             {
                 UnityEngine.Object.DestroyImmediate(decodedAtlas);
             }
+        }
+
+        private static BlockRenderManifest.Entry CreateWaterEntry()
+        {
+            var faces = new BlockRenderManifest.Face[6];
+            for (var i = 0; i < faces.Length; i++)
+            {
+                faces[i] = new BlockRenderManifest.Face(
+                    new Vector2(0f, 0f),
+                    new Vector2(0f, 1f),
+                    new Vector2(1f, 1f),
+                    new Vector2(1f, 0f),
+                    BlockRenderPass.Water);
+            }
+
+            return new BlockRenderManifest.Entry(
+                BlockTraitsCatalog.WaterCanonicalName,
+                BlockTraitsCatalog.WaterStableId,
+                BlockGeometryKind.Cube,
+                BlockTraitsKind.Liquid,
+                faces);
+        }
+
+        private static void ConfigureProPixelizerWater(Texture2D atlas)
+        {
+            var materialSet = AssetDatabase.LoadAssetAtPath<ChunkMaterialSet>(
+                ProPixelizerMaterialSetPath);
+            var source = AssetDatabase.LoadAssetAtPath<Material>(
+                ProPixelizerSourceMaterialPath);
+            if (materialSet == null || source == null)
+                return;
+
+            var water = CreateOrUpdateMaterial(
+                ProPixelizerWaterMaterialPath,
+                "MinecraftChunkWaterProPixelizer",
+                source,
+                atlas: null,
+                BlockRenderPass.Water);
+            materialSet.Configure(
+                materialSet.Atlas != null ? materialSet.Atlas : atlas,
+                materialSet.Opaque,
+                materialSet.Cutout,
+                materialSet.Transparent,
+                water);
+            EditorUtility.SetDirty(materialSet);
         }
 
         private static Texture2D DecodeAtlas()
@@ -254,6 +324,7 @@ namespace MF2.World.Editor.Registry
                     material.renderQueue = (int)RenderQueue.AlphaTest;
                     break;
                 case BlockRenderPass.Transparent:
+                case BlockRenderPass.Water:
                     SetFloat(material, "_Surface", 1f);
                     SetFloat(material, "_AlphaClip", 0f);
                     SetFloat(material, "_SrcBlend", (float)BlendMode.SrcAlpha);
@@ -264,6 +335,13 @@ namespace MF2.World.Editor.Registry
                     material.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
                     material.SetOverrideTag("RenderType", "Transparent");
                     material.renderQueue = (int)RenderQueue.Transparent;
+                    if (pass == BlockRenderPass.Water)
+                    {
+                        SetColor(material, "_BaseColor", new Color(0.1f, 0.45f, 0.8f, 0.55f));
+                        SetColor(material, "_Color", new Color(0.1f, 0.45f, 0.8f, 0.55f));
+                        SetFloat(material, "USE_ALPHA", 1f);
+                        SetFloat(material, "PROPIXELIZER_ALPHA_CLIP", 0f);
+                    }
                     break;
                 default:
                     SetFloat(material, "_Surface", 0f);
@@ -294,6 +372,12 @@ namespace MF2.World.Editor.Registry
         {
             if (material.HasProperty(property))
                 material.SetFloat(property, value);
+        }
+
+        private static void SetColor(Material material, string property, Color value)
+        {
+            if (material.HasProperty(property))
+                material.SetColor(property, value);
         }
 
         private static void EnsureFolder(string assetPath)

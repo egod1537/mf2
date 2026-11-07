@@ -13,11 +13,19 @@ namespace MF2.World.Rendering
         private MeshRenderer meshRenderer;
         private MeshCollider meshCollider;
         private Mesh mesh;
+        private ChunkReadiness readiness;
 
         public int3 ChunkCoordinate { get; private set; }
         public ChunkHandle AppliedHandle { get; private set; }
         public ulong AppliedVersion { get; private set; }
         public bool RenderingEnabled => meshRenderer != null && meshRenderer.enabled;
+
+        public bool IsCollisionReadyFor(ChunkHandle handle, ulong version) =>
+            AppliedHandle == handle &&
+            AppliedVersion == version &&
+            readiness.Coordinate.Equals(ChunkCoordinate) &&
+            readiness.DataVersion == version &&
+            readiness.IsCollisionReady;
 
         public Mesh Mesh
         {
@@ -53,12 +61,17 @@ namespace MF2.World.Rendering
                 return false;
 
             // Reassigning through null makes PhysX recook the exact accepted mesh version.
+            if (AppliedVersion != 0 && AppliedHandle != request.Handle)
+                readiness = default;
+            readiness.MarkDataReady(request.ChunkCoordinate, request.Version);
             meshCollider.sharedMesh = null;
             if (mesh.vertexCount > 0)
                 meshCollider.sharedMesh = mesh;
 
             AppliedHandle = request.Handle;
             AppliedVersion = request.Version;
+            readiness.TryMarkCollisionReady(request.Version);
+            readiness.TryMarkVisualReady(request.Version);
             return true;
         }
 
@@ -70,6 +83,7 @@ namespace MF2.World.Rendering
                 mesh.Clear(false);
             AppliedHandle = default;
             AppliedVersion = 0;
+            readiness = default;
         }
 
         private void Awake()

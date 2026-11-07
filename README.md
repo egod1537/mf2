@@ -6,6 +6,11 @@ Unity `6000.3.28f1`, FishNet `4.7.3` 기준의 직접 IP 멀티플레이 수직 
 
 규범적 아키텍처 결정, 비목표, 현재 검증 기록은
 [`docs/07_TECHNICAL_DECISIONS.md`](docs/07_TECHNICAL_DECISIONS.md)에 정리되어 있다.
+현재 코드 기준의 감사 결과와 운영 순서는
+[`refactor-baseline`](docs/architecture/refactor-baseline.md),
+[`architecture`](docs/architecture/architecture.md),
+[`lifecycle`](docs/architecture/lifecycle.md),
+[`refactor-report`](docs/architecture/refactor-report.md)에서 확인할 수 있다.
 
 ## Runtime architecture
 

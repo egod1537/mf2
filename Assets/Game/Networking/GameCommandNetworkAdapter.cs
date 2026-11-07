@@ -139,7 +139,9 @@ namespace MF2.Game.Networking
         {
             if (playerIdsByConnection.TryGetValue(connectionId, out playerId))
                 return true;
-            if (connectionId < 0 || !coordinator.TryGetSession(out var session))
+            coordinator ??= GetComponent<ServerSessionCoordinator>();
+            if (connectionId < 0 || coordinator == null ||
+                !coordinator.TryGetSession(out var session))
             {
                 playerId = default;
                 return false;
@@ -151,6 +153,47 @@ namespace MF2.Game.Networking
 
             playerIdsByConnection.Add(connectionId, playerId);
             return true;
+        }
+
+        /// <summary>
+        /// Rebinds a live transport connection to a player restored in the active session.
+        /// The restored registry remains the owner of the player model; this method only rebuilds
+        /// the transient FishNet connection map.
+        /// </summary>
+        public bool TryRestoreConnection(
+            int connectionId,
+            PlayerId restoredPlayerId,
+            out PlayerId playerId)
+        {
+            coordinator ??= GetComponent<ServerSessionCoordinator>();
+            if (playerIdsByConnection.TryGetValue(connectionId, out playerId))
+            {
+                return playerId == restoredPlayerId && coordinator != null &&
+                       coordinator.TryGetSession(out var mappedSession) &&
+                       mappedSession.Players.Contains(restoredPlayerId);
+            }
+            if (connectionId < 0 || restoredPlayerId.Value == System.Guid.Empty ||
+                coordinator == null || !coordinator.TryGetSession(out var session) ||
+                !session.Players.Contains(restoredPlayerId) ||
+                playerIdsByConnection.ContainsValue(restoredPlayerId))
+            {
+                playerId = default;
+                return false;
+            }
+
+            playerIdsByConnection.Add(connectionId, restoredPlayerId);
+            playerId = restoredPlayerId;
+            return true;
+        }
+
+        /// <summary>
+        /// Releases only transient connection state. Used when a restored player model must stay
+        /// in the candidate session after a Unity spawn failure.
+        /// </summary>
+        public bool ReleaseConnectionMapping(int connectionId)
+        {
+            commandGuard.Release(connectionId);
+            return playerIdsByConnection.Remove(connectionId);
         }
 
         public bool UnregisterConnection(int connectionId)

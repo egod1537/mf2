@@ -13,6 +13,7 @@ using MF2.Game.UI;
 using MF2.World.Core;
 using MF2.World.Registry;
 using MF2.World.Rendering;
+using ProPixelizer;
 using UnityEditor;
 using UnityEditor.Events;
 using UnityEditor.SceneManagement;
@@ -37,8 +38,7 @@ namespace MF2.Editor
         private const string IngamePath = "Assets/Scenes/Ingame.unity";
         private const string BlockRegistryManifestPath = "Assets/World/Registry/BlockRegistryManifest.asset";
         private const string BlockRenderManifestPath = "Assets/World/Rendering/BlockRenderManifest.asset";
-        private const string ChunkMaterialSetPath = "Assets/World/Rendering/ChunkMaterialSet.asset";
-        private const string IngameChunkMaterialSetPath =
+        private const string ProPixelizerChunkMaterialSetPath =
             "Assets/World/Rendering/ChunkMaterialSetProPixelizer.asset";
         private const string BlockAtlasPath =
             "Assets/Minecraft/Atlas/minecraft_blocks_atlas.png";
@@ -46,6 +46,11 @@ namespace MF2.Editor
             "Assets/Minecraft/Materials/MinecraftBlockAtlas_ProPixelizer.mat";
         private const string MinecraftMapVolumeProfilePath =
             "Assets/Scenes/MinecraftBlockMap/CM Isometric Camera Profile.asset";
+        private const float MinecraftMapOrthographicSize = 8.5f;
+        private const float MinecraftMapLensScale = 1.25f;
+        private const float ProPixelizerWorldSpacePixelSize = 0.032f;
+        private const float PixelStableGameOrthographicSize =
+            MinecraftMapOrthographicSize / MinecraftMapLensScale;
 
         [MenuItem("MF2/Build Multiplayer Test Slice")]
         public static void BuildAll()
@@ -53,7 +58,7 @@ namespace MF2.Editor
             if (EditorApplication.isPlayingOrWillChangePlaymode)
                 throw new InvalidOperationException("플레이 모드에서는 씬을 생성할 수 없습니다.");
 
-            ConfigureIngameRenderingAssets();
+            ConfigureProPixelizerRenderingAssets();
             ConfigurePlayerPrefab();
             ConfigureOfflinePlayerPrefab();
             CreateTitleScene();
@@ -130,7 +135,7 @@ namespace MF2.Editor
                     -0.1159169f,
                     0.8804763f);
                 var ownerCamera = cameraRig.AddComponent<Camera>();
-                ConfigureMinecraftMapCamera(ownerCamera);
+                ConfigurePixelStableGameCamera(ownerCamera);
                 ownerCamera.tag = "MainCamera";
                 var listener = cameraRig.AddComponent<AudioListener>();
                 controller.ConfigureOwnerCamera(ownerCamera, listener);
@@ -302,11 +307,7 @@ namespace MF2.Editor
             overview.transform.rotation = Quaternion.Euler(36f, -45f, 0f);
             overview.fieldOfView = 55f;
             overview.tag = "MainCamera";
-            if (!expandedTestScene)
-            {
-                ConfigureMinecraftMapCamera(overview);
-                CreateMinecraftMapPostProcessing();
-            }
+            var chunkMaterialSet = ConfigureGameSceneRendering(overview);
 
             var spawnPositions = expandedTestScene
                 ? new[] { new Vector3(-4f, 0.1f, -3f), new Vector3(4f, 0.1f, 3f), new Vector3(-4f, 0.1f, 3f), new Vector3(4f, 0.1f, -3f) }
@@ -323,8 +324,7 @@ namespace MF2.Editor
             worldHost.ConfigureAssets(
                 LoadRequiredAsset<BlockRegistryManifest>(BlockRegistryManifestPath),
                 LoadRequiredAsset<BlockRenderManifest>(BlockRenderManifestPath),
-                LoadRequiredAsset<ChunkMaterialSet>(
-                    expandedTestScene ? ChunkMaterialSetPath : IngameChunkMaterialSetPath));
+                chunkMaterialSet);
 
             var debugInput = new GameObject("WorldCommandDebugInput")
                 .AddComponent<WorldCommandDebugInput>();
@@ -344,16 +344,16 @@ namespace MF2.Editor
             EditorSceneManager.SaveScene(scene, path);
         }
 
-        private static void ConfigureIngameRenderingAssets()
+        private static void ConfigureProPixelizerRenderingAssets()
         {
             var atlas = LoadRequiredAsset<Texture2D>(BlockAtlasPath);
             var material = LoadRequiredAsset<Material>(ProPixelizerBlockMaterialPath);
             var materialSet = AssetDatabase.LoadAssetAtPath<ChunkMaterialSet>(
-                IngameChunkMaterialSetPath);
+                ProPixelizerChunkMaterialSetPath);
             if (materialSet == null)
             {
                 materialSet = ScriptableObject.CreateInstance<ChunkMaterialSet>();
-                AssetDatabase.CreateAsset(materialSet, IngameChunkMaterialSetPath);
+                AssetDatabase.CreateAsset(materialSet, ProPixelizerChunkMaterialSetPath);
             }
 
             var serialized = new SerializedObject(materialSet);
@@ -363,6 +363,35 @@ namespace MF2.Editor
             serialized.FindProperty("transparent").objectReferenceValue = material;
             serialized.ApplyModifiedPropertiesWithoutUndo();
             EditorUtility.SetDirty(materialSet);
+        }
+
+        private static ChunkMaterialSet ConfigureGameSceneRendering(Camera camera)
+        {
+            ConfigurePixelStableGameCamera(camera);
+            CreateMinecraftMapPostProcessing();
+            return LoadRequiredAsset<ChunkMaterialSet>(ProPixelizerChunkMaterialSetPath);
+        }
+
+        private static void ConfigurePixelStableGameCamera(Camera camera)
+        {
+            ConfigureMinecraftMapCamera(camera);
+            camera.orthographicSize = PixelStableGameOrthographicSize;
+            camera.GetUniversalAdditionalCameraData().renderPostProcessing = false;
+
+            var pixelCamera = GetOrAdd<ProPixelizerCamera>(camera.gameObject);
+            pixelCamera.SubCamera = null;
+            pixelCamera.SubcameraExcludedLayers = (1 << 5) | (1 << 1);
+            pixelCamera.FixedTargetResolution = 320;
+            pixelCamera.ClampCameraOrthoSize = false;
+            pixelCamera.Mode = ProPixelizerCamera.PixelSizeMode.WorldSpacePixelSize;
+            pixelCamera.PixelSize = ProPixelizerWorldSpacePixelSize;
+            pixelCamera.overrideUsePixelExpansion = false;
+            pixelCamera.UsePixelExpansion = true;
+            pixelCamera.PixelizationFilter = PixelizationFilter.OnlyProPixelizer;
+            pixelCamera.UsePixelArtUpscalingFilter = true;
+            pixelCamera.TargetScale = 1f;
+            pixelCamera.FullscreenColorGradingLUT = null;
+            pixelCamera.EnableProPixelizer = true;
         }
 
         private static void ConfigureProPixelizerVisual(Transform visual)
@@ -400,7 +429,7 @@ namespace MF2.Editor
             camera.farClipPlane = 160f;
             camera.fieldOfView = 40f;
             camera.orthographic = true;
-            camera.orthographicSize = 8.5f;
+            camera.orthographicSize = MinecraftMapOrthographicSize;
             camera.allowHDR = false;
             camera.allowMSAA = true;
             camera.allowDynamicResolution = false;

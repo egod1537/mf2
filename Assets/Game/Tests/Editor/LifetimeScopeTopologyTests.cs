@@ -1,7 +1,10 @@
+using System.Reflection;
+using System.Text.RegularExpressions;
 using MF2.Game.Domain;
 using MF2.Game.Lifecycle;
 using NUnit.Framework;
 using UnityEngine;
+using UnityEngine.TestTools;
 using VContainer;
 using VContainer.Unity;
 
@@ -64,6 +67,40 @@ namespace MF2.Game.Tests.Editor
                 typeof(ServerSessionLifetimeScope).IsAssignableFrom(
                     typeof(ClientPresentationLifetimeScope)),
                 Is.False);
+        }
+
+        [Test]
+        public void ClientPresentationStop_ContinuesAfterSubscriberFailureAndClearsState()
+        {
+            var rootObject = new GameObject("Client Presentation Failure Isolation Test");
+            var coordinator = rootObject.AddComponent<ClientPresentationCoordinator>();
+            var state = new ClientStateCoordinator();
+            var secondSubscriberCalled = false;
+
+            try
+            {
+                typeof(ClientPresentationCoordinator)
+                    .GetField("state", BindingFlags.Instance | BindingFlags.NonPublic)
+                    ?.SetValue(coordinator, state);
+                coordinator.PresentationStopping += _ =>
+                    throw new System.InvalidOperationException("presentation stop failure");
+                coordinator.PresentationStopping += _ => secondSubscriberCalled = true;
+                LogAssert.Expect(
+                    LogType.Exception,
+                    new Regex("InvalidOperationException: presentation stop failure"));
+
+                Assert.DoesNotThrow(coordinator.EndClientPresentation);
+                Assert.That(secondSubscriberCalled, Is.True);
+                Assert.That(coordinator.TryGetState(out _), Is.False);
+                Assert.That(
+                    coordinator.State,
+                    Is.EqualTo(ClientPresentationCoordinatorState.NoPresentation));
+            }
+            finally
+            {
+                state.Dispose();
+                Object.DestroyImmediate(rootObject);
+            }
         }
     }
 }
