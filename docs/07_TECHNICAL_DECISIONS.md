@@ -131,6 +131,34 @@ invent a second snapshot format or reimplement save/load. Its responsibility is 
 restore: replacement client state and newly created Unity objects must bind without retaining the
 old reader, identity, subscription, or View cache.
 
+## Decision cross-check and corner policies
+
+- The networking/session split is explicit: `SessionController` remains the FishNet façade while
+  `GameSession` is the server execution model. A FishNet client ID exists only in adapter maps and
+  is never persisted as `PlayerId`.
+- `WorldCore` is the only mutable block store. “Pure” here means MonoBehaviour/scene-free and
+  directly testable in Unity EditMode or a Unity headless process; it does not promise an unchanged
+  build under a general-purpose .NET CLI because Collections, Mathematics, and Jobs remain part of
+  the engine.
+- World ownership uses **option B, external-owned binding**. EditMode `WorldHost` owns its authoring
+  core. A PlayMode `WorldHost` receives the client replica through `AttachRuntimeWorld`, sets
+  `ownsWorld=false`, and disposes only its render resources when detached. It never receives the
+  authoritative server core.
+- Scene-authored `serializedBlocks` are Editor authoring data only in the current runtime policy.
+  A new server session initializes its authoritative world through its configured `IWorldInitializer`;
+  a restored session uses the validated archive as the complete replacement and does not merge the
+  scene records or run the default terrain initializer. A future authored-world game mode requires
+  an explicit importer before `Running`, rather than scene discovery inside the domain.
+- Scene unload stops presentation, render, and physics-proxy objects but does not stop the session.
+  Session stop is an explicit coordinator operation. Host server authority and its local client
+  replica may share an ID while remaining separate objects with different mutation rights.
+- Dynamic Rigidbody transforms remain PhysX/FishNet Prediction-owned. No Player NetworkTransform,
+  second physics simulation call, per-entity LifetimeScope, new global service locator, or mutable
+  domain position writer is introduced.
+- Existing uGUI controllers, public button methods, and serialized persistent callbacks remain the
+  UI contract. UI Toolkit migration, transport replacement, storage-format replacement, full
+  rollback/replay, multi-room hosting, and third-party asset refactors remain non-goals.
+
 ## Scope exclusions
 
 The following are explicit non-goals for this phase:
@@ -318,9 +346,11 @@ clear both inputs, so a reused object cannot retain the previous player's identi
 
 ## Minimal world presentation slice
 
-`WorldCommandDebugInput` is the non-player reuse proof for the command/binding architecture. It
-sends a nearby block toggle through `IGameCommandSender`; the server validates and applies it once,
-then replication updates the client-owned `WorldCore`. `WorldViewBridge` projects only world
+`WorldCommandDebugInput` is the non-player reuse proof for the command/binding architecture. F6
+selects a cell two horizontal units from the locally owned player and one unit below its body,
+falling back to the serialized target until that player exists. It sends the toggle through
+`IGameCommandSender`; the server still performs identity, block, rate, and reach validation, then
+replication updates the client-owned `WorldCore`. `WorldViewBridge` projects only world
 replacement/dirty-flush events into the existing chunk renderer. It creates no per-block scope,
 GameObject, or binder and does not bypass the EditMode paint/storage path.
 
@@ -407,3 +437,36 @@ the advanced generation.
   both observed generation 1, and a runtime manual archive/load roundtrip preserved SessionId,
   generation, and tick 1047 with a committed pointer. The generated smoke archive was removed and
   the Editor was returned to stopped Edit Mode with an empty unsaved scene.
+- The current acceptance run on 2026-11-07 recompiled Unity 6000.3.28f1 successfully, then passed
+  `MF2.Game.Tests` **100/100**, `MF2.World.Tests` **84/84**, and the unfiltered EditMode suite
+  **204/204** (0 failed, 0 skipped, 0 inconclusive). The unfiltered XML report is at
+  `C:/Users/egod1/AppData/LocalLow/DefaultCompany/mf2/TestResults.xml`. The registered PlayMode
+  test inventory is still empty.
+- `MF2/Build Multiplayer Test Slice` was executed twice against the current builder. The generated
+  prefab/scene byte hashes changed because regenerated local file IDs are not byte-idempotent, but
+  asset GUIDs, scope/network/prefab references, UI callbacks, presentation-only world wiring, and
+  Build Settings were preserved and are now covered by `MultiplayerSliceBuilderTests`.
+- A clean-Editor Host smoke created session `9a3d778d-883e-4451-8cbc-0ba6f92c25d7` generation 1,
+  loaded Test, spawned exactly one mapped domain/network player, and kept the same session and
+  replicated world through the Ingame global-scene replacement. A reliable client command changed
+  block `(-32, 6, -27)` from stable ID `426333295` to Air on both server and client; a subsequent
+  `uint.MaxValue` block request was sent but rejected without changing the server. A runtime archive
+  roundtrip preserved that SessionId, generation 1, tick 4570, and 16 stored chunks; its temporary
+  directory was removed.
+- During the same smoke, FishNet reported tick rate 30 and `PhysicsMode.TimeManager`; over 2.008
+  realtime seconds FishNet `LocalTick` and `GameSession.TickIndex` both advanced exactly 61, showing
+  one domain step per FishNet tick in that run. Disconnect left the old session in `Disposed`, the
+  coordinator in `NoSession`, and both transports stopped. A second Host created a different
+  SessionId (`4295a990-9c55-424e-803a-dc1ba243a4ab`) at generation 2.
+- The decision-07 corner pass found that F6 still targeted the serialized origin even when the
+  generated terrain and player were elsewhere. It now computes a reachable cell beside the local
+  owner, with a focused EditMode regression. A fresh Host reached Test with one owned player and
+  resolved `(-31, 6, -29)`, where server and client both held stable block ID `426333295` before
+  input. Unity then raised an external `License removed` modal and closed the Editor before the
+  post-F6 server/client values could be observed, so that final F6 end-to-end assertion is explicitly
+  **NOT RUN** in this pass; the earlier reliable command-gateway Host smoke remains valid.
+- MPPM is not installed and there are no automated PlayMode tests. External-client movement/camera
+  observation, Dedicated plus two clients, connection-failure retry, true late join/reconnect,
+  pooled network-prefab reuse, and process-restart restore therefore remain explicitly **NOT RUN**
+  in this acceptance pass. The only remaining Editor console error during the clean Host run was
+  the pre-existing optional Unterm native bridge load failure; no MF2/FishNet smoke error occurred.

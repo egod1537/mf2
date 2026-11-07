@@ -10,6 +10,11 @@
 /[Ll]ogs/
 /[Uu]ser[Ss]ettings/
 
+# FMOD Studio local caches and per-user workspace state.
+/FMOD/**/.cache/
+/FMOD/**/.user/
+/fmod_editor.log
+
 # Licensed texture packs downloaded for local Editor-only use.
 /LocalTexturePacks/
 

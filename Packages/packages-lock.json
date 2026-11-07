@@ -30,6 +30,12 @@
       },
       "hash": "73f30cf2425dc808a4f463f0a233d386010810b3"
     },
+    "com.fmod.fmod-for-unity.v204": {
+      "version": "file:C:/Users/egod1/Downloads/fmodstudio20400.tgz",
+      "depth": 0,
+      "source": "local-tarball",
+      "dependencies": {}
+    },
     "com.unity.ai.navigation": {
       "version": "2.0.16",
       "depth": 0,

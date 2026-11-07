@@ -1,0 +1,21 @@
+{
+  "name": "SceneToolbar.Editor.Tests",
+  "rootNamespace": "SceneToolbar.Editor.Tests",
+  "references": [
+    "SceneToolbar.Editor"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false,
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ]
+}

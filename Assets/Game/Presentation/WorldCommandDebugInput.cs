@@ -1,3 +1,4 @@
+using MF2.Entities.Player;
 using MF2.Game.Lifecycle;
 using MF2.Game.Networking;
 using MF2.World.Core;
@@ -58,13 +59,46 @@ namespace MF2.Game.Presentation
                 return;
             }
 
-            var position = new int3(target.x, target.y, target.z);
+            var position = ResolveTargetPosition();
             var current = replicatedWorld.GetBlockOrAir(position);
             var command = current.IsAir
                 ? WorldCommand.SetBlock(position, new Block(debugBlockId))
                 : WorldCommand.RemoveBlock(position);
             if (!commandSender.SendWorldCommand(command))
                 Debug.LogWarning("[MF2] F6 debug block command could not be sent.");
+            else
+                Debug.Log($"[MF2] F6 debug block command sent for {position}.");
+        }
+
+        private int3 ResolveTargetPosition()
+        {
+            var players = FindObjectsByType<BlockPlayerController>(
+                FindObjectsInactive.Exclude,
+                FindObjectsSortMode.None);
+            for (var i = 0; i < players.Length; i++)
+            {
+                if (players[i].IsOwner)
+                {
+                    return TargetNearLocalPlayer(
+                        players[i].transform.position,
+                        players[i].transform.forward);
+                }
+            }
+
+            return new int3(target.x, target.y, target.z);
+        }
+
+        private static int3 TargetNearLocalPlayer(Vector3 position, Vector3 forward)
+        {
+            var horizontal = Vector3.ProjectOnPlane(forward, Vector3.up);
+            if (horizontal.sqrMagnitude < 0.001f)
+                horizontal = Vector3.forward;
+            horizontal.Normalize();
+            var adjacent = position + horizontal * 2f;
+            return new int3(
+                Mathf.FloorToInt(adjacent.x),
+                Mathf.FloorToInt(position.y - 1f),
+                Mathf.FloorToInt(adjacent.z));
         }
     }
 }

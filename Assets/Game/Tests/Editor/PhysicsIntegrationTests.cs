@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Reflection;
 using FishNet.Object;
 using MF2.Entities.Player;
 using MF2.Game.Domain;
@@ -203,6 +204,27 @@ namespace MF2.Game.Tests.Editor
             Assert.That(
                 serialized.FindProperty("_networkTransform").objectReferenceValue,
                 Is.Null);
+        }
+
+        [Test]
+        public void DebugWorldCommand_TargetsAReachableCellBesideTheLocalPlayer()
+        {
+            var method = typeof(MF2.Game.Presentation.WorldCommandDebugInput).GetMethod(
+                "TargetNearLocalPlayer",
+                BindingFlags.Static | BindingFlags.NonPublic);
+            Assert.That(method, Is.Not.Null);
+
+            var playerPosition = new Vector3(-32.25f, 7.4f, -27.8f);
+            var target = (int3)method.Invoke(
+                null,
+                new object[] { playerPosition, Vector3.forward });
+
+            Assert.That(target, Is.EqualTo(new int3(-33, 6, -26)));
+            Assert.That(
+                math.distancesq((float3)target, (float3)playerPosition),
+                Is.LessThanOrEqualTo(
+                    ServerWorldCommandAuthorizer.DefaultReach *
+                    ServerWorldCommandAuthorizer.DefaultReach));
         }
 
         [Test]

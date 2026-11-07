@@ -1,0 +1,73 @@
+.scene-toolbar-root {
+    padding: 8px;
+}
+
+.scene-toolbar-title {
+    -unity-font-style: bold;
+    font-size: 14px;
+    margin-bottom: 6px;
+}
+
+.scene-toolbar-add-row,
+.scene-toolbar-entry-header,
+.scene-toolbar-icon-row {
+    flex-direction: row;
+    align-items: center;
+}
+
+.scene-toolbar-add-row {
+    margin-bottom: 6px;
+}
+
+.scene-toolbar-grow {
+    flex-grow: 1;
+}
+
+.scene-toolbar-small-button {
+    margin-left: 6px;
+}
+
+.scene-toolbar-list {
+    flex-grow: 1;
+}
+
+.scene-toolbar-entry {
+    padding: 6px;
+    margin-bottom: 6px;
+    border-bottom-width: 1px;
+    border-bottom-color: rgba(128, 128, 128, 0.45);
+}
+
+.scene-toolbar-entry-header {
+    margin-bottom: 4px;
+}
+
+.scene-toolbar-position {
+    min-width: 24px;
+    -unity-font-style: bold;
+}
+
+.scene-toolbar-icon-row {
+    margin-top: 2px;
+}
+
+.scene-toolbar-icon-preview {
+    width: 24px;
+    height: 24px;
+    margin-left: 6px;
+    margin-right: 6px;
+}
+
+.scene-toolbar-empty {
+    white-space: normal;
+    margin-top: 8px;
+}
+
+.scene-toolbar-warning {
+    color: rgb(220, 145, 55);
+    white-space: normal;
+}
+
+.scene-toolbar-valid {
+    color: rgb(90, 175, 95);
+}
