@@ -29,7 +29,7 @@ namespace MF2.World.Rendering
             this.renderingEnabled = renderingEnabled;
             sharedMaterials = materialSet != null
                 ? materialSet.CreateSharedMaterialArray()
-                : new Material[3];
+                : new Material[4];
         }
 
         public int ActiveCount => active.Count;

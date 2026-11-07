@@ -92,7 +92,7 @@ namespace MF2.World.Tests
                 "Assets/World/Registry/BlockRegistryManifest.asset");
             Assert.That(manifest, Is.Not.Null);
             Assert.That(registry, Is.Not.Null);
-            Assert.That(manifest.Entries.Count, Is.EqualTo(401));
+            Assert.That(manifest.Entries.Count, Is.EqualTo(402));
             Assert.That(manifest.SourceAtlasGuid, Is.EqualTo("246bc2e1010431c46b3649b3d5a6936e"));
 
             var stone = FindEntry(manifest, "minecraft:stone");
@@ -170,7 +170,7 @@ namespace MF2.World.Tests
         }
 
         [Test]
-        public void MeshDataApply_UsesThreeStablePassSubmeshes()
+        public void MeshDataApply_UsesFourStablePassSubmeshes()
         {
             var mesh = new Mesh();
             try
@@ -185,10 +185,11 @@ namespace MF2.World.Tests
                     {
                         Assert.That(request.TryApply(world, mesh), Is.True);
                         Assert.That(mesh.vertexCount, Is.EqualTo(24));
-                        Assert.That(mesh.subMeshCount, Is.EqualTo(3));
+                        Assert.That(mesh.subMeshCount, Is.EqualTo(4));
                         Assert.That(mesh.GetIndexCount(0), Is.EqualTo(36));
                         Assert.That(mesh.GetIndexCount(1), Is.Zero);
                         Assert.That(mesh.GetIndexCount(2), Is.Zero);
+                        Assert.That(mesh.GetIndexCount(3), Is.Zero);
                     }
                 }
             }
@@ -229,6 +230,119 @@ namespace MF2.World.Tests
                     Assert.That(request.CutoutIndices.Length, Is.EqualTo(12));
                     Assert.That(request.TransparentIndices.Length, Is.EqualTo(12));
                 }
+            }
+        }
+
+        [Test]
+        public void SolidWaterBoundary_RendersSolidInterfaceAndCullsLiquidInterface()
+        {
+            using (var table = CreateSolidWaterTable())
+            using (var world = new WorldCore())
+            {
+                world.Enqueue(WorldCommand.SetBlock(int3.zero, new Block(1)));
+                world.Enqueue(WorldCommand.SetBlock(
+                    new int3(1, 0, 0),
+                    new Block(BlockTraitsCatalog.WaterStableId)));
+                world.Flush();
+                world.TryGetChunkHandle(int3.zero, out var handle);
+
+                using (var request = Schedule(world, handle, table))
+                {
+                    Assert.That(request.FaceCount, Is.EqualTo(11));
+                    Assert.That(request.OpaqueIndices.Length, Is.EqualTo(36));
+                    Assert.That(request.WaterIndices.Length, Is.EqualTo(30));
+                    Assert.That(request.CollisionIndices.Length, Is.EqualTo(36));
+                }
+            }
+        }
+
+        [Test]
+        public void WaterNeighbors_AreCulledWithinAndAcrossChunkBorders()
+        {
+            using (var table = CreateSolidWaterTable())
+            using (var world = new WorldCore())
+            {
+                var water = new Block(BlockTraitsCatalog.WaterStableId);
+                world.Enqueue(WorldCommand.SetBlock(new int3(15, 0, 0), water));
+                world.Enqueue(WorldCommand.SetBlock(new int3(16, 0, 0), water));
+                world.Flush();
+                world.TryGetChunkHandle(int3.zero, out var leftHandle);
+                world.TryGetChunkHandle(new int3(1, 0, 0), out var rightHandle);
+
+                using (var left = Schedule(world, leftHandle, table))
+                using (var right = Schedule(world, rightHandle, table))
+                {
+                    Assert.That(left.FaceCount, Is.EqualTo(5));
+                    Assert.That(right.FaceCount, Is.EqualTo(5));
+                    Assert.That(left.CollisionIndices.Length, Is.Zero);
+                    Assert.That(right.CollisionIndices.Length, Is.Zero);
+                }
+            }
+        }
+
+        [Test]
+        public void WaterOnlyChunk_HasVisualGeometryButNoColliderMesh()
+        {
+            var root = new GameObject("Water Only Chunk Test");
+            try
+            {
+                using (var table = CreateSolidWaterTable())
+                using (var world = new WorldCore())
+                using (var pool = new ChunkRendererPool(root.transform, materialSet: null))
+                {
+                    world.Enqueue(WorldCommand.SetBlock(
+                        int3.zero,
+                        new Block(BlockTraitsCatalog.WaterStableId)));
+                    world.Flush();
+                    world.TryGetChunkHandle(int3.zero, out var handle);
+                    using (var request = Schedule(world, handle, table))
+                    {
+                        var renderer = pool.GetOrCreate(int3.zero);
+                        Assert.That(renderer.Apply(world, request), Is.True);
+                        Assert.That(renderer.Mesh.GetIndexCount(3), Is.EqualTo(36));
+                        Assert.That(renderer.ColliderMesh.vertexCount, Is.Zero);
+                        Assert.That(renderer.GetComponent<MeshCollider>().sharedMesh, Is.Null);
+                        Assert.That(renderer.GetComponent<MeshCollider>().enabled, Is.False);
+                    }
+                }
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(root);
+            }
+        }
+
+        [Test]
+        public void MixedChunk_UsesDistinctSolidOnlyColliderMesh()
+        {
+            var root = new GameObject("Mixed Chunk Collider Test");
+            try
+            {
+                using (var table = CreateSolidWaterTable())
+                using (var world = new WorldCore())
+                using (var pool = new ChunkRendererPool(root.transform, materialSet: null))
+                {
+                    world.Enqueue(WorldCommand.SetBlock(int3.zero, new Block(1)));
+                    world.Enqueue(WorldCommand.SetBlock(
+                        new int3(1, 0, 0),
+                        new Block(BlockTraitsCatalog.WaterStableId)));
+                    world.Flush();
+                    world.TryGetChunkHandle(int3.zero, out var handle);
+                    using (var request = Schedule(world, handle, table))
+                    {
+                        var renderer = pool.GetOrCreate(int3.zero);
+                        Assert.That(renderer.Apply(world, request), Is.True);
+                        var collider = renderer.GetComponent<MeshCollider>();
+                        Assert.That(collider.enabled, Is.True);
+                        Assert.That(collider.sharedMesh, Is.SameAs(renderer.ColliderMesh));
+                        Assert.That(collider.sharedMesh, Is.Not.SameAs(renderer.Mesh));
+                        Assert.That(collider.sharedMesh.GetIndexCount(0), Is.EqualTo(36));
+                    }
+                }
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(root);
             }
         }
 
@@ -493,6 +607,40 @@ namespace MF2.World.Tests
                         West = face,
                         Up = face,
                         Down = face
+                    }
+                });
+        }
+
+        private static BlockRenderTable CreateSolidWaterTable()
+        {
+            var opaque = CreateFace(BlockRenderPass.Opaque);
+            var water = CreateFace(BlockRenderPass.Water);
+            return new BlockRenderTable(
+                new[]
+                {
+                    new BlockRenderDefinition
+                    {
+                        Id = 1,
+                        GeometryKind = BlockGeometryKind.Cube,
+                        TraitsKind = BlockTraitsKind.SolidOpaque,
+                        North = opaque,
+                        South = opaque,
+                        East = opaque,
+                        West = opaque,
+                        Up = opaque,
+                        Down = opaque
+                    },
+                    new BlockRenderDefinition
+                    {
+                        Id = BlockTraitsCatalog.WaterStableId,
+                        GeometryKind = BlockGeometryKind.Cube,
+                        TraitsKind = BlockTraitsKind.Liquid,
+                        North = water,
+                        South = water,
+                        East = water,
+                        West = water,
+                        Up = water,
+                        Down = water
                     }
                 });
         }

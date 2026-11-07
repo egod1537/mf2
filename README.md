@@ -53,6 +53,25 @@ preview용 `WorldCore`를 소유하지만, PlayMode에서는 client replica의 `
 기존 chunk mesh pipeline에 dirty chunk를 투영한다. Authoritative PlayMode `WorldCore`의
 단일 소유자는 server `SimulationWorld`다.
 
+### Layered terrain and water
+
+새 서버 세션의 기본 Perlin 지형은 stone → dirt 3칸 → grass 표면으로 생성되고, 높이 7
+아래의 골짜기는 정적인 `minecraft:water` 블록으로 채워진다. 물은 별도 Water 렌더 패스와
+투명 머티리얼을 사용하며, 같은 물끼리의 내부 면은 만들지 않는다. 지형과 맞닿은 물은
+시각 메시에는 포함되지만 solid 전용 `MeshCollider`에서는 제외되므로 걸어 설 수 없다.
+스폰 탐색도 block trait을 사용해 물이 아닌 마른 solid 바닥만 선택한다.
+
+초기 월드 복제는 Tugboat MTU보다 작은 최대 48-block 파트로 전송하고, 모든 파트를 검증한
+뒤 client `WorldCore`를 한 번에 교체한다. collider 재구축 전에는 WorldReady를 보내지 않는다.
+블록/렌더 manifest를 다시 만들 때는 Unity 메뉴의 다음 항목을 순서대로 실행한다.
+
+1. `Tools > Minecraft > Rebuild Block Registry Manifest`
+2. `Tools > Minecraft > Rebuild Block Render Manifest`
+
+두 빌더 모두 built-in water 항목과 일반/ProPixelizer water 머티리얼을 결정적으로 다시
+생성한다. 기존 저장은 재생성하거나 재레이어링하지 않으며, water ID도 다른 블록처럼
+Region JSON의 `Block(Id, State)`로 그대로 보존된다.
+
 ### Startup and scene lifecycle
 
 1. `Title`의 persistent `NetworkBootstrap`이 application scope와 FishNet infrastructure를

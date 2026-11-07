@@ -168,17 +168,24 @@ namespace MF2.Game.Networking
                 var index = spawnPoints.Length == 0 ? 0 : Mathf.Abs(connection.ClientId) % spawnPoints.Length;
                 var position = spawnPoints.Length == 0 ? Vector3.up * 2f : spawnPoints[index].transform.position;
                 var rotation = spawnPoints.Length == 0 ? Quaternion.identity : spawnPoints[index].transform.rotation;
-                if (sessionCoordinator.TryGetSession(out var activeSession) &&
-                    activeSession.Terrain != null)
+                if (sessionCoordinator.TryGetSession(out var activeSession))
                 {
-                    if (!spawnLocator.TryLocate(
+                    var ordinal = Mathf.Max(0, connection.ClientId);
+                    var located = activeSession.Terrain != null
+                        ? spawnLocator.TryLocate(
                             activeSession.World,
                             activeSession.Terrain.Config,
-                            Mathf.Max(0, connection.ClientId),
-                            out var terrainPosition))
+                            ordinal,
+                            out var terrainPosition)
+                        : spawnLocator.TryLocate(
+                            activeSession.World,
+                            activeSession.CaptureSnapshot().World,
+                            ordinal,
+                            out terrainPosition);
+                    if (!located)
                     {
                         throw new System.InvalidOperationException(
-                            "No safe spawn column was found in the authoritative terrain.");
+                            "No dry solid spawn column was found in the authoritative world.");
                     }
                     position = new Vector3(terrainPosition.x, terrainPosition.y, terrainPosition.z);
                     rotation = Quaternion.identity;

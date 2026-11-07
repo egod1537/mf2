@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using MF2.World.Registry;
 using NUnit.Framework;
 using Unity.Collections;
 using UnityEditor;
+using MF2.World.Rendering;
 
 namespace MF2.World.Tests
 {
@@ -69,14 +71,17 @@ namespace MF2.World.Tests
 
             Assert.That(manifest, Is.Not.Null);
             Assert.That(manifest.IdSchemeVersion, Is.EqualTo(StableBlockId.SchemeVersion));
-            Assert.That(manifest.Entries.Count, Is.EqualTo(401));
+            Assert.That(manifest.Entries.Count, Is.EqualTo(402));
             var importedIds = new HashSet<uint>();
             for (var i = 0; i < manifest.Entries.Count; i++)
             {
                 var canonicalName = manifest.Entries[i].CanonicalName;
                 Assert.DoesNotThrow(() =>
                     StableBlockId.ValidateCanonicalName(canonicalName));
-                Assert.That(manifest.Entries[i].Prefab, Is.Not.Null);
+                if (canonicalName == BlockTraitsCatalog.WaterCanonicalName)
+                    Assert.That(manifest.Entries[i].Prefab, Is.Null);
+                else
+                    Assert.That(manifest.Entries[i].Prefab, Is.Not.Null);
                 var first = StableBlockId.Compute(canonicalName);
                 var second = StableBlockId.Compute(canonicalName);
                 Assert.That(first, Is.EqualTo(second));
@@ -89,6 +94,36 @@ namespace MF2.World.Tests
 
             using (var runtime = manifest.CreateRuntimeRegistry(Allocator.Temp))
                 Assert.That(runtime.Count, Is.EqualTo(manifest.Entries.Count));
+        }
+
+        [Test]
+        public void WaterStableId_ResolvesOnceWithLiquidRenderAndMaterialDefinitions()
+        {
+            var registry = AssetDatabase.LoadAssetAtPath<BlockRegistryManifest>(
+                "Assets/World/Registry/BlockRegistryManifest.asset");
+            var render = AssetDatabase.LoadAssetAtPath<BlockRenderManifest>(
+                "Assets/World/Rendering/BlockRenderManifest.asset");
+            var standard = AssetDatabase.LoadAssetAtPath<ChunkMaterialSet>(
+                "Assets/World/Rendering/ChunkMaterialSet.asset");
+            var proPixelizer = AssetDatabase.LoadAssetAtPath<ChunkMaterialSet>(
+                "Assets/World/Rendering/ChunkMaterialSetProPixelizer.asset");
+
+            var registryEntries = registry.Entries.Where(entry =>
+                entry.CanonicalName == BlockTraitsCatalog.WaterCanonicalName).ToArray();
+            var renderEntries = render.Entries.Where(entry =>
+                entry.CanonicalName == BlockTraitsCatalog.WaterCanonicalName).ToArray();
+
+            Assert.That(registryEntries, Has.Length.EqualTo(1));
+            Assert.That(registryEntries[0].Prefab, Is.Null);
+            Assert.That(renderEntries, Has.Length.EqualTo(1));
+            Assert.That(renderEntries[0].StableId, Is.EqualTo(BlockTraitsCatalog.WaterStableId));
+            Assert.That(renderEntries[0].TraitsKind, Is.EqualTo(BlockTraitsKind.Liquid));
+            Assert.That(renderEntries[0].Faces.All(face =>
+                face.RenderPass == BlockRenderPass.Water), Is.True);
+            Assert.That(standard.Water, Is.Not.Null);
+            Assert.That(standard.Water.renderQueue, Is.GreaterThanOrEqualTo(3000));
+            Assert.That(proPixelizer.Water, Is.Not.Null);
+            Assert.That(proPixelizer.Water.renderQueue, Is.GreaterThanOrEqualTo(3000));
         }
     }
 }

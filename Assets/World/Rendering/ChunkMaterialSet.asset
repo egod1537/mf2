@@ -16,3 +16,4 @@ MonoBehaviour:
   opaque: {fileID: 2100000, guid: ba8db60506d6cce4d9c970e0a0c10ab8, type: 2}
   cutout: {fileID: 2100000, guid: 75aaa825ae4b5c443ba30d0b71635a4c, type: 2}
   transparent: {fileID: 2100000, guid: abbc54a0019750347b1a854d035af537, type: 2}
+  water: {fileID: 2100000, guid: 3a397b787d947c24ab716e086b54e39a, type: 2}

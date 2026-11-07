@@ -23,14 +23,6 @@ namespace MF2.Game.Networking
         public uint State;
     }
 
-    public struct WorldSnapshotBroadcast : IBroadcast
-    {
-        public Guid SessionId;
-        public long Generation;
-        public long TickIndex;
-        public ReplicatedBlock[] Blocks;
-    }
-
     public struct WorldDeltaBroadcast : IBroadcast
     {
         public Guid SessionId;
@@ -55,6 +47,10 @@ namespace MF2.Game.Networking
     public sealed class WorldReplicationAdapter : MonoBehaviour
     {
         private readonly Dictionary<int, ClientWorldReadiness> readyClients = new();
+        private readonly WorldSnapshotTransferAssembler snapshotAssembler = new();
+        private readonly List<WorldDeltaBroadcast> pendingWorldDeltas = new();
+        private const int MaximumPendingDeltaMessages = 128;
+        private const int MaximumPendingDeltaBlocks = 8192;
         private NetworkManager networkManager;
         private ServerSessionCoordinator coordinator;
         private ClientPresentationCoordinator clientPresentation;
@@ -62,6 +58,8 @@ namespace MF2.Game.Networking
         private GameSession subscribedSession;
         private bool networkCallbacksRegistered;
         private long requiredWorldReadyTick = -1;
+        private int pendingWorldDeltaBlocks;
+        private int nextSnapshotTransferId;
 
         public event Action<NetworkConnection> ConnectionWorldReady;
 
@@ -91,7 +89,12 @@ namespace MF2.Game.Networking
             if (clientPresentation.TryGetState(out var readyState))
                 OnPresentationReady(readyState);
 
-            networkManager.ClientManager.RegisterBroadcast<WorldSnapshotBroadcast>(OnSnapshotReceived);
+            networkManager.ClientManager.RegisterBroadcast<WorldSnapshotBeginBroadcast>(
+                OnSnapshotBeginReceived);
+            networkManager.ClientManager.RegisterBroadcast<WorldSnapshotPartBroadcast>(
+                OnSnapshotPartReceived);
+            networkManager.ClientManager.RegisterBroadcast<WorldSnapshotEndBroadcast>(
+                OnSnapshotEndReceived);
             networkManager.ClientManager.RegisterBroadcast<WorldDeltaBroadcast>(OnDeltaReceived);
             networkManager.ServerManager.RegisterBroadcast<WorldReadyBroadcast>(
                 OnWorldReadyReceived,
@@ -116,7 +119,7 @@ namespace MF2.Game.Networking
             readyClients.Clear();
             requiredWorldReadyTick = startedSession.TickIndex;
             if (networkManager != null && networkManager.IsServerStarted)
-                networkManager.ServerManager.Broadcast(CreateSnapshot(startedSession.CaptureSnapshot()));
+                SendSnapshot(startedSession.CaptureSnapshot(), connection: null);
         }
 
         private void OnSessionStopping(GameSession endingSession)
@@ -137,7 +140,7 @@ namespace MF2.Game.Networking
                     readyClients.Remove(connection.ClientId);
                 return;
             }
-            networkManager.ServerManager.Broadcast(connection, CreateSnapshot(activeSession.CaptureSnapshot()));
+            SendSnapshot(activeSession.CaptureSnapshot(), connection);
         }
 
         private void OnSessionTickCompleted(SessionTickResult result)
@@ -163,13 +166,51 @@ namespace MF2.Game.Networking
             });
         }
 
-        private void OnSnapshotReceived(WorldSnapshotBroadcast message, Channel channel)
+        private void OnSnapshotBeginReceived(WorldSnapshotBeginBroadcast message, Channel channel)
         {
-            if (clientState == null || message.SessionId == Guid.Empty || message.Generation <= 0)
+            if (channel != Channel.Reliable || clientState == null ||
+                !snapshotAssembler.Begin(message))
+            {
                 return;
+            }
+
+            ClearPendingWorldDeltas();
+        }
+
+        private void OnSnapshotPartReceived(WorldSnapshotPartBroadcast message, Channel channel)
+        {
+            if (channel != Channel.Reliable || clientState == null)
+                return;
+            snapshotAssembler.AddPart(message);
+        }
+
+        private void OnSnapshotEndReceived(WorldSnapshotEndBroadcast message, Channel channel)
+        {
+            if (channel != Channel.Reliable || clientState == null ||
+                !snapshotAssembler.TryComplete(message, out var metadata, out var blocks))
+            {
+                return;
+            }
+
+            var applied = clientState.ApplySnapshot(
+                new SessionId(metadata.SessionId),
+                metadata.Generation,
+                metadata.TickIndex,
+                CreateStorageSnapshot(blocks));
+            if (applied)
+            {
+                for (var i = 0; i < pendingWorldDeltas.Count; i++)
+                    ApplyDelta(pendingWorldDeltas[i]);
+            }
+            ClearPendingWorldDeltas();
+        }
+
+        private static WorldStorageSnapshot CreateStorageSnapshot(ReplicatedBlock[] blocks)
+        {
+            if (blocks == null)
+                throw new ArgumentNullException(nameof(blocks));
 
             var chunks = new Dictionary<int3, List<StoredBlock>>();
-            var blocks = message.Blocks ?? Array.Empty<ReplicatedBlock>();
             for (var i = 0; i < blocks.Length; i++)
             {
                 var source = blocks[i];
@@ -189,17 +230,45 @@ namespace MF2.Game.Networking
             var storedChunks = new List<StoredChunk>(chunks.Count);
             foreach (var pair in chunks)
                 storedChunks.Add(new StoredChunk(pair.Key, pair.Value));
-            clientState.ApplySnapshot(
-                new SessionId(message.SessionId),
-                message.Generation,
-                message.TickIndex,
-                new WorldStorageSnapshot(storedChunks));
+            return new WorldStorageSnapshot(storedChunks);
         }
 
         private void OnDeltaReceived(WorldDeltaBroadcast message, Channel channel)
         {
-            if (clientState == null || message.SessionId == Guid.Empty || message.Generation <= 0)
+            if (channel != Channel.Reliable || clientState == null ||
+                message.SessionId == Guid.Empty || message.Generation <= 0)
                 return;
+            if (snapshotAssembler.IsActive)
+            {
+                // Reliable packets from a replaced session can still be drained while the new
+                // snapshot is being assembled. They are stale, not a reason to destroy the
+                // valid transfer currently in progress.
+                if (message.SessionId != snapshotAssembler.SessionId ||
+                    message.Generation != snapshotAssembler.Generation ||
+                    message.TickIndex <= snapshotAssembler.TickIndex)
+                    return;
+
+                var blockCount = message.Blocks?.Length ?? 0;
+                if (pendingWorldDeltas.Count < MaximumPendingDeltaMessages &&
+                    pendingWorldDeltaBlocks + blockCount <= MaximumPendingDeltaBlocks)
+                {
+                    pendingWorldDeltas.Add(message);
+                    pendingWorldDeltaBlocks += blockCount;
+                    return;
+                }
+
+                snapshotAssembler.Reset();
+                ClearPendingWorldDeltas();
+                clientState.Clear();
+                Debug.LogWarning("[MF2] Snapshot delta staging limits were exceeded; replica reset.");
+                return;
+            }
+
+            ApplyDelta(message);
+        }
+
+        private void ApplyDelta(WorldDeltaBroadcast message)
+        {
             var blocks = message.Blocks ?? Array.Empty<ReplicatedBlock>();
             var changes = new WorldBlockDelta[blocks.Length];
             for (var i = 0; i < blocks.Length; i++)
@@ -221,7 +290,11 @@ namespace MF2.Game.Networking
         private void OnClientConnectionState(ClientConnectionStateArgs args)
         {
             if (args.ConnectionState == LocalConnectionState.Stopped)
+            {
+                snapshotAssembler.Reset();
+                ClearPendingWorldDeltas();
                 clientState?.Clear();
+            }
         }
 
         public bool IsConnectionWorldReady(NetworkConnection connection, GameSession session)
@@ -311,7 +384,7 @@ namespace MF2.Game.Networking
                 Channel.Reliable);
         }
 
-        private static WorldSnapshotBroadcast CreateSnapshot(SessionSnapshot snapshot)
+        private void SendSnapshot(SessionSnapshot snapshot, NetworkConnection connection)
         {
             var blocks = new List<ReplicatedBlock>();
             for (var chunkIndex = 0; chunkIndex < snapshot.World.Chunks.Count; chunkIndex++)
@@ -329,13 +402,70 @@ namespace MF2.Game.Networking
                 }
             }
 
-            return new WorldSnapshotBroadcast
+            var transferId = NextSnapshotTransferId();
+            var allBlocks = blocks.ToArray();
+            var partCount = WorldSnapshotTransferProtocol.GetPartCount(allBlocks.Length);
+            var begin = new WorldSnapshotBeginBroadcast
             {
                 SessionId = snapshot.Id.Value,
                 Generation = snapshot.Generation,
                 TickIndex = snapshot.TickIndex,
-                Blocks = blocks.ToArray()
+                TransferId = transferId,
+                TotalBlocks = allBlocks.Length,
+                PartCount = partCount
             };
+            SendReliable(connection, begin);
+
+            for (var partIndex = 0; partIndex < partCount; partIndex++)
+            {
+                SendReliable(connection, new WorldSnapshotPartBroadcast
+                {
+                    SessionId = snapshot.Id.Value,
+                    Generation = snapshot.Generation,
+                    TickIndex = snapshot.TickIndex,
+                    TransferId = transferId,
+                    PartIndex = partIndex,
+                    Blocks = WorldSnapshotTransferProtocol.CopyPart(allBlocks, partIndex)
+                });
+            }
+
+            SendReliable(connection, new WorldSnapshotEndBroadcast
+            {
+                SessionId = snapshot.Id.Value,
+                Generation = snapshot.Generation,
+                TickIndex = snapshot.TickIndex,
+                TransferId = transferId
+            });
+        }
+
+        private void SendReliable<T>(NetworkConnection connection, T message)
+            where T : struct, IBroadcast
+        {
+            if (connection == null)
+                networkManager.ServerManager.Broadcast(
+                    message,
+                    requireAuthenticated: true,
+                    channel: Channel.Reliable);
+            else
+                networkManager.ServerManager.Broadcast(
+                    connection,
+                    message,
+                    requireAuthenticated: true,
+                    channel: Channel.Reliable);
+        }
+
+        private int NextSnapshotTransferId()
+        {
+            nextSnapshotTransferId = nextSnapshotTransferId == int.MaxValue
+                ? 1
+                : nextSnapshotTransferId + 1;
+            return nextSnapshotTransferId;
+        }
+
+        private void ClearPendingWorldDeltas()
+        {
+            pendingWorldDeltas.Clear();
+            pendingWorldDeltaBlocks = 0;
         }
 
         private static ReplicatedBlock ToReplicatedBlock(int3 position, Block block)
@@ -372,7 +502,12 @@ namespace MF2.Game.Networking
             var clientManager = networkManager.ClientManager;
             if (clientManager != null)
             {
-                clientManager.UnregisterBroadcast<WorldSnapshotBroadcast>(OnSnapshotReceived);
+                clientManager.UnregisterBroadcast<WorldSnapshotBeginBroadcast>(
+                    OnSnapshotBeginReceived);
+                clientManager.UnregisterBroadcast<WorldSnapshotPartBroadcast>(
+                    OnSnapshotPartReceived);
+                clientManager.UnregisterBroadcast<WorldSnapshotEndBroadcast>(
+                    OnSnapshotEndReceived);
                 clientManager.UnregisterBroadcast<WorldDeltaBroadcast>(OnDeltaReceived);
                 clientManager.OnClientConnectionState -= OnClientConnectionState;
             }
@@ -385,6 +520,8 @@ namespace MF2.Game.Networking
             }
             ConnectionWorldReady = null;
             readyClients.Clear();
+            snapshotAssembler.Reset();
+            ClearPendingWorldDeltas();
             networkCallbacksRegistered = false;
         }
     }

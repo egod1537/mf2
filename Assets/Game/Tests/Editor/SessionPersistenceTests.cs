@@ -7,6 +7,7 @@ using MF2.Game.Domain;
 using MF2.Game.Lifecycle;
 using MF2.Game.Persistence;
 using MF2.World.Core;
+using MF2.World.Registry;
 using MF2.World.Storage;
 using NUnit.Framework;
 using Unity.Mathematics;
@@ -91,7 +92,7 @@ namespace MF2.Tests
                 var storage = new SessionJsonStorage(directory);
                 var player = new PlayerId(Guid.NewGuid());
                 var position = new int3(-18, 4, 33);
-                var block = new Block(71, 9);
+                var block = new Block(BlockTraitsCatalog.WaterStableId, 9);
                 SessionArchiveSnapshot captured;
 
                 using (var sourceWorld = new SimulationWorld())

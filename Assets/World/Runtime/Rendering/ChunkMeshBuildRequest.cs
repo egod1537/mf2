@@ -78,6 +78,24 @@ namespace MF2.World.Rendering
             }
         }
 
+        public NativeArray<uint> WaterIndices
+        {
+            get
+            {
+                Complete();
+                return buffers.WaterIndices.AsArray();
+            }
+        }
+
+        public NativeArray<uint> CollisionIndices
+        {
+            get
+            {
+                Complete();
+                return buffers.CollisionIndices.AsArray();
+            }
+        }
+
         public void Complete()
         {
             ThrowIfDisposed();
@@ -103,7 +121,38 @@ namespace MF2.World.Rendering
                 buffers.Vertices.AsArray(),
                 buffers.OpaqueIndices.AsArray(),
                 buffers.CutoutIndices.AsArray(),
-                buffers.TransparentIndices.AsArray());
+                buffers.TransparentIndices.AsArray(),
+                buffers.WaterIndices.AsArray());
+            return true;
+        }
+
+        public bool TryApply(WorldCore world, Mesh visualMesh, Mesh colliderMesh)
+        {
+            if (world == null)
+                throw new ArgumentNullException(nameof(world));
+            if (visualMesh == null)
+                throw new ArgumentNullException(nameof(visualMesh));
+            if (colliderMesh == null)
+                throw new ArgumentNullException(nameof(colliderMesh));
+
+            Complete();
+            if (!snapshot.IsCurrent(world))
+                return false;
+
+            ChunkMeshApplier.Apply(
+                visualMesh,
+                buffers.Vertices.AsArray(),
+                buffers.OpaqueIndices.AsArray(),
+                buffers.CutoutIndices.AsArray(),
+                buffers.TransparentIndices.AsArray(),
+                buffers.WaterIndices.AsArray());
+            if (buffers.CollisionIndices.Length == 0)
+                colliderMesh.Clear(false);
+            else
+                ChunkMeshApplier.ApplyCollider(
+                    colliderMesh,
+                    buffers.Vertices.AsArray(),
+                    buffers.CollisionIndices.AsArray());
             return true;
         }
 

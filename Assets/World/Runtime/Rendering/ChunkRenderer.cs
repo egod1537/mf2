@@ -13,6 +13,7 @@ namespace MF2.World.Rendering
         private MeshRenderer meshRenderer;
         private MeshCollider meshCollider;
         private Mesh mesh;
+        private Mesh colliderMesh;
         private ChunkReadiness readiness;
 
         public int3 ChunkCoordinate { get; private set; }
@@ -33,6 +34,15 @@ namespace MF2.World.Rendering
             {
                 EnsureInitialized();
                 return mesh;
+            }
+        }
+
+        public Mesh ColliderMesh
+        {
+            get
+            {
+                EnsureInitialized();
+                return colliderMesh;
             }
         }
 
@@ -57,7 +67,7 @@ namespace MF2.World.Rendering
         public bool Apply(WorldCore world, ChunkMeshBuildRequest request)
         {
             EnsureInitialized();
-            if (!request.TryApply(world, mesh))
+            if (!request.TryApply(world, mesh, colliderMesh))
                 return false;
 
             // Reassigning through null makes PhysX recook the exact accepted mesh version.
@@ -65,8 +75,10 @@ namespace MF2.World.Rendering
                 readiness = default;
             readiness.MarkDataReady(request.ChunkCoordinate, request.Version);
             meshCollider.sharedMesh = null;
-            if (mesh.vertexCount > 0)
-                meshCollider.sharedMesh = mesh;
+            var hasCollision = request.CollisionIndices.Length > 0;
+            meshCollider.enabled = hasCollision;
+            if (hasCollision)
+                meshCollider.sharedMesh = colliderMesh;
 
             AppliedHandle = request.Handle;
             AppliedVersion = request.Version;
@@ -81,6 +93,10 @@ namespace MF2.World.Rendering
                 meshCollider.sharedMesh = null;
             if (mesh != null)
                 mesh.Clear(false);
+            if (colliderMesh != null)
+                colliderMesh.Clear(false);
+            if (meshCollider != null)
+                meshCollider.enabled = false;
             AppliedHandle = default;
             AppliedVersion = 0;
             readiness = default;
@@ -93,14 +109,10 @@ namespace MF2.World.Rendering
 
         private void OnDestroy()
         {
-            if (mesh == null)
-                return;
-
-            if (Application.isPlaying)
-                Destroy(mesh);
-            else
-                DestroyImmediate(mesh);
+            DestroyOwnedMesh(mesh);
+            DestroyOwnedMesh(colliderMesh);
             mesh = null;
+            colliderMesh = null;
         }
 
         private void EnsureInitialized()
@@ -125,6 +137,24 @@ namespace MF2.World.Rendering
             };
             mesh.MarkDynamic();
             meshFilter.sharedMesh = mesh;
+
+            colliderMesh = new Mesh
+            {
+                name = "Chunk Collider Mesh",
+                indexFormat = IndexFormat.UInt32,
+                hideFlags = HideFlags.DontSave
+            };
+            colliderMesh.MarkDynamic();
+        }
+
+        private static void DestroyOwnedMesh(Mesh owned)
+        {
+            if (owned == null)
+                return;
+            if (Application.isPlaying)
+                Destroy(owned);
+            else
+                DestroyImmediate(owned);
         }
     }
 }

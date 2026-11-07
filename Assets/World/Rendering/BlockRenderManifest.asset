@@ -20,6 +20,7 @@ MonoBehaviour:
   - canonicalName: minecraft:acacia_leaves
     stableId: 919625603
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.0048828125, y: 0.0048828125}
       uv1: {x: 0.0048828125, y: 0.034179688}
@@ -54,6 +55,7 @@ MonoBehaviour:
   - canonicalName: minecraft:acacia_log
     stableId: 2148181291
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.08300781, y: 0.0048828125}
       uv1: {x: 0.08300781, y: 0.034179688}
@@ -88,6 +90,7 @@ MonoBehaviour:
   - canonicalName: minecraft:acacia_planks
     stableId: 3219790936
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.12207031, y: 0.0048828125}
       uv1: {x: 0.12207031, y: 0.034179688}
@@ -122,6 +125,7 @@ MonoBehaviour:
   - canonicalName: minecraft:acacia_wood
     stableId: 224004618
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.08300781, y: 0.0048828125}
       uv1: {x: 0.08300781, y: 0.034179688}
@@ -156,6 +160,7 @@ MonoBehaviour:
   - canonicalName: minecraft:amethyst_block
     stableId: 1364973230
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.16113281, y: 0.0048828125}
       uv1: {x: 0.16113281, y: 0.034179688}
@@ -190,6 +195,7 @@ MonoBehaviour:
   - canonicalName: minecraft:ancient_debris
     stableId: 1538685476
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.20019531, y: 0.0048828125}
       uv1: {x: 0.20019531, y: 0.034179688}
@@ -224,6 +230,7 @@ MonoBehaviour:
   - canonicalName: minecraft:andesite
     stableId: 4248503697
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.2783203, y: 0.0048828125}
       uv1: {x: 0.2783203, y: 0.034179688}
@@ -258,6 +265,7 @@ MonoBehaviour:
   - canonicalName: minecraft:azalea_leaves
     stableId: 55635684
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.3173828, y: 0.0048828125}
       uv1: {x: 0.3173828, y: 0.034179688}
@@ -292,6 +300,7 @@ MonoBehaviour:
   - canonicalName: minecraft:bamboo_block
     stableId: 1945155469
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.3955078, y: 0.0048828125}
       uv1: {x: 0.3955078, y: 0.034179688}
@@ -326,6 +335,7 @@ MonoBehaviour:
   - canonicalName: minecraft:bamboo_mosaic
     stableId: 115194298
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.4345703, y: 0.0048828125}
       uv1: {x: 0.4345703, y: 0.034179688}
@@ -360,6 +370,7 @@ MonoBehaviour:
   - canonicalName: minecraft:bamboo_planks
     stableId: 3099010711
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.4736328, y: 0.0048828125}
       uv1: {x: 0.4736328, y: 0.034179688}
@@ -394,6 +405,7 @@ MonoBehaviour:
   - canonicalName: minecraft:barrel
     stableId: 1095213450
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.5517578, y: 0.0048828125}
       uv1: {x: 0.5517578, y: 0.034179688}
@@ -428,6 +440,7 @@ MonoBehaviour:
   - canonicalName: minecraft:basalt
     stableId: 3123826951
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.6298828, y: 0.0048828125}
       uv1: {x: 0.6298828, y: 0.034179688}
@@ -462,6 +475,7 @@ MonoBehaviour:
   - canonicalName: minecraft:bedrock
     stableId: 70698416
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.7080078, y: 0.0048828125}
       uv1: {x: 0.7080078, y: 0.034179688}
@@ -496,6 +510,7 @@ MonoBehaviour:
   - canonicalName: minecraft:bee_nest
     stableId: 102791608
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.7861328, y: 0.0048828125}
       uv1: {x: 0.7861328, y: 0.034179688}
@@ -530,6 +545,7 @@ MonoBehaviour:
   - canonicalName: minecraft:beehive
     stableId: 2300303424
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.9423828, y: 0.0048828125}
       uv1: {x: 0.9423828, y: 0.034179688}
@@ -564,6 +580,7 @@ MonoBehaviour:
   - canonicalName: minecraft:birch_leaves
     stableId: 2272903666
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.043945312, y: 0.043945312}
       uv1: {x: 0.043945312, y: 0.07324219}
@@ -598,6 +615,7 @@ MonoBehaviour:
   - canonicalName: minecraft:birch_log
     stableId: 1502123331
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.12207031, y: 0.043945312}
       uv1: {x: 0.12207031, y: 0.07324219}
@@ -632,6 +650,7 @@ MonoBehaviour:
   - canonicalName: minecraft:birch_planks
     stableId: 274739811
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.16113281, y: 0.043945312}
       uv1: {x: 0.16113281, y: 0.07324219}
@@ -666,6 +685,7 @@ MonoBehaviour:
   - canonicalName: minecraft:birch_wood
     stableId: 3930864636
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.12207031, y: 0.043945312}
       uv1: {x: 0.12207031, y: 0.07324219}
@@ -700,6 +720,7 @@ MonoBehaviour:
   - canonicalName: minecraft:black_concrete
     stableId: 3480535813
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.23925781, y: 0.043945312}
       uv1: {x: 0.23925781, y: 0.07324219}
@@ -734,6 +755,7 @@ MonoBehaviour:
   - canonicalName: minecraft:black_concrete_powder
     stableId: 3952537982
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.20019531, y: 0.043945312}
       uv1: {x: 0.20019531, y: 0.07324219}
@@ -768,6 +790,7 @@ MonoBehaviour:
   - canonicalName: minecraft:black_stained_glass
     stableId: 2028244523
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.2783203, y: 0.043945312}
       uv1: {x: 0.2783203, y: 0.07324219}
@@ -802,6 +825,7 @@ MonoBehaviour:
   - canonicalName: minecraft:black_terracotta
     stableId: 4136687927
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.3173828, y: 0.043945312}
       uv1: {x: 0.3173828, y: 0.07324219}
@@ -836,6 +860,7 @@ MonoBehaviour:
   - canonicalName: minecraft:black_wool
     stableId: 3277741785
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.3564453, y: 0.043945312}
       uv1: {x: 0.3564453, y: 0.07324219}
@@ -870,6 +895,7 @@ MonoBehaviour:
   - canonicalName: minecraft:blackstone
     stableId: 2820230818
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.4345703, y: 0.043945312}
       uv1: {x: 0.4345703, y: 0.07324219}
@@ -904,6 +930,7 @@ MonoBehaviour:
   - canonicalName: minecraft:blast_furnace
     stableId: 230963718
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.4736328, y: 0.043945312}
       uv1: {x: 0.4736328, y: 0.07324219}
@@ -938,6 +965,7 @@ MonoBehaviour:
   - canonicalName: minecraft:blue_concrete
     stableId: 1017913321
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.6298828, y: 0.043945312}
       uv1: {x: 0.6298828, y: 0.07324219}
@@ -972,6 +1000,7 @@ MonoBehaviour:
   - canonicalName: minecraft:blue_concrete_powder
     stableId: 2653918668
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.5908203, y: 0.043945312}
       uv1: {x: 0.5908203, y: 0.07324219}
@@ -1006,6 +1035,7 @@ MonoBehaviour:
   - canonicalName: minecraft:blue_ice
     stableId: 2233275259
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.6689453, y: 0.043945312}
       uv1: {x: 0.6689453, y: 0.07324219}
@@ -1040,6 +1070,7 @@ MonoBehaviour:
   - canonicalName: minecraft:blue_stained_glass
     stableId: 63732714
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.7080078, y: 0.043945312}
       uv1: {x: 0.7080078, y: 0.07324219}
@@ -1074,6 +1105,7 @@ MonoBehaviour:
   - canonicalName: minecraft:blue_terracotta
     stableId: 505086915
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.7470703, y: 0.043945312}
       uv1: {x: 0.7470703, y: 0.07324219}
@@ -1108,6 +1140,7 @@ MonoBehaviour:
   - canonicalName: minecraft:blue_wool
     stableId: 481076546
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.7861328, y: 0.043945312}
       uv1: {x: 0.7861328, y: 0.07324219}
@@ -1142,6 +1175,7 @@ MonoBehaviour:
   - canonicalName: minecraft:bone_block
     stableId: 1900779198
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.8251953, y: 0.043945312}
       uv1: {x: 0.8251953, y: 0.07324219}
@@ -1176,6 +1210,7 @@ MonoBehaviour:
   - canonicalName: minecraft:bookshelf
     stableId: 1394871822
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.9033203, y: 0.043945312}
       uv1: {x: 0.9033203, y: 0.07324219}
@@ -1210,6 +1245,7 @@ MonoBehaviour:
   - canonicalName: minecraft:brain_coral_block
     stableId: 3742521407
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.9423828, y: 0.043945312}
       uv1: {x: 0.9423828, y: 0.07324219}
@@ -1244,6 +1280,7 @@ MonoBehaviour:
   - canonicalName: minecraft:bricks
     stableId: 4001701991
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.0048828125, y: 0.08300781}
       uv1: {x: 0.0048828125, y: 0.11230469}
@@ -1278,6 +1315,7 @@ MonoBehaviour:
   - canonicalName: minecraft:brown_concrete
     stableId: 3827454312
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.08300781, y: 0.08300781}
       uv1: {x: 0.08300781, y: 0.11230469}
@@ -1312,6 +1350,7 @@ MonoBehaviour:
   - canonicalName: minecraft:brown_concrete_powder
     stableId: 814473749
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.043945312, y: 0.08300781}
       uv1: {x: 0.043945312, y: 0.11230469}
@@ -1346,6 +1385,7 @@ MonoBehaviour:
   - canonicalName: minecraft:brown_stained_glass
     stableId: 3608748913
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.12207031, y: 0.08300781}
       uv1: {x: 0.12207031, y: 0.11230469}
@@ -1380,6 +1420,7 @@ MonoBehaviour:
   - canonicalName: minecraft:brown_terracotta
     stableId: 1078183506
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.16113281, y: 0.08300781}
       uv1: {x: 0.16113281, y: 0.11230469}
@@ -1414,6 +1455,7 @@ MonoBehaviour:
   - canonicalName: minecraft:brown_wool
     stableId: 1754992406
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.20019531, y: 0.08300781}
       uv1: {x: 0.20019531, y: 0.11230469}
@@ -1448,6 +1490,7 @@ MonoBehaviour:
   - canonicalName: minecraft:bubble_coral_block
     stableId: 1030091324
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.23925781, y: 0.08300781}
       uv1: {x: 0.23925781, y: 0.11230469}
@@ -1482,6 +1525,7 @@ MonoBehaviour:
   - canonicalName: minecraft:budding_amethyst
     stableId: 3041342620
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.2783203, y: 0.08300781}
       uv1: {x: 0.2783203, y: 0.11230469}
@@ -1516,6 +1560,7 @@ MonoBehaviour:
   - canonicalName: minecraft:calcite
     stableId: 722710068
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.3173828, y: 0.08300781}
       uv1: {x: 0.3173828, y: 0.11230469}
@@ -1550,6 +1595,7 @@ MonoBehaviour:
   - canonicalName: minecraft:cartography_table
     stableId: 2385177785
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.4345703, y: 0.08300781}
       uv1: {x: 0.4345703, y: 0.11230469}
@@ -1584,6 +1630,7 @@ MonoBehaviour:
   - canonicalName: minecraft:carved_pumpkin
     stableId: 676828111
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.5126953, y: 0.08300781}
       uv1: {x: 0.5126953, y: 0.11230469}
@@ -1618,6 +1665,7 @@ MonoBehaviour:
   - canonicalName: minecraft:cherry_leaves
     stableId: 1280975867
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.5517578, y: 0.08300781}
       uv1: {x: 0.5517578, y: 0.11230469}
@@ -1652,6 +1700,7 @@ MonoBehaviour:
   - canonicalName: minecraft:cherry_log
     stableId: 1751624151
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.6298828, y: 0.08300781}
       uv1: {x: 0.6298828, y: 0.11230469}
@@ -1686,6 +1735,7 @@ MonoBehaviour:
   - canonicalName: minecraft:cherry_planks
     stableId: 780242228
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.6689453, y: 0.08300781}
       uv1: {x: 0.6689453, y: 0.11230469}
@@ -1720,6 +1770,7 @@ MonoBehaviour:
   - canonicalName: minecraft:cherry_wood
     stableId: 3699800837
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.6298828, y: 0.08300781}
       uv1: {x: 0.6298828, y: 0.11230469}
@@ -1754,6 +1805,7 @@ MonoBehaviour:
   - canonicalName: minecraft:chiseled_cinnabar
     stableId: 1897141524
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.7080078, y: 0.08300781}
       uv1: {x: 0.7080078, y: 0.11230469}
@@ -1788,6 +1840,7 @@ MonoBehaviour:
   - canonicalName: minecraft:chiseled_copper
     stableId: 1123696855
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.7470703, y: 0.08300781}
       uv1: {x: 0.7470703, y: 0.11230469}
@@ -1822,6 +1875,7 @@ MonoBehaviour:
   - canonicalName: minecraft:chiseled_deepslate
     stableId: 1345628046
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.7861328, y: 0.08300781}
       uv1: {x: 0.7861328, y: 0.11230469}
@@ -1856,6 +1910,7 @@ MonoBehaviour:
   - canonicalName: minecraft:chiseled_nether_bricks
     stableId: 2515346630
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.8251953, y: 0.08300781}
       uv1: {x: 0.8251953, y: 0.11230469}
@@ -1890,6 +1945,7 @@ MonoBehaviour:
   - canonicalName: minecraft:chiseled_polished_blackstone
     stableId: 4277293849
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.8642578, y: 0.08300781}
       uv1: {x: 0.8642578, y: 0.11230469}
@@ -1924,6 +1980,7 @@ MonoBehaviour:
   - canonicalName: minecraft:chiseled_quartz_block
     stableId: 756162379
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.9423828, y: 0.08300781}
       uv1: {x: 0.9423828, y: 0.11230469}
@@ -1958,6 +2015,7 @@ MonoBehaviour:
   - canonicalName: minecraft:chiseled_red_sandstone
     stableId: 2216909224
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.0048828125, y: 0.12207031}
       uv1: {x: 0.0048828125, y: 0.15136719}
@@ -1992,6 +2050,7 @@ MonoBehaviour:
   - canonicalName: minecraft:chiseled_resin_bricks
     stableId: 85760570
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.043945312, y: 0.12207031}
       uv1: {x: 0.043945312, y: 0.15136719}
@@ -2026,6 +2085,7 @@ MonoBehaviour:
   - canonicalName: minecraft:chiseled_sandstone
     stableId: 2152445146
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.08300781, y: 0.12207031}
       uv1: {x: 0.08300781, y: 0.15136719}
@@ -2060,6 +2120,7 @@ MonoBehaviour:
   - canonicalName: minecraft:chiseled_stone_bricks
     stableId: 2800709182
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.12207031, y: 0.12207031}
       uv1: {x: 0.12207031, y: 0.15136719}
@@ -2094,6 +2155,7 @@ MonoBehaviour:
   - canonicalName: minecraft:chiseled_sulfur
     stableId: 675808387
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.16113281, y: 0.12207031}
       uv1: {x: 0.16113281, y: 0.15136719}
@@ -2128,6 +2190,7 @@ MonoBehaviour:
   - canonicalName: minecraft:chiseled_tuff
     stableId: 1151898950
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.3173828, y: 0.12207031}
       uv1: {x: 0.3173828, y: 0.15136719}
@@ -2162,6 +2225,7 @@ MonoBehaviour:
   - canonicalName: minecraft:chiseled_tuff_bricks
     stableId: 3545022358
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.23925781, y: 0.12207031}
       uv1: {x: 0.23925781, y: 0.15136719}
@@ -2196,6 +2260,7 @@ MonoBehaviour:
   - canonicalName: minecraft:cinnabar
     stableId: 1344694895
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.3955078, y: 0.12207031}
       uv1: {x: 0.3955078, y: 0.15136719}
@@ -2230,6 +2295,7 @@ MonoBehaviour:
   - canonicalName: minecraft:cinnabar_bricks
     stableId: 4013757356
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.3564453, y: 0.12207031}
       uv1: {x: 0.3564453, y: 0.15136719}
@@ -2264,6 +2330,7 @@ MonoBehaviour:
   - canonicalName: minecraft:clay
     stableId: 3740620340
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.4345703, y: 0.12207031}
       uv1: {x: 0.4345703, y: 0.15136719}
@@ -2298,6 +2365,7 @@ MonoBehaviour:
   - canonicalName: minecraft:coal_block
     stableId: 3333178168
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.4736328, y: 0.12207031}
       uv1: {x: 0.4736328, y: 0.15136719}
@@ -2332,6 +2400,7 @@ MonoBehaviour:
   - canonicalName: minecraft:coal_ore
     stableId: 1814211222
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.5126953, y: 0.12207031}
       uv1: {x: 0.5126953, y: 0.15136719}
@@ -2366,6 +2435,7 @@ MonoBehaviour:
   - canonicalName: minecraft:coarse_dirt
     stableId: 3647261346
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.5517578, y: 0.12207031}
       uv1: {x: 0.5517578, y: 0.15136719}
@@ -2400,6 +2470,7 @@ MonoBehaviour:
   - canonicalName: minecraft:cobbled_deepslate
     stableId: 3879937341
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.5908203, y: 0.12207031}
       uv1: {x: 0.5908203, y: 0.15136719}
@@ -2434,6 +2505,7 @@ MonoBehaviour:
   - canonicalName: minecraft:cobblestone
     stableId: 1038291844
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.6298828, y: 0.12207031}
       uv1: {x: 0.6298828, y: 0.15136719}
@@ -2468,6 +2540,7 @@ MonoBehaviour:
   - canonicalName: minecraft:copper_block
     stableId: 3823716213
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.6689453, y: 0.12207031}
       uv1: {x: 0.6689453, y: 0.15136719}
@@ -2502,6 +2575,7 @@ MonoBehaviour:
   - canonicalName: minecraft:copper_bulb
     stableId: 2994142323
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.7080078, y: 0.12207031}
       uv1: {x: 0.7080078, y: 0.15136719}
@@ -2536,6 +2610,7 @@ MonoBehaviour:
   - canonicalName: minecraft:copper_grate
     stableId: 3013931657
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.7470703, y: 0.12207031}
       uv1: {x: 0.7470703, y: 0.15136719}
@@ -2570,6 +2645,7 @@ MonoBehaviour:
   - canonicalName: minecraft:copper_ore
     stableId: 3257780617
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.7861328, y: 0.12207031}
       uv1: {x: 0.7861328, y: 0.15136719}
@@ -2604,6 +2680,7 @@ MonoBehaviour:
   - canonicalName: minecraft:cracked_deepslate_bricks
     stableId: 3752456125
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.8251953, y: 0.12207031}
       uv1: {x: 0.8251953, y: 0.15136719}
@@ -2638,6 +2715,7 @@ MonoBehaviour:
   - canonicalName: minecraft:cracked_deepslate_tiles
     stableId: 3270265137
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.8642578, y: 0.12207031}
       uv1: {x: 0.8642578, y: 0.15136719}
@@ -2672,6 +2750,7 @@ MonoBehaviour:
   - canonicalName: minecraft:cracked_nether_bricks
     stableId: 1864559346
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.9033203, y: 0.12207031}
       uv1: {x: 0.9033203, y: 0.15136719}
@@ -2706,6 +2785,7 @@ MonoBehaviour:
   - canonicalName: minecraft:cracked_polished_blackstone_bricks
     stableId: 41556789
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.9423828, y: 0.12207031}
       uv1: {x: 0.9423828, y: 0.15136719}
@@ -2740,6 +2820,7 @@ MonoBehaviour:
   - canonicalName: minecraft:cracked_stone_bricks
     stableId: 1424609119
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.0048828125, y: 0.16113281}
       uv1: {x: 0.0048828125, y: 0.19042969}
@@ -2774,6 +2855,7 @@ MonoBehaviour:
   - canonicalName: minecraft:crafting_table
     stableId: 3304596880
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.043945312, y: 0.16113281}
       uv1: {x: 0.043945312, y: 0.19042969}
@@ -2808,6 +2890,7 @@ MonoBehaviour:
   - canonicalName: minecraft:creaking_heart
     stableId: 2023435903
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.20019531, y: 0.16113281}
       uv1: {x: 0.20019531, y: 0.19042969}
@@ -2842,6 +2925,7 @@ MonoBehaviour:
   - canonicalName: minecraft:crimson_hyphae
     stableId: 2535806644
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.3955078, y: 0.16113281}
       uv1: {x: 0.3955078, y: 0.19042969}
@@ -2876,6 +2960,7 @@ MonoBehaviour:
   - canonicalName: minecraft:crimson_nylium
     stableId: 3885020845
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.23925781, y: 0.16113281}
       uv1: {x: 0.23925781, y: 0.19042969}
@@ -2910,6 +2995,7 @@ MonoBehaviour:
   - canonicalName: minecraft:crimson_planks
     stableId: 177818247
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.3173828, y: 0.16113281}
       uv1: {x: 0.3173828, y: 0.19042969}
@@ -2944,6 +3030,7 @@ MonoBehaviour:
   - canonicalName: minecraft:crimson_stem
     stableId: 4092808806
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.3955078, y: 0.16113281}
       uv1: {x: 0.3955078, y: 0.19042969}
@@ -2978,6 +3065,7 @@ MonoBehaviour:
   - canonicalName: minecraft:crying_obsidian
     stableId: 1002506306
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.4345703, y: 0.16113281}
       uv1: {x: 0.4345703, y: 0.19042969}
@@ -3012,6 +3100,7 @@ MonoBehaviour:
   - canonicalName: minecraft:cut_copper
     stableId: 3611056898
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.4736328, y: 0.16113281}
       uv1: {x: 0.4736328, y: 0.19042969}
@@ -3046,6 +3135,7 @@ MonoBehaviour:
   - canonicalName: minecraft:cut_red_sandstone
     stableId: 2145223943
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.5126953, y: 0.16113281}
       uv1: {x: 0.5126953, y: 0.19042969}
@@ -3080,6 +3170,7 @@ MonoBehaviour:
   - canonicalName: minecraft:cut_sandstone
     stableId: 3607269544
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.5517578, y: 0.16113281}
       uv1: {x: 0.5517578, y: 0.19042969}
@@ -3114,6 +3205,7 @@ MonoBehaviour:
   - canonicalName: minecraft:cyan_concrete
     stableId: 1207074624
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.6298828, y: 0.16113281}
       uv1: {x: 0.6298828, y: 0.19042969}
@@ -3148,6 +3240,7 @@ MonoBehaviour:
   - canonicalName: minecraft:cyan_concrete_powder
     stableId: 1368870477
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.5908203, y: 0.16113281}
       uv1: {x: 0.5908203, y: 0.19042969}
@@ -3182,6 +3275,7 @@ MonoBehaviour:
   - canonicalName: minecraft:cyan_stained_glass
     stableId: 1130067285
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.6689453, y: 0.16113281}
       uv1: {x: 0.6689453, y: 0.19042969}
@@ -3216,6 +3310,7 @@ MonoBehaviour:
   - canonicalName: minecraft:cyan_terracotta
     stableId: 1456278622
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.7080078, y: 0.16113281}
       uv1: {x: 0.7080078, y: 0.19042969}
@@ -3250,6 +3345,7 @@ MonoBehaviour:
   - canonicalName: minecraft:cyan_wool
     stableId: 491677078
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.7470703, y: 0.16113281}
       uv1: {x: 0.7470703, y: 0.19042969}
@@ -3284,6 +3380,7 @@ MonoBehaviour:
   - canonicalName: minecraft:dark_oak_leaves
     stableId: 4032949815
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.7861328, y: 0.16113281}
       uv1: {x: 0.7861328, y: 0.19042969}
@@ -3318,6 +3415,7 @@ MonoBehaviour:
   - canonicalName: minecraft:dark_oak_log
     stableId: 1236499805
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.8642578, y: 0.16113281}
       uv1: {x: 0.8642578, y: 0.19042969}
@@ -3352,6 +3450,7 @@ MonoBehaviour:
   - canonicalName: minecraft:dark_oak_planks
     stableId: 1833866715
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.9033203, y: 0.16113281}
       uv1: {x: 0.9033203, y: 0.19042969}
@@ -3386,6 +3485,7 @@ MonoBehaviour:
   - canonicalName: minecraft:dark_oak_wood
     stableId: 1985259180
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.8642578, y: 0.16113281}
       uv1: {x: 0.8642578, y: 0.19042969}
@@ -3420,6 +3520,7 @@ MonoBehaviour:
   - canonicalName: minecraft:dark_prismarine
     stableId: 1382892058
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.9423828, y: 0.16113281}
       uv1: {x: 0.9423828, y: 0.19042969}
@@ -3454,6 +3555,7 @@ MonoBehaviour:
   - canonicalName: minecraft:dead_brain_coral_block
     stableId: 3943083815
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.0048828125, y: 0.20019531}
       uv1: {x: 0.0048828125, y: 0.22949219}
@@ -3488,6 +3590,7 @@ MonoBehaviour:
   - canonicalName: minecraft:dead_bubble_coral_block
     stableId: 2217464502
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.043945312, y: 0.20019531}
       uv1: {x: 0.043945312, y: 0.22949219}
@@ -3522,6 +3625,7 @@ MonoBehaviour:
   - canonicalName: minecraft:dead_fire_coral_block
     stableId: 1904143867
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.08300781, y: 0.20019531}
       uv1: {x: 0.08300781, y: 0.22949219}
@@ -3556,6 +3660,7 @@ MonoBehaviour:
   - canonicalName: minecraft:dead_horn_coral_block
     stableId: 2184238531
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.12207031, y: 0.20019531}
       uv1: {x: 0.12207031, y: 0.22949219}
@@ -3590,6 +3695,7 @@ MonoBehaviour:
   - canonicalName: minecraft:dead_tube_coral_block
     stableId: 919934747
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.16113281, y: 0.20019531}
       uv1: {x: 0.16113281, y: 0.22949219}
@@ -3624,6 +3730,7 @@ MonoBehaviour:
   - canonicalName: minecraft:deepslate
     stableId: 1213514417
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.6298828, y: 0.20019531}
       uv1: {x: 0.6298828, y: 0.22949219}
@@ -3658,6 +3765,7 @@ MonoBehaviour:
   - canonicalName: minecraft:deepslate_bricks
     stableId: 2669403428
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.20019531, y: 0.20019531}
       uv1: {x: 0.20019531, y: 0.22949219}
@@ -3692,6 +3800,7 @@ MonoBehaviour:
   - canonicalName: minecraft:deepslate_coal_ore
     stableId: 1485520039
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.23925781, y: 0.20019531}
       uv1: {x: 0.23925781, y: 0.22949219}
@@ -3726,6 +3835,7 @@ MonoBehaviour:
   - canonicalName: minecraft:deepslate_copper_ore
     stableId: 1009640643
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.2783203, y: 0.20019531}
       uv1: {x: 0.2783203, y: 0.22949219}
@@ -3760,6 +3870,7 @@ MonoBehaviour:
   - canonicalName: minecraft:deepslate_diamond_ore
     stableId: 3348078787
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.3173828, y: 0.20019531}
       uv1: {x: 0.3173828, y: 0.22949219}
@@ -3794,6 +3905,7 @@ MonoBehaviour:
   - canonicalName: minecraft:deepslate_emerald_ore
     stableId: 3637879013
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.3564453, y: 0.20019531}
       uv1: {x: 0.3564453, y: 0.22949219}
@@ -3828,6 +3940,7 @@ MonoBehaviour:
   - canonicalName: minecraft:deepslate_gold_ore
     stableId: 3871443953
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.3955078, y: 0.20019531}
       uv1: {x: 0.3955078, y: 0.22949219}
@@ -3862,6 +3975,7 @@ MonoBehaviour:
   - canonicalName: minecraft:deepslate_iron_ore
     stableId: 3747113791
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.4345703, y: 0.20019531}
       uv1: {x: 0.4345703, y: 0.22949219}
@@ -3896,6 +4010,7 @@ MonoBehaviour:
   - canonicalName: minecraft:deepslate_lapis_ore
     stableId: 1142542545
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.4736328, y: 0.20019531}
       uv1: {x: 0.4736328, y: 0.22949219}
@@ -3930,6 +4045,7 @@ MonoBehaviour:
   - canonicalName: minecraft:deepslate_redstone_ore
     stableId: 2847352742
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.5126953, y: 0.20019531}
       uv1: {x: 0.5126953, y: 0.22949219}
@@ -3964,6 +4080,7 @@ MonoBehaviour:
   - canonicalName: minecraft:deepslate_tiles
     stableId: 2700785850
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.5517578, y: 0.20019531}
       uv1: {x: 0.5517578, y: 0.22949219}
@@ -3998,6 +4115,7 @@ MonoBehaviour:
   - canonicalName: minecraft:diamond_block
     stableId: 2009535342
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.6689453, y: 0.20019531}
       uv1: {x: 0.6689453, y: 0.22949219}
@@ -4032,6 +4150,7 @@ MonoBehaviour:
   - canonicalName: minecraft:diamond_ore
     stableId: 1802696687
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.7080078, y: 0.20019531}
       uv1: {x: 0.7080078, y: 0.22949219}
@@ -4066,6 +4185,7 @@ MonoBehaviour:
   - canonicalName: minecraft:diorite
     stableId: 191086598
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.7470703, y: 0.20019531}
       uv1: {x: 0.7470703, y: 0.22949219}
@@ -4100,6 +4220,7 @@ MonoBehaviour:
   - canonicalName: minecraft:dirt
     stableId: 3961408736
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.7861328, y: 0.20019531}
       uv1: {x: 0.7861328, y: 0.22949219}
@@ -4134,6 +4255,7 @@ MonoBehaviour:
   - canonicalName: minecraft:dispenser
     stableId: 1155999522
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.8251953, y: 0.20019531}
       uv1: {x: 0.8251953, y: 0.22949219}
@@ -4168,6 +4290,7 @@ MonoBehaviour:
   - canonicalName: minecraft:dripstone_block
     stableId: 1116566461
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.8642578, y: 0.20019531}
       uv1: {x: 0.8642578, y: 0.22949219}
@@ -4202,6 +4325,7 @@ MonoBehaviour:
   - canonicalName: minecraft:dropper
     stableId: 252349475
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.9033203, y: 0.20019531}
       uv1: {x: 0.9033203, y: 0.22949219}
@@ -4236,6 +4360,7 @@ MonoBehaviour:
   - canonicalName: minecraft:emerald_block
     stableId: 3168851615
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.9423828, y: 0.20019531}
       uv1: {x: 0.9423828, y: 0.22949219}
@@ -4270,6 +4395,7 @@ MonoBehaviour:
   - canonicalName: minecraft:emerald_ore
     stableId: 1679097320
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.0048828125, y: 0.23925781}
       uv1: {x: 0.0048828125, y: 0.2685547}
@@ -4304,6 +4430,7 @@ MonoBehaviour:
   - canonicalName: minecraft:end_stone
     stableId: 859646359
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.08300781, y: 0.23925781}
       uv1: {x: 0.08300781, y: 0.2685547}
@@ -4338,6 +4465,7 @@ MonoBehaviour:
   - canonicalName: minecraft:end_stone_bricks
     stableId: 3931791365
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.043945312, y: 0.23925781}
       uv1: {x: 0.043945312, y: 0.2685547}
@@ -4372,6 +4500,7 @@ MonoBehaviour:
   - canonicalName: minecraft:exposed_chiseled_copper
     stableId: 2699815703
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.12207031, y: 0.23925781}
       uv1: {x: 0.12207031, y: 0.2685547}
@@ -4406,6 +4535,7 @@ MonoBehaviour:
   - canonicalName: minecraft:exposed_copper
     stableId: 133638676
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.23925781, y: 0.23925781}
       uv1: {x: 0.23925781, y: 0.2685547}
@@ -4440,6 +4570,7 @@ MonoBehaviour:
   - canonicalName: minecraft:exposed_copper_bulb
     stableId: 363446912
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.16113281, y: 0.23925781}
       uv1: {x: 0.16113281, y: 0.2685547}
@@ -4474,6 +4605,7 @@ MonoBehaviour:
   - canonicalName: minecraft:exposed_copper_grate
     stableId: 2355529084
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.20019531, y: 0.23925781}
       uv1: {x: 0.20019531, y: 0.2685547}
@@ -4508,6 +4640,7 @@ MonoBehaviour:
   - canonicalName: minecraft:exposed_cut_copper
     stableId: 340379920
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.2783203, y: 0.23925781}
       uv1: {x: 0.2783203, y: 0.2685547}
@@ -4542,6 +4675,7 @@ MonoBehaviour:
   - canonicalName: minecraft:fire_coral_block
     stableId: 2913980006
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.3173828, y: 0.23925781}
       uv1: {x: 0.3173828, y: 0.2685547}
@@ -4576,6 +4710,7 @@ MonoBehaviour:
   - canonicalName: minecraft:fletching_table
     stableId: 2556932439
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.3564453, y: 0.23925781}
       uv1: {x: 0.3564453, y: 0.2685547}
@@ -4610,6 +4745,7 @@ MonoBehaviour:
   - canonicalName: minecraft:flowering_azalea_leaves
     stableId: 1143520130
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.4736328, y: 0.23925781}
       uv1: {x: 0.4736328, y: 0.2685547}
@@ -4644,6 +4780,7 @@ MonoBehaviour:
   - canonicalName: minecraft:frosted_ice
     stableId: 3014475273
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.5126953, y: 0.23925781}
       uv1: {x: 0.5126953, y: 0.2685547}
@@ -4678,6 +4815,7 @@ MonoBehaviour:
   - canonicalName: minecraft:furnace
     stableId: 4008123057
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.5517578, y: 0.23925781}
       uv1: {x: 0.5517578, y: 0.2685547}
@@ -4712,6 +4850,7 @@ MonoBehaviour:
   - canonicalName: minecraft:gilded_blackstone
     stableId: 164067801
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.6689453, y: 0.23925781}
       uv1: {x: 0.6689453, y: 0.2685547}
@@ -4746,6 +4885,7 @@ MonoBehaviour:
   - canonicalName: minecraft:glass
     stableId: 3497013235
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.7080078, y: 0.23925781}
       uv1: {x: 0.7080078, y: 0.2685547}
@@ -4780,6 +4920,7 @@ MonoBehaviour:
   - canonicalName: minecraft:glowstone
     stableId: 1074864824
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.7470703, y: 0.23925781}
       uv1: {x: 0.7470703, y: 0.2685547}
@@ -4814,6 +4955,7 @@ MonoBehaviour:
   - canonicalName: minecraft:gold_block
     stableId: 2178313116
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.7861328, y: 0.23925781}
       uv1: {x: 0.7861328, y: 0.2685547}
@@ -4848,6 +4990,7 @@ MonoBehaviour:
   - canonicalName: minecraft:gold_ore
     stableId: 1384340743
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.8251953, y: 0.23925781}
       uv1: {x: 0.8251953, y: 0.2685547}
@@ -4882,6 +5025,7 @@ MonoBehaviour:
   - canonicalName: minecraft:granite
     stableId: 2880270424
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.8642578, y: 0.23925781}
       uv1: {x: 0.8642578, y: 0.2685547}
@@ -4916,6 +5060,7 @@ MonoBehaviour:
   - canonicalName: minecraft:grass_block
     stableId: 594884130
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.9033203, y: 0.23925781}
       uv1: {x: 0.9033203, y: 0.2685547}
@@ -4950,6 +5095,7 @@ MonoBehaviour:
   - canonicalName: minecraft:gravel
     stableId: 1666693933
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.0048828125, y: 0.2783203}
       uv1: {x: 0.0048828125, y: 0.3076172}
@@ -4984,6 +5130,7 @@ MonoBehaviour:
   - canonicalName: minecraft:gray_concrete
     stableId: 30151036
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.08300781, y: 0.2783203}
       uv1: {x: 0.08300781, y: 0.3076172}
@@ -5018,6 +5165,7 @@ MonoBehaviour:
   - canonicalName: minecraft:gray_concrete_powder
     stableId: 813817160
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.043945312, y: 0.2783203}
       uv1: {x: 0.043945312, y: 0.3076172}
@@ -5052,6 +5200,7 @@ MonoBehaviour:
   - canonicalName: minecraft:gray_stained_glass
     stableId: 2782413335
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.12207031, y: 0.2783203}
       uv1: {x: 0.12207031, y: 0.3076172}
@@ -5086,6 +5235,7 @@ MonoBehaviour:
   - canonicalName: minecraft:gray_terracotta
     stableId: 267472200
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.16113281, y: 0.2783203}
       uv1: {x: 0.16113281, y: 0.3076172}
@@ -5120,6 +5270,7 @@ MonoBehaviour:
   - canonicalName: minecraft:gray_wool
     stableId: 2410201336
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.20019531, y: 0.2783203}
       uv1: {x: 0.20019531, y: 0.3076172}
@@ -5154,6 +5305,7 @@ MonoBehaviour:
   - canonicalName: minecraft:green_concrete
     stableId: 2143560516
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.2783203, y: 0.2783203}
       uv1: {x: 0.2783203, y: 0.3076172}
@@ -5188,6 +5340,7 @@ MonoBehaviour:
   - canonicalName: minecraft:green_concrete_powder
     stableId: 1846720296
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.23925781, y: 0.2783203}
       uv1: {x: 0.23925781, y: 0.3076172}
@@ -5222,6 +5375,7 @@ MonoBehaviour:
   - canonicalName: minecraft:green_stained_glass
     stableId: 1443097208
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.3173828, y: 0.2783203}
       uv1: {x: 0.3173828, y: 0.3076172}
@@ -5256,6 +5410,7 @@ MonoBehaviour:
   - canonicalName: minecraft:green_terracotta
     stableId: 564183108
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.3564453, y: 0.2783203}
       uv1: {x: 0.3564453, y: 0.3076172}
@@ -5290,6 +5445,7 @@ MonoBehaviour:
   - canonicalName: minecraft:green_wool
     stableId: 3950675856
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.3955078, y: 0.2783203}
       uv1: {x: 0.3955078, y: 0.3076172}
@@ -5324,6 +5480,7 @@ MonoBehaviour:
   - canonicalName: minecraft:hay_block
     stableId: 3061639513
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.4345703, y: 0.2783203}
       uv1: {x: 0.4345703, y: 0.3076172}
@@ -5358,6 +5515,7 @@ MonoBehaviour:
   - canonicalName: minecraft:honeycomb_block
     stableId: 1206094958
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.5126953, y: 0.2783203}
       uv1: {x: 0.5126953, y: 0.3076172}
@@ -5392,6 +5550,7 @@ MonoBehaviour:
   - canonicalName: minecraft:horn_coral_block
     stableId: 2109918291
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.5517578, y: 0.2783203}
       uv1: {x: 0.5517578, y: 0.3076172}
@@ -5426,6 +5585,7 @@ MonoBehaviour:
   - canonicalName: minecraft:ice
     stableId: 708125282
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.5908203, y: 0.2783203}
       uv1: {x: 0.5908203, y: 0.3076172}
@@ -5460,6 +5620,7 @@ MonoBehaviour:
   - canonicalName: minecraft:infested_chiseled_stone_bricks
     stableId: 4113263093
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.12207031, y: 0.12207031}
       uv1: {x: 0.12207031, y: 0.15136719}
@@ -5494,6 +5655,7 @@ MonoBehaviour:
   - canonicalName: minecraft:infested_cobblestone
     stableId: 2645196170
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.6298828, y: 0.12207031}
       uv1: {x: 0.6298828, y: 0.15136719}
@@ -5528,6 +5690,7 @@ MonoBehaviour:
   - canonicalName: minecraft:infested_cracked_stone_bricks
     stableId: 691153469
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.0048828125, y: 0.16113281}
       uv1: {x: 0.0048828125, y: 0.19042969}
@@ -5562,6 +5725,7 @@ MonoBehaviour:
   - canonicalName: minecraft:infested_deepslate
     stableId: 2433716859
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.6298828, y: 0.20019531}
       uv1: {x: 0.6298828, y: 0.22949219}
@@ -5596,6 +5760,7 @@ MonoBehaviour:
   - canonicalName: minecraft:infested_mossy_stone_bricks
     stableId: 978581422
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.4736328, y: 0.3564453}
       uv1: {x: 0.4736328, y: 0.3857422}
@@ -5630,6 +5795,7 @@ MonoBehaviour:
   - canonicalName: minecraft:infested_stone
     stableId: 2860489361
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.8642578, y: 0.5517578}
       uv1: {x: 0.8642578, y: 0.5810547}
@@ -5664,6 +5830,7 @@ MonoBehaviour:
   - canonicalName: minecraft:infested_stone_bricks
     stableId: 2612948686
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.8251953, y: 0.5517578}
       uv1: {x: 0.8251953, y: 0.5810547}
@@ -5698,6 +5865,7 @@ MonoBehaviour:
   - canonicalName: minecraft:iron_block
     stableId: 3734152623
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.6298828, y: 0.2783203}
       uv1: {x: 0.6298828, y: 0.3076172}
@@ -5732,6 +5900,7 @@ MonoBehaviour:
   - canonicalName: minecraft:iron_ore
     stableId: 1266421045
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.6689453, y: 0.2783203}
       uv1: {x: 0.6689453, y: 0.3076172}
@@ -5766,6 +5935,7 @@ MonoBehaviour:
   - canonicalName: minecraft:jack_o_lantern
     stableId: 2201433606
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.7080078, y: 0.2783203}
       uv1: {x: 0.7080078, y: 0.3076172}
@@ -5800,6 +5970,7 @@ MonoBehaviour:
   - canonicalName: minecraft:jukebox
     stableId: 2339184494
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.7470703, y: 0.2783203}
       uv1: {x: 0.7470703, y: 0.3076172}
@@ -5834,6 +6005,7 @@ MonoBehaviour:
   - canonicalName: minecraft:jungle_leaves
     stableId: 3226407306
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.8251953, y: 0.2783203}
       uv1: {x: 0.8251953, y: 0.3076172}
@@ -5868,6 +6040,7 @@ MonoBehaviour:
   - canonicalName: minecraft:jungle_log
     stableId: 1145245893
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.9033203, y: 0.2783203}
       uv1: {x: 0.9033203, y: 0.3076172}
@@ -5902,6 +6075,7 @@ MonoBehaviour:
   - canonicalName: minecraft:jungle_planks
     stableId: 3517686383
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.9423828, y: 0.2783203}
       uv1: {x: 0.9423828, y: 0.3076172}
@@ -5936,6 +6110,7 @@ MonoBehaviour:
   - canonicalName: minecraft:jungle_wood
     stableId: 3319170936
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.9033203, y: 0.2783203}
       uv1: {x: 0.9033203, y: 0.3076172}
@@ -5970,6 +6145,7 @@ MonoBehaviour:
   - canonicalName: minecraft:lapis_block
     stableId: 3817655284
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.0048828125, y: 0.3173828}
       uv1: {x: 0.0048828125, y: 0.3466797}
@@ -6004,6 +6180,7 @@ MonoBehaviour:
   - canonicalName: minecraft:lapis_ore
     stableId: 701916423
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.043945312, y: 0.3173828}
       uv1: {x: 0.043945312, y: 0.3466797}
@@ -6038,6 +6215,7 @@ MonoBehaviour:
   - canonicalName: minecraft:light_blue_concrete
     stableId: 744728959
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.12207031, y: 0.3173828}
       uv1: {x: 0.12207031, y: 0.3466797}
@@ -6072,6 +6250,7 @@ MonoBehaviour:
   - canonicalName: minecraft:light_blue_concrete_powder
     stableId: 1212165170
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.08300781, y: 0.3173828}
       uv1: {x: 0.08300781, y: 0.3466797}
@@ -6106,6 +6285,7 @@ MonoBehaviour:
   - canonicalName: minecraft:light_blue_stained_glass
     stableId: 2781100220
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.16113281, y: 0.3173828}
       uv1: {x: 0.16113281, y: 0.3466797}
@@ -6140,6 +6320,7 @@ MonoBehaviour:
   - canonicalName: minecraft:light_blue_terracotta
     stableId: 2811754562
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.20019531, y: 0.3173828}
       uv1: {x: 0.20019531, y: 0.3466797}
@@ -6174,6 +6355,7 @@ MonoBehaviour:
   - canonicalName: minecraft:light_blue_wool
     stableId: 2275048972
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.23925781, y: 0.3173828}
       uv1: {x: 0.23925781, y: 0.3466797}
@@ -6208,6 +6390,7 @@ MonoBehaviour:
   - canonicalName: minecraft:light_gray_concrete
     stableId: 3527914638
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.3173828, y: 0.3173828}
       uv1: {x: 0.3173828, y: 0.3466797}
@@ -6242,6 +6425,7 @@ MonoBehaviour:
   - canonicalName: minecraft:light_gray_concrete_powder
     stableId: 925514188
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.2783203, y: 0.3173828}
       uv1: {x: 0.2783203, y: 0.3466797}
@@ -6276,6 +6460,7 @@ MonoBehaviour:
   - canonicalName: minecraft:light_gray_stained_glass
     stableId: 3539006370
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.3564453, y: 0.3173828}
       uv1: {x: 0.3564453, y: 0.3466797}
@@ -6310,6 +6495,7 @@ MonoBehaviour:
   - canonicalName: minecraft:light_gray_terracotta
     stableId: 286102202
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.3955078, y: 0.3173828}
       uv1: {x: 0.3955078, y: 0.3466797}
@@ -6344,6 +6530,7 @@ MonoBehaviour:
   - canonicalName: minecraft:light_gray_wool
     stableId: 1833549444
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.4345703, y: 0.3173828}
       uv1: {x: 0.4345703, y: 0.3466797}
@@ -6378,6 +6565,7 @@ MonoBehaviour:
   - canonicalName: minecraft:lime_concrete
     stableId: 3664782084
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.5126953, y: 0.3173828}
       uv1: {x: 0.5126953, y: 0.3466797}
@@ -6412,6 +6600,7 @@ MonoBehaviour:
   - canonicalName: minecraft:lime_concrete_powder
     stableId: 1337263812
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.4736328, y: 0.3173828}
       uv1: {x: 0.4736328, y: 0.3466797}
@@ -6446,6 +6635,7 @@ MonoBehaviour:
   - canonicalName: minecraft:lime_stained_glass
     stableId: 1267788080
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.5517578, y: 0.3173828}
       uv1: {x: 0.5517578, y: 0.3466797}
@@ -6480,6 +6670,7 @@ MonoBehaviour:
   - canonicalName: minecraft:lime_terracotta
     stableId: 3445493708
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.5908203, y: 0.3173828}
       uv1: {x: 0.5908203, y: 0.3466797}
@@ -6514,6 +6705,7 @@ MonoBehaviour:
   - canonicalName: minecraft:lime_wool
     stableId: 837394205
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.6298828, y: 0.3173828}
       uv1: {x: 0.6298828, y: 0.3466797}
@@ -6548,6 +6740,7 @@ MonoBehaviour:
   - canonicalName: minecraft:lodestone
     stableId: 2632136453
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.6689453, y: 0.3173828}
       uv1: {x: 0.6689453, y: 0.3466797}
@@ -6582,6 +6775,7 @@ MonoBehaviour:
   - canonicalName: minecraft:loom
     stableId: 2235072033
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.7861328, y: 0.3173828}
       uv1: {x: 0.7861328, y: 0.3466797}
@@ -6616,6 +6810,7 @@ MonoBehaviour:
   - canonicalName: minecraft:magenta_concrete
     stableId: 3862820543
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.9423828, y: 0.3173828}
       uv1: {x: 0.9423828, y: 0.3466797}
@@ -6650,6 +6845,7 @@ MonoBehaviour:
   - canonicalName: minecraft:magenta_concrete_powder
     stableId: 72041097
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.9033203, y: 0.3173828}
       uv1: {x: 0.9033203, y: 0.3466797}
@@ -6684,6 +6880,7 @@ MonoBehaviour:
   - canonicalName: minecraft:magenta_stained_glass
     stableId: 374323587
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.0048828125, y: 0.3564453}
       uv1: {x: 0.0048828125, y: 0.3857422}
@@ -6718,6 +6915,7 @@ MonoBehaviour:
   - canonicalName: minecraft:magenta_terracotta
     stableId: 2063180907
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.043945312, y: 0.3564453}
       uv1: {x: 0.043945312, y: 0.3857422}
@@ -6752,6 +6950,7 @@ MonoBehaviour:
   - canonicalName: minecraft:magenta_wool
     stableId: 1222519288
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.08300781, y: 0.3564453}
       uv1: {x: 0.08300781, y: 0.3857422}
@@ -6786,6 +6985,7 @@ MonoBehaviour:
   - canonicalName: minecraft:magma_block
     stableId: 912927958
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.12207031, y: 0.3564453}
       uv1: {x: 0.12207031, y: 0.3857422}
@@ -6820,6 +7020,7 @@ MonoBehaviour:
   - canonicalName: minecraft:mangrove_leaves
     stableId: 4032557014
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.16113281, y: 0.3564453}
       uv1: {x: 0.16113281, y: 0.3857422}
@@ -6854,6 +7055,7 @@ MonoBehaviour:
   - canonicalName: minecraft:mangrove_log
     stableId: 1924689762
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.23925781, y: 0.3564453}
       uv1: {x: 0.23925781, y: 0.3857422}
@@ -6888,6 +7090,7 @@ MonoBehaviour:
   - canonicalName: minecraft:mangrove_planks
     stableId: 1744623257
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.2783203, y: 0.3564453}
       uv1: {x: 0.2783203, y: 0.3857422}
@@ -6922,6 +7125,7 @@ MonoBehaviour:
   - canonicalName: minecraft:mangrove_wood
     stableId: 57570952
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.23925781, y: 0.3564453}
       uv1: {x: 0.23925781, y: 0.3857422}
@@ -6956,6 +7160,7 @@ MonoBehaviour:
   - canonicalName: minecraft:melon
     stableId: 2593466534
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.3173828, y: 0.3564453}
       uv1: {x: 0.3173828, y: 0.3857422}
@@ -6990,6 +7195,7 @@ MonoBehaviour:
   - canonicalName: minecraft:moss_block
     stableId: 3334915889
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.3955078, y: 0.3564453}
       uv1: {x: 0.3955078, y: 0.3857422}
@@ -7024,6 +7230,7 @@ MonoBehaviour:
   - canonicalName: minecraft:mossy_cobblestone
     stableId: 2160922283
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.4345703, y: 0.3564453}
       uv1: {x: 0.4345703, y: 0.3857422}
@@ -7058,6 +7265,7 @@ MonoBehaviour:
   - canonicalName: minecraft:mossy_stone_bricks
     stableId: 3119556546
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.4736328, y: 0.3564453}
       uv1: {x: 0.4736328, y: 0.3857422}
@@ -7092,6 +7300,7 @@ MonoBehaviour:
   - canonicalName: minecraft:mud
     stableId: 198429103
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.5908203, y: 0.3564453}
       uv1: {x: 0.5908203, y: 0.3857422}
@@ -7126,6 +7335,7 @@ MonoBehaviour:
   - canonicalName: minecraft:muddy_mangrove_roots
     stableId: 2015410226
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.5126953, y: 0.3564453}
       uv1: {x: 0.5126953, y: 0.3857422}
@@ -7160,6 +7370,7 @@ MonoBehaviour:
   - canonicalName: minecraft:mycelium
     stableId: 558638105
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.6298828, y: 0.3564453}
       uv1: {x: 0.6298828, y: 0.3857422}
@@ -7194,6 +7405,7 @@ MonoBehaviour:
   - canonicalName: minecraft:nether_bricks
     stableId: 1357471290
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.7080078, y: 0.3564453}
       uv1: {x: 0.7080078, y: 0.3857422}
@@ -7228,6 +7440,7 @@ MonoBehaviour:
   - canonicalName: minecraft:nether_gold_ore
     stableId: 1073813421
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.7470703, y: 0.3564453}
       uv1: {x: 0.7470703, y: 0.3857422}
@@ -7262,6 +7475,7 @@ MonoBehaviour:
   - canonicalName: minecraft:nether_quartz_ore
     stableId: 2062562671
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.7861328, y: 0.3564453}
       uv1: {x: 0.7861328, y: 0.3857422}
@@ -7296,6 +7510,7 @@ MonoBehaviour:
   - canonicalName: minecraft:nether_wart_block
     stableId: 1916229279
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.8251953, y: 0.3564453}
       uv1: {x: 0.8251953, y: 0.3857422}
@@ -7330,6 +7545,7 @@ MonoBehaviour:
   - canonicalName: minecraft:netherite_block
     stableId: 1199556757
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.8642578, y: 0.3564453}
       uv1: {x: 0.8642578, y: 0.3857422}
@@ -7364,6 +7580,7 @@ MonoBehaviour:
   - canonicalName: minecraft:netherrack
     stableId: 2944387092
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.9033203, y: 0.3564453}
       uv1: {x: 0.9033203, y: 0.3857422}
@@ -7398,6 +7615,7 @@ MonoBehaviour:
   - canonicalName: minecraft:note_block
     stableId: 1589975523
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.9423828, y: 0.3564453}
       uv1: {x: 0.9423828, y: 0.3857422}
@@ -7432,6 +7650,7 @@ MonoBehaviour:
   - canonicalName: minecraft:oak_leaves
     stableId: 2478887977
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.0048828125, y: 0.3955078}
       uv1: {x: 0.0048828125, y: 0.4248047}
@@ -7466,6 +7685,7 @@ MonoBehaviour:
   - canonicalName: minecraft:oak_log
     stableId: 2930784426
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.08300781, y: 0.3955078}
       uv1: {x: 0.08300781, y: 0.4248047}
@@ -7500,6 +7720,7 @@ MonoBehaviour:
   - canonicalName: minecraft:oak_planks
     stableId: 4252301196
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.12207031, y: 0.3955078}
       uv1: {x: 0.12207031, y: 0.4248047}
@@ -7534,6 +7755,7 @@ MonoBehaviour:
   - canonicalName: minecraft:oak_wood
     stableId: 2242180235
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.08300781, y: 0.3955078}
       uv1: {x: 0.08300781, y: 0.4248047}
@@ -7568,6 +7790,7 @@ MonoBehaviour:
   - canonicalName: minecraft:obsidian
     stableId: 110701888
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.16113281, y: 0.3955078}
       uv1: {x: 0.16113281, y: 0.4248047}
@@ -7602,6 +7825,7 @@ MonoBehaviour:
   - canonicalName: minecraft:ochre_froglight
     stableId: 1402694139
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.20019531, y: 0.3955078}
       uv1: {x: 0.20019531, y: 0.4248047}
@@ -7636,6 +7860,7 @@ MonoBehaviour:
   - canonicalName: minecraft:orange_concrete
     stableId: 3377102599
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.3173828, y: 0.3955078}
       uv1: {x: 0.3173828, y: 0.4248047}
@@ -7670,6 +7895,7 @@ MonoBehaviour:
   - canonicalName: minecraft:orange_concrete_powder
     stableId: 981784350
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.2783203, y: 0.3955078}
       uv1: {x: 0.2783203, y: 0.4248047}
@@ -7704,6 +7930,7 @@ MonoBehaviour:
   - canonicalName: minecraft:orange_poplar_leaves
     stableId: 2311277298
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.3564453, y: 0.3955078}
       uv1: {x: 0.3564453, y: 0.4248047}
@@ -7738,6 +7965,7 @@ MonoBehaviour:
   - canonicalName: minecraft:orange_stained_glass
     stableId: 1190279443
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.3955078, y: 0.3955078}
       uv1: {x: 0.3955078, y: 0.4248047}
@@ -7772,6 +8000,7 @@ MonoBehaviour:
   - canonicalName: minecraft:orange_terracotta
     stableId: 2284428940
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.4345703, y: 0.3955078}
       uv1: {x: 0.4345703, y: 0.4248047}
@@ -7806,6 +8035,7 @@ MonoBehaviour:
   - canonicalName: minecraft:orange_wool
     stableId: 2062411553
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.4736328, y: 0.3955078}
       uv1: {x: 0.4736328, y: 0.4248047}
@@ -7840,6 +8070,7 @@ MonoBehaviour:
   - canonicalName: minecraft:oxidized_chiseled_copper
     stableId: 1427435574
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.5126953, y: 0.3955078}
       uv1: {x: 0.5126953, y: 0.4248047}
@@ -7874,6 +8105,7 @@ MonoBehaviour:
   - canonicalName: minecraft:oxidized_copper
     stableId: 1887294814
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.6298828, y: 0.3955078}
       uv1: {x: 0.6298828, y: 0.4248047}
@@ -7908,6 +8140,7 @@ MonoBehaviour:
   - canonicalName: minecraft:oxidized_copper_bulb
     stableId: 3501836409
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.5517578, y: 0.3955078}
       uv1: {x: 0.5517578, y: 0.4248047}
@@ -7942,6 +8175,7 @@ MonoBehaviour:
   - canonicalName: minecraft:oxidized_copper_grate
     stableId: 2505718653
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.5908203, y: 0.3955078}
       uv1: {x: 0.5908203, y: 0.4248047}
@@ -7976,6 +8210,7 @@ MonoBehaviour:
   - canonicalName: minecraft:oxidized_cut_copper
     stableId: 1052930869
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.6689453, y: 0.3955078}
       uv1: {x: 0.6689453, y: 0.4248047}
@@ -8010,6 +8245,7 @@ MonoBehaviour:
   - canonicalName: minecraft:packed_ice
     stableId: 2072006545
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.7080078, y: 0.3955078}
       uv1: {x: 0.7080078, y: 0.4248047}
@@ -8044,6 +8280,7 @@ MonoBehaviour:
   - canonicalName: minecraft:packed_mud
     stableId: 2692977263
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.7470703, y: 0.3955078}
       uv1: {x: 0.7470703, y: 0.4248047}
@@ -8078,6 +8315,7 @@ MonoBehaviour:
   - canonicalName: minecraft:pale_moss_block
     stableId: 833194763
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.7861328, y: 0.3955078}
       uv1: {x: 0.7861328, y: 0.4248047}
@@ -8112,6 +8350,7 @@ MonoBehaviour:
   - canonicalName: minecraft:pale_oak_leaves
     stableId: 3417458548
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.8251953, y: 0.3955078}
       uv1: {x: 0.8251953, y: 0.4248047}
@@ -8146,6 +8385,7 @@ MonoBehaviour:
   - canonicalName: minecraft:pale_oak_log
     stableId: 3885606144
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.9033203, y: 0.3955078}
       uv1: {x: 0.9033203, y: 0.4248047}
@@ -8180,6 +8420,7 @@ MonoBehaviour:
   - canonicalName: minecraft:pale_oak_planks
     stableId: 973915611
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.9423828, y: 0.3955078}
       uv1: {x: 0.9423828, y: 0.4248047}
@@ -8214,6 +8455,7 @@ MonoBehaviour:
   - canonicalName: minecraft:pale_oak_wood
     stableId: 3079170829
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.9033203, y: 0.3955078}
       uv1: {x: 0.9033203, y: 0.4248047}
@@ -8248,6 +8490,7 @@ MonoBehaviour:
   - canonicalName: minecraft:pearlescent_froglight
     stableId: 1786198835
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.0048828125, y: 0.4345703}
       uv1: {x: 0.0048828125, y: 0.4638672}
@@ -8282,6 +8525,7 @@ MonoBehaviour:
   - canonicalName: minecraft:pink_concrete
     stableId: 4283501242
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.12207031, y: 0.4345703}
       uv1: {x: 0.12207031, y: 0.4638672}
@@ -8316,6 +8560,7 @@ MonoBehaviour:
   - canonicalName: minecraft:pink_concrete_powder
     stableId: 1223567200
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.08300781, y: 0.4345703}
       uv1: {x: 0.08300781, y: 0.4638672}
@@ -8350,6 +8595,7 @@ MonoBehaviour:
   - canonicalName: minecraft:pink_stained_glass
     stableId: 2281401172
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.16113281, y: 0.4345703}
       uv1: {x: 0.16113281, y: 0.4638672}
@@ -8384,6 +8630,7 @@ MonoBehaviour:
   - canonicalName: minecraft:pink_terracotta
     stableId: 674724458
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.20019531, y: 0.4345703}
       uv1: {x: 0.20019531, y: 0.4638672}
@@ -8418,6 +8665,7 @@ MonoBehaviour:
   - canonicalName: minecraft:pink_wool
     stableId: 2830323472
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.23925781, y: 0.4345703}
       uv1: {x: 0.23925781, y: 0.4638672}
@@ -8452,6 +8700,7 @@ MonoBehaviour:
   - canonicalName: minecraft:podzol
     stableId: 758208208
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.2783203, y: 0.4345703}
       uv1: {x: 0.2783203, y: 0.4638672}
@@ -8486,6 +8735,7 @@ MonoBehaviour:
   - canonicalName: minecraft:polished_andesite
     stableId: 3802980099
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.3564453, y: 0.4345703}
       uv1: {x: 0.3564453, y: 0.4638672}
@@ -8520,6 +8770,7 @@ MonoBehaviour:
   - canonicalName: minecraft:polished_basalt
     stableId: 3005196292
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.3955078, y: 0.4345703}
       uv1: {x: 0.3955078, y: 0.4638672}
@@ -8554,6 +8805,7 @@ MonoBehaviour:
   - canonicalName: minecraft:polished_blackstone
     stableId: 691197419
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.5126953, y: 0.4345703}
       uv1: {x: 0.5126953, y: 0.4638672}
@@ -8588,6 +8840,7 @@ MonoBehaviour:
   - canonicalName: minecraft:polished_blackstone_bricks
     stableId: 4062197451
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.4736328, y: 0.4345703}
       uv1: {x: 0.4736328, y: 0.4638672}
@@ -8622,6 +8875,7 @@ MonoBehaviour:
   - canonicalName: minecraft:polished_cinnabar
     stableId: 1020816005
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.5517578, y: 0.4345703}
       uv1: {x: 0.5517578, y: 0.4638672}
@@ -8656,6 +8910,7 @@ MonoBehaviour:
   - canonicalName: minecraft:polished_deepslate
     stableId: 1284917876
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.5908203, y: 0.4345703}
       uv1: {x: 0.5908203, y: 0.4638672}
@@ -8690,6 +8945,7 @@ MonoBehaviour:
   - canonicalName: minecraft:polished_diorite
     stableId: 2924113812
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.6298828, y: 0.4345703}
       uv1: {x: 0.6298828, y: 0.4638672}
@@ -8724,6 +8980,7 @@ MonoBehaviour:
   - canonicalName: minecraft:polished_granite
     stableId: 2964674938
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.6689453, y: 0.4345703}
       uv1: {x: 0.6689453, y: 0.4638672}
@@ -8758,6 +9015,7 @@ MonoBehaviour:
   - canonicalName: minecraft:polished_sulfur
     stableId: 2630246293
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.7080078, y: 0.4345703}
       uv1: {x: 0.7080078, y: 0.4638672}
@@ -8792,6 +9050,7 @@ MonoBehaviour:
   - canonicalName: minecraft:polished_tuff
     stableId: 1874112642
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.7470703, y: 0.4345703}
       uv1: {x: 0.7470703, y: 0.4638672}
@@ -8826,6 +9085,7 @@ MonoBehaviour:
   - canonicalName: minecraft:poplar_log
     stableId: 1281303034
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.8251953, y: 0.4345703}
       uv1: {x: 0.8251953, y: 0.4638672}
@@ -8860,6 +9120,7 @@ MonoBehaviour:
   - canonicalName: minecraft:poplar_planks
     stableId: 314310619
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.8642578, y: 0.4345703}
       uv1: {x: 0.8642578, y: 0.4638672}
@@ -8894,6 +9155,7 @@ MonoBehaviour:
   - canonicalName: minecraft:poplar_wood
     stableId: 676837344
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.8251953, y: 0.4345703}
       uv1: {x: 0.8251953, y: 0.4638672}
@@ -8928,6 +9190,7 @@ MonoBehaviour:
   - canonicalName: minecraft:potent_sulfur
     stableId: 1397018424
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.9033203, y: 0.4345703}
       uv1: {x: 0.9033203, y: 0.4638672}
@@ -8962,6 +9225,7 @@ MonoBehaviour:
   - canonicalName: minecraft:prismarine
     stableId: 3967538558
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.0048828125, y: 0.4736328}
       uv1: {x: 0.0048828125, y: 0.5029297}
@@ -8996,6 +9260,7 @@ MonoBehaviour:
   - canonicalName: minecraft:prismarine_bricks
     stableId: 619540929
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.9423828, y: 0.4345703}
       uv1: {x: 0.9423828, y: 0.4638672}
@@ -9030,6 +9295,7 @@ MonoBehaviour:
   - canonicalName: minecraft:pumpkin
     stableId: 732917286
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.043945312, y: 0.4736328}
       uv1: {x: 0.043945312, y: 0.5029297}
@@ -9064,6 +9330,7 @@ MonoBehaviour:
   - canonicalName: minecraft:purple_concrete
     stableId: 3074770458
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.16113281, y: 0.4736328}
       uv1: {x: 0.16113281, y: 0.5029297}
@@ -9098,6 +9365,7 @@ MonoBehaviour:
   - canonicalName: minecraft:purple_concrete_powder
     stableId: 41522845
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.12207031, y: 0.4736328}
       uv1: {x: 0.12207031, y: 0.5029297}
@@ -9132,6 +9400,7 @@ MonoBehaviour:
   - canonicalName: minecraft:purple_stained_glass
     stableId: 3482083628
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.20019531, y: 0.4736328}
       uv1: {x: 0.20019531, y: 0.5029297}
@@ -9166,6 +9435,7 @@ MonoBehaviour:
   - canonicalName: minecraft:purple_terracotta
     stableId: 896015294
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.23925781, y: 0.4736328}
       uv1: {x: 0.23925781, y: 0.5029297}
@@ -9200,6 +9470,7 @@ MonoBehaviour:
   - canonicalName: minecraft:purple_wool
     stableId: 637913414
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.2783203, y: 0.4736328}
       uv1: {x: 0.2783203, y: 0.5029297}
@@ -9234,6 +9505,7 @@ MonoBehaviour:
   - canonicalName: minecraft:purpur_block
     stableId: 4049490963
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.3173828, y: 0.4736328}
       uv1: {x: 0.3173828, y: 0.5029297}
@@ -9268,6 +9540,7 @@ MonoBehaviour:
   - canonicalName: minecraft:purpur_pillar
     stableId: 1434202847
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.3564453, y: 0.4736328}
       uv1: {x: 0.3564453, y: 0.5029297}
@@ -9302,6 +9575,7 @@ MonoBehaviour:
   - canonicalName: minecraft:quartz_block
     stableId: 2548318807
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.4736328, y: 0.4736328}
       uv1: {x: 0.4736328, y: 0.5029297}
@@ -9336,6 +9610,7 @@ MonoBehaviour:
   - canonicalName: minecraft:quartz_bricks
     stableId: 3428562518
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.5517578, y: 0.4736328}
       uv1: {x: 0.5517578, y: 0.5029297}
@@ -9370,6 +9645,7 @@ MonoBehaviour:
   - canonicalName: minecraft:quartz_pillar
     stableId: 3266161643
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.5908203, y: 0.4736328}
       uv1: {x: 0.5908203, y: 0.5029297}
@@ -9404,6 +9680,7 @@ MonoBehaviour:
   - canonicalName: minecraft:raw_copper_block
     stableId: 391528628
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.6689453, y: 0.4736328}
       uv1: {x: 0.6689453, y: 0.5029297}
@@ -9438,6 +9715,7 @@ MonoBehaviour:
   - canonicalName: minecraft:raw_gold_block
     stableId: 1037357902
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.7080078, y: 0.4736328}
       uv1: {x: 0.7080078, y: 0.5029297}
@@ -9472,6 +9750,7 @@ MonoBehaviour:
   - canonicalName: minecraft:raw_iron_block
     stableId: 2243951526
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.7470703, y: 0.4736328}
       uv1: {x: 0.7470703, y: 0.5029297}
@@ -9506,6 +9785,7 @@ MonoBehaviour:
   - canonicalName: minecraft:red_concrete
     stableId: 485150053
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.8251953, y: 0.4736328}
       uv1: {x: 0.8251953, y: 0.5029297}
@@ -9540,6 +9820,7 @@ MonoBehaviour:
   - canonicalName: minecraft:red_concrete_powder
     stableId: 1187011087
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.7861328, y: 0.4736328}
       uv1: {x: 0.7861328, y: 0.5029297}
@@ -9574,6 +9855,7 @@ MonoBehaviour:
   - canonicalName: minecraft:red_nether_bricks
     stableId: 1780976176
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.8642578, y: 0.4736328}
       uv1: {x: 0.8642578, y: 0.5029297}
@@ -9608,6 +9890,7 @@ MonoBehaviour:
   - canonicalName: minecraft:red_poplar_leaves
     stableId: 3312815745
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.9033203, y: 0.4736328}
       uv1: {x: 0.9033203, y: 0.5029297}
@@ -9642,6 +9925,7 @@ MonoBehaviour:
   - canonicalName: minecraft:red_sand
     stableId: 3192266788
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.08300781, y: 0.5126953}
       uv1: {x: 0.08300781, y: 0.5419922}
@@ -9676,6 +9960,7 @@ MonoBehaviour:
   - canonicalName: minecraft:red_sandstone
     stableId: 4250540002
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.043945312, y: 0.5126953}
       uv1: {x: 0.043945312, y: 0.5419922}
@@ -9710,6 +9995,7 @@ MonoBehaviour:
   - canonicalName: minecraft:red_stained_glass
     stableId: 1082966686
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.12207031, y: 0.5126953}
       uv1: {x: 0.12207031, y: 0.5419922}
@@ -9744,6 +10030,7 @@ MonoBehaviour:
   - canonicalName: minecraft:red_terracotta
     stableId: 934917402
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.16113281, y: 0.5126953}
       uv1: {x: 0.16113281, y: 0.5419922}
@@ -9778,6 +10065,7 @@ MonoBehaviour:
   - canonicalName: minecraft:red_wool
     stableId: 833901121
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.20019531, y: 0.5126953}
       uv1: {x: 0.20019531, y: 0.5419922}
@@ -9812,6 +10100,7 @@ MonoBehaviour:
   - canonicalName: minecraft:redstone_block
     stableId: 1443746052
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.23925781, y: 0.5126953}
       uv1: {x: 0.23925781, y: 0.5419922}
@@ -9846,6 +10135,7 @@ MonoBehaviour:
   - canonicalName: minecraft:redstone_lamp
     stableId: 720914169
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.2783203, y: 0.5126953}
       uv1: {x: 0.2783203, y: 0.5419922}
@@ -9880,6 +10170,7 @@ MonoBehaviour:
   - canonicalName: minecraft:redstone_ore
     stableId: 217919631
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.3173828, y: 0.5126953}
       uv1: {x: 0.3173828, y: 0.5419922}
@@ -9914,6 +10205,7 @@ MonoBehaviour:
   - canonicalName: minecraft:reinforced_deepslate
     stableId: 1984927805
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.3955078, y: 0.5126953}
       uv1: {x: 0.3955078, y: 0.5419922}
@@ -9948,6 +10240,7 @@ MonoBehaviour:
   - canonicalName: minecraft:resin_block
     stableId: 1308622265
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.4736328, y: 0.5126953}
       uv1: {x: 0.4736328, y: 0.5419922}
@@ -9982,6 +10275,7 @@ MonoBehaviour:
   - canonicalName: minecraft:resin_bricks
     stableId: 2912438927
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.5126953, y: 0.5126953}
       uv1: {x: 0.5126953, y: 0.5419922}
@@ -10016,6 +10310,7 @@ MonoBehaviour:
   - canonicalName: minecraft:respawn_anchor
     stableId: 1597102384
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.5908203, y: 0.5126953}
       uv1: {x: 0.5908203, y: 0.5419922}
@@ -10050,6 +10345,7 @@ MonoBehaviour:
   - canonicalName: minecraft:rooted_dirt
     stableId: 1434736080
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.6689453, y: 0.5126953}
       uv1: {x: 0.6689453, y: 0.5419922}
@@ -10084,6 +10380,7 @@ MonoBehaviour:
   - canonicalName: minecraft:sand
     stableId: 274706099
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.8251953, y: 0.5126953}
       uv1: {x: 0.8251953, y: 0.5419922}
@@ -10118,6 +10415,7 @@ MonoBehaviour:
   - canonicalName: minecraft:sandstone
     stableId: 358062722
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.7861328, y: 0.5126953}
       uv1: {x: 0.7861328, y: 0.5419922}
@@ -10152,6 +10450,7 @@ MonoBehaviour:
   - canonicalName: minecraft:sculk
     stableId: 56268528
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.0048828125, y: 0.5517578}
       uv1: {x: 0.0048828125, y: 0.5810547}
@@ -10186,6 +10485,7 @@ MonoBehaviour:
   - canonicalName: minecraft:sculk_catalyst
     stableId: 1525883117
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.9033203, y: 0.5126953}
       uv1: {x: 0.9033203, y: 0.5419922}
@@ -10220,6 +10520,7 @@ MonoBehaviour:
   - canonicalName: minecraft:sea_lantern
     stableId: 817941611
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.043945312, y: 0.5517578}
       uv1: {x: 0.043945312, y: 0.5810547}
@@ -10254,6 +10555,7 @@ MonoBehaviour:
   - canonicalName: minecraft:shroomlight
     stableId: 2422645382
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.08300781, y: 0.5517578}
       uv1: {x: 0.08300781, y: 0.5810547}
@@ -10288,6 +10590,7 @@ MonoBehaviour:
   - canonicalName: minecraft:smithing_table
     stableId: 1615421387
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.16113281, y: 0.5517578}
       uv1: {x: 0.16113281, y: 0.5810547}
@@ -10322,6 +10625,7 @@ MonoBehaviour:
   - canonicalName: minecraft:smoker
     stableId: 2905468073
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.3173828, y: 0.5517578}
       uv1: {x: 0.3173828, y: 0.5810547}
@@ -10356,6 +10660,7 @@ MonoBehaviour:
   - canonicalName: minecraft:smooth_basalt
     stableId: 1383605461
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.4345703, y: 0.5517578}
       uv1: {x: 0.4345703, y: 0.5810547}
@@ -10390,6 +10695,7 @@ MonoBehaviour:
   - canonicalName: minecraft:smooth_quartz
     stableId: 2756984902
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.4345703, y: 0.4736328}
       uv1: {x: 0.4345703, y: 0.5029297}
@@ -10424,6 +10730,7 @@ MonoBehaviour:
   - canonicalName: minecraft:smooth_red_sandstone
     stableId: 269439764
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.0048828125, y: 0.5126953}
       uv1: {x: 0.0048828125, y: 0.5419922}
@@ -10458,6 +10765,7 @@ MonoBehaviour:
   - canonicalName: minecraft:smooth_sandstone
     stableId: 2884674013
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.7470703, y: 0.5126953}
       uv1: {x: 0.7470703, y: 0.5419922}
@@ -10492,6 +10800,7 @@ MonoBehaviour:
   - canonicalName: minecraft:smooth_stone
     stableId: 3022941561
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.4736328, y: 0.5517578}
       uv1: {x: 0.4736328, y: 0.5810547}
@@ -10526,6 +10835,7 @@ MonoBehaviour:
   - canonicalName: minecraft:snow_block
     stableId: 1147527462
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.5126953, y: 0.5517578}
       uv1: {x: 0.5126953, y: 0.5810547}
@@ -10560,6 +10870,7 @@ MonoBehaviour:
   - canonicalName: minecraft:soul_sand
     stableId: 2053017802
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.5517578, y: 0.5517578}
       uv1: {x: 0.5517578, y: 0.5810547}
@@ -10594,6 +10905,7 @@ MonoBehaviour:
   - canonicalName: minecraft:soul_soil
     stableId: 2187959640
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.5908203, y: 0.5517578}
       uv1: {x: 0.5908203, y: 0.5810547}
@@ -10628,6 +10940,7 @@ MonoBehaviour:
   - canonicalName: minecraft:sponge
     stableId: 2848045480
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.6298828, y: 0.5517578}
       uv1: {x: 0.6298828, y: 0.5810547}
@@ -10662,6 +10975,7 @@ MonoBehaviour:
   - canonicalName: minecraft:spruce_leaves
     stableId: 2075698875
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.6689453, y: 0.5517578}
       uv1: {x: 0.6689453, y: 0.5810547}
@@ -10696,6 +11010,7 @@ MonoBehaviour:
   - canonicalName: minecraft:spruce_log
     stableId: 3662810169
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.7470703, y: 0.5517578}
       uv1: {x: 0.7470703, y: 0.5810547}
@@ -10730,6 +11045,7 @@ MonoBehaviour:
   - canonicalName: minecraft:spruce_planks
     stableId: 3605414817
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.7861328, y: 0.5517578}
       uv1: {x: 0.7861328, y: 0.5810547}
@@ -10764,6 +11080,7 @@ MonoBehaviour:
   - canonicalName: minecraft:spruce_wood
     stableId: 2150464409
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.7470703, y: 0.5517578}
       uv1: {x: 0.7470703, y: 0.5810547}
@@ -10798,6 +11115,7 @@ MonoBehaviour:
   - canonicalName: minecraft:stone
     stableId: 426333295
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.8642578, y: 0.5517578}
       uv1: {x: 0.8642578, y: 0.5810547}
@@ -10832,6 +11150,7 @@ MonoBehaviour:
   - canonicalName: minecraft:stone_bricks
     stableId: 1188176420
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.8251953, y: 0.5517578}
       uv1: {x: 0.8251953, y: 0.5810547}
@@ -10866,6 +11185,7 @@ MonoBehaviour:
   - canonicalName: minecraft:stripped_acacia_log
     stableId: 1913502191
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.9423828, y: 0.5517578}
       uv1: {x: 0.9423828, y: 0.5810547}
@@ -10900,6 +11220,7 @@ MonoBehaviour:
   - canonicalName: minecraft:stripped_acacia_wood
     stableId: 483634793
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.9423828, y: 0.5517578}
       uv1: {x: 0.9423828, y: 0.5810547}
@@ -10934,6 +11255,7 @@ MonoBehaviour:
   - canonicalName: minecraft:stripped_bamboo_block
     stableId: 963214318
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.043945312, y: 0.5908203}
       uv1: {x: 0.043945312, y: 0.6201172}
@@ -10968,6 +11290,7 @@ MonoBehaviour:
   - canonicalName: minecraft:stripped_birch_log
     stableId: 1178792707
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.12207031, y: 0.5908203}
       uv1: {x: 0.12207031, y: 0.6201172}
@@ -11002,6 +11325,7 @@ MonoBehaviour:
   - canonicalName: minecraft:stripped_birch_wood
     stableId: 1589191833
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.12207031, y: 0.5908203}
       uv1: {x: 0.12207031, y: 0.6201172}
@@ -11036,6 +11360,7 @@ MonoBehaviour:
   - canonicalName: minecraft:stripped_cherry_log
     stableId: 3397611230
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.20019531, y: 0.5908203}
       uv1: {x: 0.20019531, y: 0.6201172}
@@ -11070,6 +11395,7 @@ MonoBehaviour:
   - canonicalName: minecraft:stripped_cherry_wood
     stableId: 377414815
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.20019531, y: 0.5908203}
       uv1: {x: 0.20019531, y: 0.6201172}
@@ -11104,6 +11430,7 @@ MonoBehaviour:
   - canonicalName: minecraft:stripped_crimson_hyphae
     stableId: 3894402835
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.2783203, y: 0.5908203}
       uv1: {x: 0.2783203, y: 0.6201172}
@@ -11138,6 +11465,7 @@ MonoBehaviour:
   - canonicalName: minecraft:stripped_crimson_stem
     stableId: 3127541997
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.2783203, y: 0.5908203}
       uv1: {x: 0.2783203, y: 0.6201172}
@@ -11172,6 +11500,7 @@ MonoBehaviour:
   - canonicalName: minecraft:stripped_dark_oak_log
     stableId: 271184334
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.3564453, y: 0.5908203}
       uv1: {x: 0.3564453, y: 0.6201172}
@@ -11206,6 +11535,7 @@ MonoBehaviour:
   - canonicalName: minecraft:stripped_dark_oak_wood
     stableId: 387778562
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.3564453, y: 0.5908203}
       uv1: {x: 0.3564453, y: 0.6201172}
@@ -11240,6 +11570,7 @@ MonoBehaviour:
   - canonicalName: minecraft:stripped_jungle_log
     stableId: 54984013
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.4345703, y: 0.5908203}
       uv1: {x: 0.4345703, y: 0.6201172}
@@ -11274,6 +11605,7 @@ MonoBehaviour:
   - canonicalName: minecraft:stripped_jungle_wood
     stableId: 468219249
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.4345703, y: 0.5908203}
       uv1: {x: 0.4345703, y: 0.6201172}
@@ -11308,6 +11640,7 @@ MonoBehaviour:
   - canonicalName: minecraft:stripped_mangrove_log
     stableId: 3092749358
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.5126953, y: 0.5908203}
       uv1: {x: 0.5126953, y: 0.6201172}
@@ -11342,6 +11675,7 @@ MonoBehaviour:
   - canonicalName: minecraft:stripped_mangrove_wood
     stableId: 27259098
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.5126953, y: 0.5908203}
       uv1: {x: 0.5126953, y: 0.6201172}
@@ -11376,6 +11710,7 @@ MonoBehaviour:
   - canonicalName: minecraft:stripped_oak_log
     stableId: 3526852312
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.5908203, y: 0.5908203}
       uv1: {x: 0.5908203, y: 0.6201172}
@@ -11410,6 +11745,7 @@ MonoBehaviour:
   - canonicalName: minecraft:stripped_oak_wood
     stableId: 488791207
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.5908203, y: 0.5908203}
       uv1: {x: 0.5908203, y: 0.6201172}
@@ -11444,6 +11780,7 @@ MonoBehaviour:
   - canonicalName: minecraft:stripped_pale_oak_log
     stableId: 2735491935
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.6689453, y: 0.5908203}
       uv1: {x: 0.6689453, y: 0.6201172}
@@ -11478,6 +11815,7 @@ MonoBehaviour:
   - canonicalName: minecraft:stripped_pale_oak_wood
     stableId: 2081878698
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.6689453, y: 0.5908203}
       uv1: {x: 0.6689453, y: 0.6201172}
@@ -11512,6 +11850,7 @@ MonoBehaviour:
   - canonicalName: minecraft:stripped_poplar_log
     stableId: 2545019265
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.7470703, y: 0.5908203}
       uv1: {x: 0.7470703, y: 0.6201172}
@@ -11546,6 +11885,7 @@ MonoBehaviour:
   - canonicalName: minecraft:stripped_poplar_wood
     stableId: 3051144522
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.7470703, y: 0.5908203}
       uv1: {x: 0.7470703, y: 0.6201172}
@@ -11580,6 +11920,7 @@ MonoBehaviour:
   - canonicalName: minecraft:stripped_spruce_log
     stableId: 3759300052
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.8251953, y: 0.5908203}
       uv1: {x: 0.8251953, y: 0.6201172}
@@ -11614,6 +11955,7 @@ MonoBehaviour:
   - canonicalName: minecraft:stripped_spruce_wood
     stableId: 2380589054
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.8251953, y: 0.5908203}
       uv1: {x: 0.8251953, y: 0.6201172}
@@ -11648,6 +11990,7 @@ MonoBehaviour:
   - canonicalName: minecraft:stripped_warped_hyphae
     stableId: 1173023549
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.9033203, y: 0.5908203}
       uv1: {x: 0.9033203, y: 0.6201172}
@@ -11682,6 +12025,7 @@ MonoBehaviour:
   - canonicalName: minecraft:stripped_warped_stem
     stableId: 3557275879
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.9033203, y: 0.5908203}
       uv1: {x: 0.9033203, y: 0.6201172}
@@ -11716,6 +12060,7 @@ MonoBehaviour:
   - canonicalName: minecraft:structure_block
     stableId: 814206054
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.9423828, y: 0.5908203}
       uv1: {x: 0.9423828, y: 0.6201172}
@@ -11750,6 +12095,7 @@ MonoBehaviour:
   - canonicalName: minecraft:sulfur
     stableId: 1774676742
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.043945312, y: 0.6298828}
       uv1: {x: 0.043945312, y: 0.6591797}
@@ -11784,6 +12130,7 @@ MonoBehaviour:
   - canonicalName: minecraft:sulfur_bricks
     stableId: 1652366309
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.0048828125, y: 0.6298828}
       uv1: {x: 0.0048828125, y: 0.6591797}
@@ -11818,6 +12165,7 @@ MonoBehaviour:
   - canonicalName: minecraft:suspicious_gravel
     stableId: 1726389495
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.08300781, y: 0.6298828}
       uv1: {x: 0.08300781, y: 0.6591797}
@@ -11852,6 +12200,7 @@ MonoBehaviour:
   - canonicalName: minecraft:suspicious_sand
     stableId: 4161782173
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.12207031, y: 0.6298828}
       uv1: {x: 0.12207031, y: 0.6591797}
@@ -11886,6 +12235,7 @@ MonoBehaviour:
   - canonicalName: minecraft:target
     stableId: 1258280082
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.16113281, y: 0.6298828}
       uv1: {x: 0.16113281, y: 0.6591797}
@@ -11920,6 +12270,7 @@ MonoBehaviour:
   - canonicalName: minecraft:terracotta
     stableId: 3256667662
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.23925781, y: 0.6298828}
       uv1: {x: 0.23925781, y: 0.6591797}
@@ -11954,6 +12305,7 @@ MonoBehaviour:
   - canonicalName: minecraft:test_block
     stableId: 2022523497
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.2783203, y: 0.6298828}
       uv1: {x: 0.2783203, y: 0.6591797}
@@ -11988,6 +12340,7 @@ MonoBehaviour:
   - canonicalName: minecraft:test_instance_block
     stableId: 4086197350
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.3173828, y: 0.6298828}
       uv1: {x: 0.3173828, y: 0.6591797}
@@ -12022,6 +12375,7 @@ MonoBehaviour:
   - canonicalName: minecraft:tinted_glass
     stableId: 3929365589
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.3564453, y: 0.6298828}
       uv1: {x: 0.3564453, y: 0.6591797}
@@ -12056,6 +12410,7 @@ MonoBehaviour:
   - canonicalName: minecraft:tnt
     stableId: 2046812059
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.4345703, y: 0.6298828}
       uv1: {x: 0.4345703, y: 0.6591797}
@@ -12090,6 +12445,7 @@ MonoBehaviour:
   - canonicalName: minecraft:tube_coral_block
     stableId: 1338998198
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.5126953, y: 0.6298828}
       uv1: {x: 0.5126953, y: 0.6591797}
@@ -12124,6 +12480,7 @@ MonoBehaviour:
   - canonicalName: minecraft:tuff
     stableId: 3176662298
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.5908203, y: 0.6298828}
       uv1: {x: 0.5908203, y: 0.6591797}
@@ -12158,6 +12515,7 @@ MonoBehaviour:
   - canonicalName: minecraft:tuff_bricks
     stableId: 2701037187
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.5517578, y: 0.6298828}
       uv1: {x: 0.5517578, y: 0.6591797}
@@ -12192,6 +12550,7 @@ MonoBehaviour:
   - canonicalName: minecraft:verdant_froglight
     stableId: 2705672434
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.6298828, y: 0.6298828}
       uv1: {x: 0.6298828, y: 0.6591797}
@@ -12226,6 +12585,7 @@ MonoBehaviour:
   - canonicalName: minecraft:warped_hyphae
     stableId: 1711699923
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.8642578, y: 0.6298828}
       uv1: {x: 0.8642578, y: 0.6591797}
@@ -12260,6 +12620,7 @@ MonoBehaviour:
   - canonicalName: minecraft:warped_nylium
     stableId: 2520204839
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.7080078, y: 0.6298828}
       uv1: {x: 0.7080078, y: 0.6591797}
@@ -12294,6 +12655,7 @@ MonoBehaviour:
   - canonicalName: minecraft:warped_planks
     stableId: 3057482940
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.7861328, y: 0.6298828}
       uv1: {x: 0.7861328, y: 0.6591797}
@@ -12328,6 +12690,7 @@ MonoBehaviour:
   - canonicalName: minecraft:warped_stem
     stableId: 3556419225
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.8642578, y: 0.6298828}
       uv1: {x: 0.8642578, y: 0.6591797}
@@ -12362,6 +12725,7 @@ MonoBehaviour:
   - canonicalName: minecraft:warped_wart_block
     stableId: 1999253107
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.9033203, y: 0.6298828}
       uv1: {x: 0.9033203, y: 0.6591797}
@@ -12396,6 +12760,7 @@ MonoBehaviour:
   - canonicalName: minecraft:waxed_chiseled_copper
     stableId: 3096381800
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.7470703, y: 0.08300781}
       uv1: {x: 0.7470703, y: 0.11230469}
@@ -12430,6 +12795,7 @@ MonoBehaviour:
   - canonicalName: minecraft:waxed_copper_block
     stableId: 1985547072
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.6689453, y: 0.12207031}
       uv1: {x: 0.6689453, y: 0.15136719}
@@ -12464,6 +12830,7 @@ MonoBehaviour:
   - canonicalName: minecraft:waxed_copper_bulb
     stableId: 3437581525
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.7080078, y: 0.12207031}
       uv1: {x: 0.7080078, y: 0.15136719}
@@ -12498,6 +12865,7 @@ MonoBehaviour:
   - canonicalName: minecraft:waxed_copper_grate
     stableId: 829077600
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.7470703, y: 0.12207031}
       uv1: {x: 0.7470703, y: 0.15136719}
@@ -12532,6 +12900,7 @@ MonoBehaviour:
   - canonicalName: minecraft:waxed_cut_copper
     stableId: 2830018132
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.4736328, y: 0.16113281}
       uv1: {x: 0.4736328, y: 0.19042969}
@@ -12566,6 +12935,7 @@ MonoBehaviour:
   - canonicalName: minecraft:waxed_exposed_chiseled_copper
     stableId: 883619713
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.12207031, y: 0.23925781}
       uv1: {x: 0.12207031, y: 0.2685547}
@@ -12600,6 +12970,7 @@ MonoBehaviour:
   - canonicalName: minecraft:waxed_exposed_copper
     stableId: 2485030611
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.23925781, y: 0.23925781}
       uv1: {x: 0.23925781, y: 0.2685547}
@@ -12634,6 +13005,7 @@ MonoBehaviour:
   - canonicalName: minecraft:waxed_exposed_copper_bulb
     stableId: 1668764192
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.16113281, y: 0.23925781}
       uv1: {x: 0.16113281, y: 0.2685547}
@@ -12668,6 +13040,7 @@ MonoBehaviour:
   - canonicalName: minecraft:waxed_exposed_copper_grate
     stableId: 3482051875
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.20019531, y: 0.23925781}
       uv1: {x: 0.20019531, y: 0.2685547}
@@ -12702,6 +13075,7 @@ MonoBehaviour:
   - canonicalName: minecraft:waxed_exposed_cut_copper
     stableId: 3154168247
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.2783203, y: 0.23925781}
       uv1: {x: 0.2783203, y: 0.2685547}
@@ -12736,6 +13110,7 @@ MonoBehaviour:
   - canonicalName: minecraft:waxed_oxidized_chiseled_copper
     stableId: 207470406
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.5126953, y: 0.3955078}
       uv1: {x: 0.5126953, y: 0.4248047}
@@ -12770,6 +13145,7 @@ MonoBehaviour:
   - canonicalName: minecraft:waxed_oxidized_copper
     stableId: 2832478826
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.6298828, y: 0.3955078}
       uv1: {x: 0.6298828, y: 0.4248047}
@@ -12804,6 +13180,7 @@ MonoBehaviour:
   - canonicalName: minecraft:waxed_oxidized_copper_bulb
     stableId: 643022993
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.5517578, y: 0.3955078}
       uv1: {x: 0.5517578, y: 0.4248047}
@@ -12838,6 +13215,7 @@ MonoBehaviour:
   - canonicalName: minecraft:waxed_oxidized_copper_grate
     stableId: 3721007820
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.5908203, y: 0.3955078}
       uv1: {x: 0.5908203, y: 0.4248047}
@@ -12872,6 +13250,7 @@ MonoBehaviour:
   - canonicalName: minecraft:waxed_oxidized_cut_copper
     stableId: 4271359029
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.6689453, y: 0.3955078}
       uv1: {x: 0.6689453, y: 0.4248047}
@@ -12906,6 +13285,7 @@ MonoBehaviour:
   - canonicalName: minecraft:waxed_weathered_chiseled_copper
     stableId: 1532508695
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.9423828, y: 0.6298828}
       uv1: {x: 0.9423828, y: 0.6591797}
@@ -12940,6 +13320,7 @@ MonoBehaviour:
   - canonicalName: minecraft:waxed_weathered_copper
     stableId: 2629063095
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.08300781, y: 0.6689453}
       uv1: {x: 0.08300781, y: 0.6982422}
@@ -12974,6 +13355,7 @@ MonoBehaviour:
   - canonicalName: minecraft:waxed_weathered_copper_bulb
     stableId: 3197218524
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.0048828125, y: 0.6689453}
       uv1: {x: 0.0048828125, y: 0.6982422}
@@ -13008,6 +13390,7 @@ MonoBehaviour:
   - canonicalName: minecraft:waxed_weathered_copper_grate
     stableId: 1291690625
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.043945312, y: 0.6689453}
       uv1: {x: 0.043945312, y: 0.6982422}
@@ -13042,6 +13425,7 @@ MonoBehaviour:
   - canonicalName: minecraft:waxed_weathered_cut_copper
     stableId: 300675357
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.12207031, y: 0.6689453}
       uv1: {x: 0.12207031, y: 0.6982422}
@@ -13076,6 +13460,7 @@ MonoBehaviour:
   - canonicalName: minecraft:weathered_chiseled_copper
     stableId: 2700523515
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.9423828, y: 0.6298828}
       uv1: {x: 0.9423828, y: 0.6591797}
@@ -13110,6 +13495,7 @@ MonoBehaviour:
   - canonicalName: minecraft:weathered_copper
     stableId: 477190884
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.08300781, y: 0.6689453}
       uv1: {x: 0.08300781, y: 0.6982422}
@@ -13144,6 +13530,7 @@ MonoBehaviour:
   - canonicalName: minecraft:weathered_copper_bulb
     stableId: 3314133302
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.0048828125, y: 0.6689453}
       uv1: {x: 0.0048828125, y: 0.6982422}
@@ -13178,6 +13565,7 @@ MonoBehaviour:
   - canonicalName: minecraft:weathered_copper_grate
     stableId: 1349749368
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.043945312, y: 0.6689453}
       uv1: {x: 0.043945312, y: 0.6982422}
@@ -13212,6 +13600,7 @@ MonoBehaviour:
   - canonicalName: minecraft:weathered_cut_copper
     stableId: 1868092141
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.12207031, y: 0.6689453}
       uv1: {x: 0.12207031, y: 0.6982422}
@@ -13246,6 +13635,7 @@ MonoBehaviour:
   - canonicalName: minecraft:wet_sponge
     stableId: 3705496108
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.16113281, y: 0.6689453}
       uv1: {x: 0.16113281, y: 0.6982422}
@@ -13280,6 +13670,7 @@ MonoBehaviour:
   - canonicalName: minecraft:white_concrete
     stableId: 3458308261
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.23925781, y: 0.6689453}
       uv1: {x: 0.23925781, y: 0.6982422}
@@ -13314,6 +13705,7 @@ MonoBehaviour:
   - canonicalName: minecraft:white_concrete_powder
     stableId: 731856466
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.20019531, y: 0.6689453}
       uv1: {x: 0.20019531, y: 0.6982422}
@@ -13348,6 +13740,7 @@ MonoBehaviour:
   - canonicalName: minecraft:white_stained_glass
     stableId: 3162795761
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.2783203, y: 0.6689453}
       uv1: {x: 0.2783203, y: 0.6982422}
@@ -13382,6 +13775,7 @@ MonoBehaviour:
   - canonicalName: minecraft:white_terracotta
     stableId: 3728927900
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.3173828, y: 0.6689453}
       uv1: {x: 0.3173828, y: 0.6982422}
@@ -13416,6 +13810,7 @@ MonoBehaviour:
   - canonicalName: minecraft:white_wool
     stableId: 4108765465
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.3564453, y: 0.6689453}
       uv1: {x: 0.3564453, y: 0.6982422}
@@ -13450,6 +13845,7 @@ MonoBehaviour:
   - canonicalName: minecraft:yellow_concrete
     stableId: 1486490236
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.4345703, y: 0.6689453}
       uv1: {x: 0.4345703, y: 0.6982422}
@@ -13484,6 +13880,7 @@ MonoBehaviour:
   - canonicalName: minecraft:yellow_concrete_powder
     stableId: 411398841
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.3955078, y: 0.6689453}
       uv1: {x: 0.3955078, y: 0.6982422}
@@ -13518,6 +13915,7 @@ MonoBehaviour:
   - canonicalName: minecraft:yellow_poplar_leaves
     stableId: 1368278576
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.4736328, y: 0.6689453}
       uv1: {x: 0.4736328, y: 0.6982422}
@@ -13552,6 +13950,7 @@ MonoBehaviour:
   - canonicalName: minecraft:yellow_stained_glass
     stableId: 2455902115
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.5126953, y: 0.6689453}
       uv1: {x: 0.5126953, y: 0.6982422}
@@ -13586,6 +13985,7 @@ MonoBehaviour:
   - canonicalName: minecraft:yellow_terracotta
     stableId: 3604796866
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.5517578, y: 0.6689453}
       uv1: {x: 0.5517578, y: 0.6982422}
@@ -13620,6 +14020,7 @@ MonoBehaviour:
   - canonicalName: minecraft:yellow_wool
     stableId: 1809860927
     geometryKind: 0
+    traitsKind: 0
     faces:
     - uv0: {x: 0.5908203, y: 0.6689453}
       uv1: {x: 0.5908203, y: 0.6982422}
@@ -13651,3 +14052,38 @@ MonoBehaviour:
       uv2: {x: 0.6201172, y: 0.6982422}
       uv3: {x: 0.6201172, y: 0.6689453}
       renderPass: 0
+  - canonicalName: minecraft:water
+    stableId: 4209575417
+    geometryKind: 0
+    traitsKind: 1
+    faces:
+    - uv0: {x: 0, y: 0}
+      uv1: {x: 0, y: 1}
+      uv2: {x: 1, y: 1}
+      uv3: {x: 1, y: 0}
+      renderPass: 3
+    - uv0: {x: 0, y: 0}
+      uv1: {x: 0, y: 1}
+      uv2: {x: 1, y: 1}
+      uv3: {x: 1, y: 0}
+      renderPass: 3
+    - uv0: {x: 0, y: 0}
+      uv1: {x: 0, y: 1}
+      uv2: {x: 1, y: 1}
+      uv3: {x: 1, y: 0}
+      renderPass: 3
+    - uv0: {x: 0, y: 0}
+      uv1: {x: 0, y: 1}
+      uv2: {x: 1, y: 1}
+      uv3: {x: 1, y: 0}
+      renderPass: 3
+    - uv0: {x: 0, y: 0}
+      uv1: {x: 0, y: 1}
+      uv2: {x: 1, y: 1}
+      uv3: {x: 1, y: 0}
+      renderPass: 3
+    - uv0: {x: 0, y: 0}
+      uv1: {x: 0, y: 1}
+      uv2: {x: 1, y: 1}
+      uv3: {x: 1, y: 0}
+      renderPass: 3

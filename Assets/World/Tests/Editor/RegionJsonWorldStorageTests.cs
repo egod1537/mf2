@@ -85,6 +85,24 @@ namespace MF2.World.Tests
         }
 
         [Test]
+        public void WaterRoundTrip_PreservesStableIdAndState()
+        {
+            var position = new int3(-17, 7, 16);
+            var water = new Block(BlockTraitsCatalog.WaterStableId, 9);
+            using (var source = new WorldCore())
+            {
+                var session = new WorldStorageSession();
+                source.Enqueue(WorldCommand.SetBlock(position, water));
+                source.Flush();
+                session.TrackDirty(source);
+                session.SaveDirty(source, CreateStorage());
+            }
+
+            using (var loaded = WorldStorageWorldBuilder.CreateWorld(CreateStorage().LoadAll()))
+                Assert.That(loaded.GetBlockOrAir(position), Is.EqualTo(water));
+        }
+
+        [Test]
         public void Json_IsSparseDeterministicAndUsesAuthoritativeNumericIds()
         {
             using (var world = new WorldCore())

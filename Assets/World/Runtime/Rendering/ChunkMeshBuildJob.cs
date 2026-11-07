@@ -1,4 +1,5 @@
 using MF2.World.Core;
+using MF2.World.Registry;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Jobs;
@@ -22,6 +23,8 @@ namespace MF2.World.Rendering
         public NativeList<uint> OpaqueIndices;
         public NativeList<uint> CutoutIndices;
         public NativeList<uint> TransparentIndices;
+        public NativeList<uint> WaterIndices;
+        public NativeList<uint> CollisionIndices;
 
         public void Execute()
         {
@@ -39,11 +42,32 @@ namespace MF2.World.Rendering
                 for (var faceIndex = 0; faceIndex < 6; faceIndex++)
                 {
                     var face = (BlockFace)faceIndex;
-                    if (!GetNeighbor(local, face).IsAir)
+                    var neighbor = GetNeighbor(local, face);
+                    if (!ShouldRenderFace(definition.TraitsKind, neighbor))
                         continue;
 
-                    AddFace(local, face, GetFace(definition, face));
+                    AddFace(local, face, GetFace(definition, face), definition.TraitsKind);
                 }
+            }
+        }
+
+        private bool ShouldRenderFace(BlockTraitsKind sourceKind, Block neighbor)
+        {
+            if (neighbor.IsAir)
+                return true;
+
+            var neighborKind = BlockTraitsKind.SolidOpaque;
+            if (RenderLookup.TryGetValue(neighbor.Id, out var neighborIndex))
+                neighborKind = RenderDefinitions[neighborIndex].TraitsKind;
+
+            switch (sourceKind)
+            {
+                case BlockTraitsKind.Liquid:
+                    return neighborKind == BlockTraitsKind.NonSolidNonOccluding;
+                case BlockTraitsKind.NonSolidNonOccluding:
+                    return neighborKind != BlockTraitsKind.NonSolidNonOccluding;
+                default:
+                    return neighborKind != BlockTraitsKind.SolidOpaque;
             }
         }
 
@@ -88,7 +112,8 @@ namespace MF2.World.Rendering
         private void AddFace(
             int3 local,
             BlockFace face,
-            BlockFaceRenderDefinition definition)
+            BlockFaceRenderDefinition definition,
+            BlockTraitsKind traitsKind)
         {
             var origin = new float3(local.x, local.y, local.z);
             float3 normal;
@@ -155,6 +180,16 @@ namespace MF2.World.Rendering
             AddIndex(definition.Pass, firstVertex);
             AddIndex(definition.Pass, firstVertex + 2);
             AddIndex(definition.Pass, firstVertex + 3);
+
+            if (traitsKind == BlockTraitsKind.SolidOpaque)
+            {
+                CollisionIndices.Add(firstVertex);
+                CollisionIndices.Add(firstVertex + 1);
+                CollisionIndices.Add(firstVertex + 2);
+                CollisionIndices.Add(firstVertex);
+                CollisionIndices.Add(firstVertex + 2);
+                CollisionIndices.Add(firstVertex + 3);
+            }
         }
 
         private void AddIndex(BlockRenderPass pass, uint index)
@@ -166,6 +201,9 @@ namespace MF2.World.Rendering
                     break;
                 case BlockRenderPass.Transparent:
                     TransparentIndices.Add(index);
+                    break;
+                case BlockRenderPass.Water:
+                    WaterIndices.Add(index);
                     break;
                 default:
                     OpaqueIndices.Add(index);

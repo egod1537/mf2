@@ -133,7 +133,7 @@ namespace MF2.World.Editor.Registry
                     "MinecraftChunkWater",
                     sourceMaterial,
                     atlas: null,
-                    BlockRenderPass.Water);
+                    pass: BlockRenderPass.Water);
 
                 var manifest = AssetDatabase.LoadAssetAtPath<BlockRenderManifest>(RenderManifestPath);
                 if (manifest == null)
@@ -208,7 +208,7 @@ namespace MF2.World.Editor.Registry
                 "MinecraftChunkWaterProPixelizer",
                 source,
                 atlas: null,
-                BlockRenderPass.Water);
+                pass: BlockRenderPass.Water);
             materialSet.Configure(
                 materialSet.Atlas != null ? materialSet.Atlas : atlas,
                 materialSet.Opaque,
@@ -319,6 +319,7 @@ namespace MF2.World.Editor.Registry
                     SetFloat(material, "_SrcBlendAlpha", (float)BlendMode.One);
                     SetFloat(material, "_DstBlendAlpha", (float)BlendMode.Zero);
                     SetFloat(material, "_ZWrite", 1f);
+                    SetFloat(material, "_AlphaToMask", 1f);
                     material.EnableKeyword("_ALPHATEST_ON");
                     material.SetOverrideTag("RenderType", "TransparentCutout");
                     material.renderQueue = (int)RenderQueue.AlphaTest;
@@ -327,12 +328,22 @@ namespace MF2.World.Editor.Registry
                 case BlockRenderPass.Water:
                     SetFloat(material, "_Surface", 1f);
                     SetFloat(material, "_AlphaClip", 0f);
-                    SetFloat(material, "_SrcBlend", (float)BlendMode.SrcAlpha);
+                    SetFloat(
+                        material,
+                        "_SrcBlend",
+                        (float)(pass == BlockRenderPass.Transparent
+                            ? BlendMode.One
+                            : BlendMode.SrcAlpha));
                     SetFloat(material, "_DstBlend", (float)BlendMode.OneMinusSrcAlpha);
                     SetFloat(material, "_SrcBlendAlpha", (float)BlendMode.One);
                     SetFloat(material, "_DstBlendAlpha", (float)BlendMode.OneMinusSrcAlpha);
                     SetFloat(material, "_ZWrite", 0f);
+                    SetFloat(material, "_AlphaToMask", 0f);
                     material.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
+                    if (pass == BlockRenderPass.Transparent)
+                        material.EnableKeyword("_ALPHAPREMULTIPLY_ON");
+                    material.SetShaderPassEnabled("DepthOnly", false);
+                    material.SetShaderPassEnabled("ShadowCaster", false);
                     material.SetOverrideTag("RenderType", "Transparent");
                     material.renderQueue = (int)RenderQueue.Transparent;
                     if (pass == BlockRenderPass.Water)
@@ -351,6 +362,7 @@ namespace MF2.World.Editor.Registry
                     SetFloat(material, "_SrcBlendAlpha", (float)BlendMode.One);
                     SetFloat(material, "_DstBlendAlpha", (float)BlendMode.Zero);
                     SetFloat(material, "_ZWrite", 1f);
+                    SetFloat(material, "_AlphaToMask", 0f);
                     material.SetOverrideTag("RenderType", "Opaque");
                     material.renderQueue = (int)RenderQueue.Geometry;
                     break;

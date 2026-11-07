@@ -254,7 +254,7 @@ namespace MF2.Game.Domain
                 new Block(StableBlockId.Compute("minecraft:stone")),
                 new Block(StableBlockId.Compute("minecraft:dirt")),
                 new Block(StableBlockId.Compute("minecraft:grass_block")),
-                new Block(StableBlockId.Compute("minecraft:water"))),
+                new Block(BlockTraitsCatalog.WaterStableId)),
             dirtDepth: 3,
             waterLevel: 7);
 

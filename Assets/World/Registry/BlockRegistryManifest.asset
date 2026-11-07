@@ -816,3 +816,5 @@ MonoBehaviour:
     prefab: {fileID: 230959243695975557, guid: d3b91183618dc6b48aa3965966417b9e, type: 3}
   - canonicalName: minecraft:yellow_wool
     prefab: {fileID: 9255391210370779, guid: 4ab6dc8b7e8f9a64ebbee41b40fb97ae, type: 3}
+  - canonicalName: minecraft:water
+    prefab: {fileID: 0}

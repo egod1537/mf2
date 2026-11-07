@@ -1,7 +1,10 @@
 using System;
+using System.Runtime.InteropServices;
 using MF2.Game.Domain;
 using MF2.Game.Lifecycle;
+using MF2.Game.Networking;
 using MF2.World.Core;
+using MF2.World.Registry;
 using MF2.World.Storage;
 using NUnit.Framework;
 using Unity.Mathematics;
@@ -95,6 +98,140 @@ namespace MF2.Tests
                 Assert.That(client.GetBlockOrAir(position), Is.EqualTo(new Block(8)));
                 Assert.That(client.TryGetPlayer(player, out _), Is.True);
             }
+        }
+
+        [Test]
+        public void SnapshotBudget_UsesBoundedPartsAndAppliesOnlyAfterCompleteEnd()
+        {
+            Assert.That(Marshal.SizeOf<ReplicatedBlock>(),
+                Is.EqualTo(WorldSnapshotTransferProtocol.ReplicatedBlockBytes));
+            Assert.That(WorldSnapshotTransferProtocol.MaximumEstimatedPartBytes, Is.LessThan(1282));
+
+            var sessionId = Guid.NewGuid();
+            var source = new ReplicatedBlock[113];
+            for (var i = 0; i < source.Length; i++)
+            {
+                source[i] = new ReplicatedBlock
+                {
+                    X = i,
+                    Y = i % 17,
+                    Z = -i,
+                    Id = i == 12 ? BlockTraitsCatalog.WaterStableId : 1u,
+                    State = (uint)i
+                };
+            }
+
+            var partCount = WorldSnapshotTransferProtocol.GetPartCount(source.Length);
+            Assert.That(partCount, Is.EqualTo(3));
+            var assembler = new WorldSnapshotTransferAssembler();
+            var begin = new WorldSnapshotBeginBroadcast
+            {
+                SessionId = sessionId,
+                Generation = 2,
+                TickIndex = 9,
+                TransferId = 7,
+                TotalBlocks = source.Length,
+                PartCount = partCount
+            };
+            Assert.That(assembler.Begin(begin), Is.True);
+
+            for (var partIndex = partCount - 1; partIndex >= 0; partIndex--)
+            {
+                var blocks = WorldSnapshotTransferProtocol.CopyPart(source, partIndex);
+                Assert.That(blocks.Length,
+                    Is.LessThanOrEqualTo(WorldSnapshotTransferProtocol.MaximumBlocksPerPart));
+                Assert.That(assembler.AddPart(new WorldSnapshotPartBroadcast
+                {
+                    SessionId = sessionId,
+                    Generation = 2,
+                    TickIndex = 9,
+                    TransferId = 7,
+                    PartIndex = partIndex,
+                    Blocks = blocks
+                }), Is.True);
+            }
+
+            Assert.That(assembler.TryComplete(new WorldSnapshotEndBroadcast
+            {
+                SessionId = sessionId,
+                Generation = 2,
+                TickIndex = 9,
+                TransferId = 7
+            }, out var metadata, out var result), Is.True);
+            Assert.That(metadata.TotalBlocks, Is.EqualTo(source.Length));
+            Assert.That(result, Is.EqualTo(source));
+            Assert.That(assembler.IsActive, Is.False);
+        }
+
+        [Test]
+        public void SnapshotTransfer_RejectsPartialDuplicateAndOversizedParts()
+        {
+            var sessionId = Guid.NewGuid();
+            var assembler = new WorldSnapshotTransferAssembler();
+            var begin = new WorldSnapshotBeginBroadcast
+            {
+                SessionId = sessionId,
+                Generation = 1,
+                TickIndex = 0,
+                TransferId = 1,
+                TotalBlocks = 49,
+                PartCount = 2
+            };
+            Assert.That(assembler.Begin(begin), Is.True);
+            var first = new WorldSnapshotPartBroadcast
+            {
+                SessionId = sessionId,
+                Generation = 1,
+                TickIndex = 0,
+                TransferId = 1,
+                PartIndex = 0,
+                Blocks = new ReplicatedBlock[WorldSnapshotTransferProtocol.MaximumBlocksPerPart]
+            };
+            Assert.That(assembler.AddPart(first), Is.True);
+            Assert.That(assembler.AddPart(first), Is.False);
+            Assert.That(assembler.TryComplete(new WorldSnapshotEndBroadcast
+            {
+                SessionId = sessionId,
+                Generation = 1,
+                TickIndex = 0,
+                TransferId = 1
+            }, out _, out _), Is.False);
+
+            Assert.That(assembler.AddPart(new WorldSnapshotPartBroadcast
+            {
+                SessionId = sessionId,
+                Generation = 1,
+                TickIndex = 0,
+                TransferId = 1,
+                PartIndex = 1,
+                Blocks = new ReplicatedBlock[2]
+            }), Is.False);
+            Assert.That(assembler.IsActive, Is.False);
+        }
+
+        [Test]
+        public void WaterSnapshotAndDelta_PreserveLiquidStableIdInClientReplica()
+        {
+            using var client = new ClientStateCoordinator();
+            var session = new SessionId(Guid.NewGuid());
+            var water = new Block(BlockTraitsCatalog.WaterStableId, 3);
+            var position = new int3(1, 7, -1);
+            var local = new int3(1, 7, 15);
+            var snapshot = new WorldStorageSnapshot(new[]
+            {
+                new StoredChunk(new int3(0, 0, -1), new[]
+                {
+                    new StoredBlock(ChunkCoordinates.ToIndex(local), water.Id, water.State)
+                })
+            });
+
+            Assert.That(client.ApplySnapshot(session, 1, 0, snapshot), Is.True);
+            Assert.That(client.GetBlockOrAir(position), Is.EqualTo(water));
+            Assert.That(client.ApplyDelta(session, 1, 1, new[]
+            {
+                new WorldBlockDelta(position, water, Block.Air)
+            }), Is.True);
+            Assert.That(client.GetBlockOrAir(position).IsAir, Is.True);
         }
 
         private static GameSession CreateRunningSession(

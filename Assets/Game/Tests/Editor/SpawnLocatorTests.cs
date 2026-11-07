@@ -1,5 +1,6 @@
 using MF2.Game.Domain;
 using MF2.World.Core;
+using MF2.World.Registry;
 using NUnit.Framework;
 using Unity.Mathematics;
 
@@ -34,6 +35,55 @@ namespace MF2.Tests
                 Assert.That(world.GetBlockOrAir(new int3(x, surface + 1, z)).IsAir, Is.True);
                 Assert.That(world.GetBlockOrAir(new int3(x, surface + 2, z)).IsAir, Is.True);
             }
+        }
+
+        [Test]
+        public void DrySpawn_NeverTreatsWaterAsFloorOrDryHeadroom()
+        {
+            var config = TerrainConfigTests.CreateLayeredConfig(
+                width: 4,
+                depth: 4,
+                baseHeight: 4);
+            using var world = new SimulationWorld();
+            var locator = new SpawnLocator();
+            var water = new Block(BlockTraitsCatalog.WaterStableId);
+
+            for (var z = config.OriginZ; z <= config.MaximumZ; z++)
+            for (var x = config.OriginX; x <= config.MaximumX; x++)
+                world.Enqueue(WorldCommand.SetBlock(new int3(x, 7, z), water));
+            world.FlushAndCapture();
+
+            Assert.That(locator.TryLocate(world, config, 0, out _), Is.False);
+
+            world.Enqueue(WorldCommand.RemoveBlock(new int3(2, 7, 1)));
+            world.Enqueue(WorldCommand.SetBlock(new int3(2, 4, 1), config.StoneBlock));
+            world.FlushAndCapture();
+
+            Assert.That(locator.TryLocate(world, config, 0, out var position), Is.True);
+            Assert.That(position.x, Is.EqualTo(2.5f));
+            Assert.That(position.z, Is.EqualTo(1.5f));
+            Assert.That(position.y, Is.EqualTo(5.05f).Within(0.0001f));
+        }
+
+        [Test]
+        public void RestoredWorldSnapshot_FindsDrySolidFloorWithoutTerrainConfig()
+        {
+            using var world = new SimulationWorld();
+            var locator = new SpawnLocator();
+            var water = new Block(BlockTraitsCatalog.WaterStableId);
+            var stone = new Block(StableBlockId.Compute("minecraft:stone"));
+
+            world.Enqueue(WorldCommand.SetBlock(new int3(0, 7, 0), water));
+            world.Enqueue(WorldCommand.SetBlock(new int3(1, 4, 0), stone));
+            world.Enqueue(WorldCommand.SetBlock(new int3(1, 5, 0), water));
+            world.Enqueue(WorldCommand.SetBlock(new int3(2, 3, 0), stone));
+            world.FlushAndCapture();
+
+            var snapshot = world.CaptureSnapshot();
+            Assert.That(locator.TryLocate(world, snapshot, 0, out var position), Is.True);
+            Assert.That(position.x, Is.EqualTo(2.5f));
+            Assert.That(position.y, Is.EqualTo(4.05f).Within(0.0001f));
+            Assert.That(position.z, Is.EqualTo(0.5f));
         }
     }
 }

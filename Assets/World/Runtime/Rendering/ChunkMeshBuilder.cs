@@ -32,7 +32,9 @@ namespace MF2.World.Rendering
                     Vertices = buffers.Vertices,
                     OpaqueIndices = buffers.OpaqueIndices,
                     CutoutIndices = buffers.CutoutIndices,
-                    TransparentIndices = buffers.TransparentIndices
+                    TransparentIndices = buffers.TransparentIndices,
+                    WaterIndices = buffers.WaterIndices,
+                    CollisionIndices = buffers.CollisionIndices
                 };
 
                 request = new ChunkMeshBuildRequest(snapshot, buffers, job.Schedule());
