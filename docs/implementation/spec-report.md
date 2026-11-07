@@ -3,6 +3,7 @@
 작성일: 2026-11-08  
 기준 branch/base: `impl` / `4dbc84c90086308bb855ad2464a9a3fa88330946`  
 소유 에셋 통합 시작점: `790bbfb2c676f765bcfc11d136c895c167d9028f`  
+소유 에셋 구현 commit: `12de774ab40afc60fd21f53e810f71e3428f158f`  
 Unity: `6000.3.28f1`, FishNet `4.7.3`, VContainer `1.19.0`
 
 이 보고서는 교체된 `spec/` 작업 트리를 수정하지 않고 실제 구현과 실행 증거를 기록한다.
