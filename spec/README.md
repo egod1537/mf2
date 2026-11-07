@@ -1,35 +1,63 @@
-# MF2 리팩터링 리뷰 보완 명세 — Codex 실행 패키지
+# MF2 `impl` 통합 구현 명세 패키지
 
-- 저장소: `egod1537/mf2`, 브랜치: `impl`
-- **정적 코드 감사 기준 HEAD:** `53fd8bda2d7b14808e98ea414f8dbcb9522a1c3a` (2026-11-07 21:17 KST)
-- 비교 기준: `53f47a14dec54627a8acdd1147180296613e42a0` (바로 전 커밋)
-- 목적: *이미 작성한 전체 아키텍처 리팩터링 명세*를 유지하면서, 최신 커밋에서 확인된 문제를 P0/P1로 우선 해결한다.
-- **우선순위:** 현 HEAD 확인 → P0 물 메시·충돌 → P0 안전 Spawn·복원 → P1 세션 교체 재동기화 테스트 → P1 DI/Scope 잔여 정리 → 회귀 테스트와 보고.
+작성 기준: 2026-11-07, GitHub에 게시된 코드 및 사용자 요구사항. 이 ZIP은 **명세와 Codex 실행 지침**이며 실제 Unity 코드, 디컴파일 결과, 그래픽 에셋을 포함하지 않는다.
 
-## 적용 방식
+## 목적
 
-압축을 MF2 레포 루트에 풀고 **이 ZIP의 최상위 `CODEX_TASK.md`** 를 Codex에게 지정한다.
-`original_architecture_spec/`는 예전 베이스 (`7c511d0`)에 대해 작성한 원본 전체 리팩터링 문서이며, 이번 최신 코드에 대해 다음과 같이 우선순위가 있다.
+`egod1537/mf2`의 `impl` 브랜치에서 기존 FishNet/VContainer/WorldCore 아키텍처를 유지한 채 다음을 모두 구현한다.
 
-1. 현재 실제 소스, `AGENTS.md` 및 Git 상태
-2. 이 패키지 최상위 `CODEX_TASK.md` 및 `0x_*.md` (최신 리뷰 보완 사항)
-3. `original_architecture_spec/` 안의 아키텍처 목표·실행 단계 (최신 코드와 충돌 시 수정/생략)
+1. Caveworks 인벤토리, 툴바, HUD의 기능/시각적 이식
+2. 플레이어 가림 블록의 디더링 시 지형에 구멍이 생기는 문제 수정
+3. 플레이어 이동 및 카메라 추적의 떨림 해결
+4. Minefarm0 캐릭터 모델, 공격, 대시 이식
+5. Title/Outgame/Ingame (및 Test) Hierarchy 정리
+6. 실제 월드와 연동하는 미니맵
+7. 도트 이미지를 블록/복셀로 변환하는 Unity Editor 도구
+8. Minecraft Amplified 스타일 지형 생성
 
-기존에 이미 구현된 지형 레이어, ProPixelizer 카메라, Test/Ingame 렌더링 통일 및 안전 장치는 **재구현하거나 되돌리지 않는다.**
+## 시작 방법
 
-## 포함 문서
+1. **`CODEX_MASTER_PROMPT.md` 전체를 Codex에 전달**한다.
+2. Codex가 `docs/00_REQUIREMENTS_AND_NONNEGOTIABLES.md`와 `docs/01_SOURCE_MAP_AND_RECON.md`를 먼저 읽고 현행 브랜치/로컬 파일/툴 상태를 조사하게 한다.
+3. 조사 후 `docs/02_EXECUTION_PLAN.md` 순서로 구현한다. 각 태스크의 상세 계약은 `docs/03_*`부터 `docs/10_*`까지에 있다.
+4. 테스트는 `docs/11_TEST_MATRIX.md`, 결과 보고는 `docs/12_DELIVERY_AND_REPORTING.md`, 에셋 사용은 `docs/13_ASSET_PROVENANCE_AND_LICENSE.md`를 따른다.
+5. Codex가 모든 작업을 마친 척하지 않도록 `templates/`의 보고 양식을 채운다.
+
+## 중요 전제
+
+- MF2: Unity `6000.3.28f1`, FishNet `4.7.3`, VContainer `1.19.0`을 레포 문서에서 확인했다.
+- 현재 `impl` 브랜치 GitHub HEAD 확인 값: `4dbc84c90086308bb855ad2464a9a3fa88330946`. Codex 시작 시 `git rev-parse HEAD`, `git status`로 **반드시 재확인**한다. 이미 변경된 경우에는 최신 상태가 우선이다.
+- Caveworks 공개 레포에는 분석 보고서 및 ILSpy 추출 스크립트가 있지만 **원본 게임 코드/에셋은 포함되지 않는다**. 사용자 PC의 합법적으로 설치된 게임에서 확인하고 필요한 범위만 추출한다.
+- Minefarm0 공개 레포에는 `GreenIdol.fbx`, `Player.prefab`, animation, 대시/공격 코드가 있다.
+- 이 명세 작성 과정에서 로컬 Unity 실행, 실제 게임 설치본 접근, 코드 빌드, 에셋 라이선스 심사는 **하지 않았다**. 추정 사항은 태스크별 `확인 필요`로 표시했다.
+
+## 목차
 
 | 문서 | 내용 |
 |---|---|
-| `CODEX_TASK.md` | 최신 기준 Codex 최상위 작업 계약 |
-| `01_SOURCE_FINDINGS.md` | 확인된 불일치, 리스크, 증거 파일 |
-| `02_WATER_RENDER_COLLISION.md` | Water 렌더 패스, 4 SubMesh, Solid-only Collider |
-| `03_SAFE_SPAWN_RESTORE.md` | Liquid 제외 Spawn, 복구 후 지형/좌표, 재접속 |
-| `04_NETWORK_AND_SCOPE.md` | 서버/클라이언트/Host 이벤트 경계, DI 잔여사항 |
-| `05_TEST_ACCEPTANCE.md` | EditMode, PlayMode, 수동 네트워크 테스트와 완료 게이트 |
-| `06_DELIVERABLES.md` | 산출물, 중단 기준, 테스트 결과 템플릿 |
-| `original_architecture_spec/` | 앞서 제공한 13개 Markdown 전체 리팩터링 명세 |
+| `CODEX_MASTER_PROMPT.md` | Codex에 직접 붙여넣을 최상위 지시 |
+| `docs/00_REQUIREMENTS_AND_NONNEGOTIABLES.md` | 범위, 완료 정의, 보존 조건, 금지사항 |
+| `docs/01_SOURCE_MAP_AND_RECON.md` | 실제 코드 경로, 사전 조사, 자료 확보 |
+| `docs/02_EXECUTION_PLAN.md` | Phase, 종속성, 체크포인트 |
+| `docs/03_CAVEWORKS_EXTRACTION.md` | 설치본 발견 → ILSpy → 에셋 추출 → 검증 |
+| `docs/04_INVENTORY_HOTBAR_HUD.md` | 인벤토리 모델, 명령, UI 계약, 원본 동등성 |
+| `docs/05_DITHER_OCCLUSION.md` | 내부 면 누락/가림 디더링 해결 설계 및 테스트 |
+| `docs/06_PLAYER_CAMERA_JITTER.md` | 시간축 측정, Prediction, 카메라 보간 |
+| `docs/07_PLAYER_MODEL_ATTACK_DASH.md` | Minefarm0 캐릭터/전투/대시 이식 |
+| `docs/08_SCENE_HIERARCHY.md` | 씬 Hierarchy/Builder/LifetimeScope |
+| `docs/09_MINIMAP.md` | 월드 연동 미니맵 |
+| `docs/10_PIXEL_TO_VOXEL_AND_TERRAIN.md` | 에디터 변환기, Amplified 지형 |
+| `docs/11_TEST_MATRIX.md` | 자동/수동/멀티/저장 검증 |
+| `docs/12_DELIVERY_AND_REPORTING.md` | 커밋, 문서, 완료 보고, 블로커 |
+| `docs/13_ASSET_PROVENANCE_AND_LICENSE.md` | 저작권/에셋 재배포/출처 기록 |
+| `docs/14_RISKS_AND_DECISIONS.md` | 위험/결정/미해결 사항 |
+| `templates/*` | 보고서 및 매니페스트 양식 |
+| `tools/Inspect-CaveworksInstall.ps1` | 읽기 전용 로컬 Steam 설치 경로 탐색 도우미 |
 
-## 검증 범위의 한계
+## 절대적인 합격 기준
 
-이 패키지는 GitHub의 원격 파일과 커밋을 정적 검사해 작성했다. **Unity Editor를 실행하거나 실제 게임을 플레이한 결과가 아니다.** 테스트 통과를 추측하지 말고 Codex가 직접 실행 결과와 환경상 미실행을 구분해야 한다.
+- 모든 기능이 *화면 표시만*이 아니라 실제 MF2 월드, 플레이어, 서버 상태를 사용한다.
+- Host+1 Client, Dedicated Server+2 Clients, scene transition, disconnect/reconnect, late join, save/restore에 대해 영향을 받는 부분을 검증한다.
+- Unity Editor Build/PlayMode 및 관련 EditMode 테스트 통과. 환경상 실행 불가 항목은 `미검증`으로 정직하게 표시하고 증거와 재현 방법을 남긴다.
+- 씬/프리팹 생성기 재실행 후에도 기능, 참조, Hierarchy가 유지된다.
+- 최종 산출물은 실제 소스 수정, 에셋/출처 관리, 테스트 로그, 작업 요약이다. 이 ZIP 자체는 구현 결과물이 아니다.
