@@ -38,6 +38,10 @@ namespace MF2.Game.Networking
     public static class WorldSnapshotTransferProtocol
     {
         public const int MaximumBlocksPerPart = 48;
+        // A delta uses the same ReplicatedBlock payload and FishNet broadcast envelope as one
+        // snapshot part. Larger authoritative ticks fall back to a bounded full snapshot so a
+        // single broadcast never relies on transport fragmentation or partial same-tick apply.
+        public const int MaximumDeltaBlocksPerMessage = MaximumBlocksPerPart;
         public const int MaximumSnapshotBlocks = 1_000_000;
         public const int EstimatedFixedEnvelopeBytes = 256;
         public const int ReplicatedBlockBytes = 20;
@@ -66,6 +70,13 @@ namespace MF2.Game.Networking
             var result = new ReplicatedBlock[count];
             Array.Copy(source, offset, result, 0, count);
             return result;
+        }
+
+        public static bool RequiresSnapshotForDelta(int blockCount)
+        {
+            if (blockCount < 0 || blockCount > MaximumSnapshotBlocks)
+                throw new ArgumentOutOfRangeException(nameof(blockCount));
+            return blockCount > MaximumDeltaBlocksPerMessage;
         }
     }
 

@@ -1,7 +1,10 @@
 using System.Reflection;
 using System.Text.RegularExpressions;
+using System.Linq;
+using FishNet.Managing;
 using MF2.Game.Domain;
 using MF2.Game.Lifecycle;
+using MF2.Game.Networking;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
@@ -101,6 +104,68 @@ namespace MF2.Game.Tests.Editor
                 state.Dispose();
                 Object.DestroyImmediate(rootObject);
             }
+        }
+
+        [Test]
+        public void ReplicationAdapters_DisableAndReenableWithoutDuplicatingSessionSubscriptions()
+        {
+            var rootObject = new GameObject("Replication Adapter Subscription Test");
+            rootObject.SetActive(false);
+            rootObject.AddComponent<NetworkManager>();
+            var coordinator = rootObject.AddComponent<ServerSessionCoordinator>();
+            var worldReplication = rootObject.AddComponent<WorldReplicationAdapter>();
+            var playerReplication = rootObject.AddComponent<PlayerReplicationAdapter>();
+
+            try
+            {
+                rootObject.SetActive(true);
+                InvokeLifecycle(worldReplication, "OnEnable");
+                InvokeLifecycle(playerReplication, "OnEnable");
+                AssertSessionSubscriptionCount(coordinator, "SessionStarted", worldReplication, 1);
+                AssertSessionSubscriptionCount(coordinator, "SessionStopping", worldReplication, 1);
+                AssertSessionSubscriptionCount(coordinator, "SessionStarted", playerReplication, 1);
+                AssertSessionSubscriptionCount(coordinator, "SessionStopping", playerReplication, 1);
+
+                InvokeLifecycle(worldReplication, "OnDisable");
+                InvokeLifecycle(playerReplication, "OnDisable");
+                AssertSessionSubscriptionCount(coordinator, "SessionStarted", worldReplication, 0);
+                AssertSessionSubscriptionCount(coordinator, "SessionStopping", worldReplication, 0);
+                AssertSessionSubscriptionCount(coordinator, "SessionStarted", playerReplication, 0);
+                AssertSessionSubscriptionCount(coordinator, "SessionStopping", playerReplication, 0);
+
+                InvokeLifecycle(worldReplication, "OnEnable");
+                InvokeLifecycle(playerReplication, "OnEnable");
+                AssertSessionSubscriptionCount(coordinator, "SessionStarted", worldReplication, 1);
+                AssertSessionSubscriptionCount(coordinator, "SessionStopping", worldReplication, 1);
+                AssertSessionSubscriptionCount(coordinator, "SessionStarted", playerReplication, 1);
+                AssertSessionSubscriptionCount(coordinator, "SessionStopping", playerReplication, 1);
+            }
+            finally
+            {
+                Object.DestroyImmediate(rootObject);
+            }
+        }
+
+        private static void AssertSessionSubscriptionCount(
+            ServerSessionCoordinator coordinator,
+            string eventName,
+            object subscriber,
+            int expected)
+        {
+            var handlers = typeof(ServerSessionCoordinator)
+                .GetField(eventName, BindingFlags.Instance | BindingFlags.NonPublic)
+                ?.GetValue(coordinator) as System.Delegate;
+            var count = handlers?.GetInvocationList()
+                .Count(handler => ReferenceEquals(handler.Target, subscriber)) ?? 0;
+            Assert.That(count, Is.EqualTo(expected), $"{subscriber.GetType().Name}.{eventName}");
+        }
+
+        private static void InvokeLifecycle(object target, string methodName)
+        {
+            typeof(WorldReplicationAdapter).Assembly
+                .GetType(target.GetType().FullName)
+                ?.GetMethod(methodName, BindingFlags.Instance | BindingFlags.NonPublic)
+                ?.Invoke(target, null);
         }
     }
 }

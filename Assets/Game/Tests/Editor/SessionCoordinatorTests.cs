@@ -272,6 +272,143 @@ namespace MF2.Tests
             }
         }
 
+        [Test]
+        public void ServerSession_ThreeStartStopCyclesKeepOneScopeAndMonotonicGeneration()
+        {
+            var networkObject = new GameObject("Repeated Coordinator NetworkManager Test");
+            var coordinatorObject = new GameObject("Repeated Coordinator Test");
+            var networkManager = networkObject.AddComponent<NetworkManager>();
+            var coordinator = coordinatorObject.AddComponent<ServerSessionCoordinator>();
+            LifetimeScope application = null;
+            var scopesBefore = Object.FindObjectsByType<ServerSessionLifetimeScope>(
+                FindObjectsInactive.Include,
+                FindObjectsSortMode.None).Length;
+            var started = 0;
+            var stopping = 0;
+            long previousGeneration = 0;
+            var identities = new System.Collections.Generic.HashSet<System.Guid>();
+
+            try
+            {
+                application = LifetimeScope.Create(
+                    builder =>
+                    {
+                        builder.RegisterInstance(networkManager);
+                        builder.RegisterInstance<IBlockIdCatalog>(new PermissiveBlockCatalog());
+                    },
+                    "Repeated Coordinator Application Scope Test");
+                if (application.Container == null)
+                    application.Build();
+                application.Container.Inject(coordinator);
+                coordinator.SessionStarted += _ => started++;
+                coordinator.SessionStopping += _ => stopping++;
+
+                for (var cycle = 0; cycle < 3; cycle++)
+                {
+                    var current = coordinator.BeginServerSession();
+                    Assert.That(coordinator.BeginServerSession(), Is.SameAs(current));
+                    Assert.That(current.Generation, Is.GreaterThan(previousGeneration));
+                    Assert.That(identities.Add(current.Id.Value), Is.True);
+                    Assert.That(
+                        Object.FindObjectsByType<ServerSessionLifetimeScope>(
+                            FindObjectsInactive.Include,
+                            FindObjectsSortMode.None).Length,
+                        Is.EqualTo(scopesBefore + 1));
+
+                    previousGeneration = current.Generation;
+                    coordinator.EndServerSession();
+                    Assert.That(current.Phase, Is.EqualTo(SessionPhase.Disposed));
+                    Assert.That(coordinator.State, Is.EqualTo(ServerSessionCoordinatorState.NoSession));
+                    Assert.That(
+                        Object.FindObjectsByType<ServerSessionLifetimeScope>(
+                            FindObjectsInactive.Include,
+                            FindObjectsSortMode.None).Length,
+                        Is.EqualTo(scopesBefore));
+                }
+
+                Assert.That(started, Is.EqualTo(3));
+                Assert.That(stopping, Is.EqualTo(3));
+            }
+            finally
+            {
+                coordinator.EndServerSession();
+                application?.DisposeCore();
+                Object.DestroyImmediate(coordinatorObject);
+                Object.DestroyImmediate(networkObject);
+                if (application != null)
+                    Object.DestroyImmediate(application.gameObject);
+            }
+        }
+
+        [Test]
+        public void RestoreServerSession_ThreeTimesPublishesStopBeforeStartAndDisposesPrevious()
+        {
+            var networkObject = new GameObject("Repeated Restore NetworkManager Test");
+            var coordinatorObject = new GameObject("Repeated Restore Coordinator Test");
+            var networkManager = networkObject.AddComponent<NetworkManager>();
+            var coordinator = coordinatorObject.AddComponent<ServerSessionCoordinator>();
+            LifetimeScope application = null;
+
+            try
+            {
+                application = LifetimeScope.Create(
+                    builder =>
+                    {
+                        builder.RegisterInstance(networkManager);
+                        builder.RegisterInstance<IBlockIdCatalog>(new PermissiveBlockCatalog());
+                    },
+                    "Repeated Restore Application Scope Test");
+                if (application.Container == null)
+                    application.Build();
+                application.Container.Inject(coordinator);
+
+                var current = coordinator.BeginServerSession();
+                SessionArchiveSnapshot archive;
+                using (var sourceWorld = new SimulationWorld())
+                using (var source = new GameSession(
+                           new PlayerRegistry(),
+                           sourceWorld,
+                           new CommandProcessor(),
+                           new SessionClock()))
+                {
+                    source.Start();
+                    source.Step(new SimulationStep(0f));
+                    archive = source.CaptureArchive();
+                }
+
+                var events = new System.Collections.Generic.List<(string Kind, GameSession Session)>();
+                coordinator.SessionStopping += value => events.Add(("stop", value));
+                coordinator.SessionStarted += value => events.Add(("start", value));
+
+                for (var cycle = 0; cycle < 3; cycle++)
+                {
+                    var previous = current;
+                    var previousGeneration = previous.Generation;
+                    current = coordinator.RestoreServerSession(archive);
+
+                    Assert.That(previous.Phase, Is.EqualTo(SessionPhase.Disposed));
+                    Assert.That(current.Generation, Is.GreaterThan(previousGeneration));
+                    Assert.That(events[cycle * 2].Kind, Is.EqualTo("stop"));
+                    Assert.That(events[cycle * 2].Session, Is.SameAs(previous));
+                    Assert.That(events[cycle * 2 + 1].Kind, Is.EqualTo("start"));
+                    Assert.That(events[cycle * 2 + 1].Session, Is.SameAs(current));
+                }
+
+                Assert.That(events.Count, Is.EqualTo(6));
+                Assert.That(coordinator.Session, Is.SameAs(current));
+                Assert.That(coordinator.State, Is.EqualTo(ServerSessionCoordinatorState.Running));
+            }
+            finally
+            {
+                coordinator.EndServerSession();
+                application?.DisposeCore();
+                Object.DestroyImmediate(coordinatorObject);
+                Object.DestroyImmediate(networkObject);
+                if (application != null)
+                    Object.DestroyImmediate(application.gameObject);
+            }
+        }
+
         private sealed class PermissiveBlockCatalog : IBlockIdCatalog
         {
             public bool IsKnown(uint stableBlockId) => stableBlockId != 0;

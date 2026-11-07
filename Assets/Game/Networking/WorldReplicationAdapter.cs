@@ -57,6 +57,7 @@ namespace MF2.Game.Networking
         private ClientStateCoordinator clientState;
         private GameSession subscribedSession;
         private bool networkCallbacksRegistered;
+        private bool coordinatorCallbacksRegistered;
         private long requiredWorldReadyTick = -1;
         private int pendingWorldDeltaBlocks;
         private int nextSnapshotTransferId;
@@ -78,8 +79,16 @@ namespace MF2.Game.Networking
         private void OnEnable()
         {
             coordinator ??= GetComponent<ServerSessionCoordinator>();
+            if (coordinatorCallbacksRegistered)
+                return;
             coordinator.SessionStarted += OnSessionStarted;
             coordinator.SessionStopping += OnSessionStopping;
+            coordinatorCallbacksRegistered = true;
+
+            // Start is not invoked again after a component disable/enable cycle. Re-establish the
+            // authoritative subscription and publish a complete base before sending later deltas.
+            if (networkCallbacksRegistered && coordinator.TryGetSession(out var activeSession))
+                OnSessionStarted(activeSession);
         }
 
         private void Start()
@@ -157,7 +166,13 @@ namespace MF2.Game.Networking
                 blocks[i] = ToReplicatedBlock(change.Position, change.Final);
             }
 
-            networkManager.ServerManager.Broadcast(new WorldDeltaBroadcast
+            if (WorldSnapshotTransferProtocol.RequiresSnapshotForDelta(blocks.Length))
+            {
+                SendSnapshot(subscribedSession.CaptureSnapshot(), connection: null);
+                return;
+            }
+
+            SendReliable(null, new WorldDeltaBroadcast
             {
                 SessionId = subscribedSession.Id.Value,
                 Generation = subscribedSession.Generation,
@@ -480,13 +495,28 @@ namespace MF2.Game.Networking
             };
         }
 
+        private void OnDisable()
+        {
+            UnsubscribeCoordinator();
+            if (subscribedSession != null)
+                subscribedSession.TickCompleted -= OnSessionTickCompleted;
+            subscribedSession = null;
+            readyClients.Clear();
+            requiredWorldReadyTick = -1;
+        }
+
+        private void UnsubscribeCoordinator()
+        {
+            if (!coordinatorCallbacksRegistered || coordinator == null)
+                return;
+            coordinator.SessionStarted -= OnSessionStarted;
+            coordinator.SessionStopping -= OnSessionStopping;
+            coordinatorCallbacksRegistered = false;
+        }
+
         private void OnDestroy()
         {
-            if (coordinator != null)
-            {
-                coordinator.SessionStarted -= OnSessionStarted;
-                coordinator.SessionStopping -= OnSessionStopping;
-            }
+            UnsubscribeCoordinator();
             if (subscribedSession != null)
                 subscribedSession.TickCompleted -= OnSessionTickCompleted;
             if (clientPresentation != null)

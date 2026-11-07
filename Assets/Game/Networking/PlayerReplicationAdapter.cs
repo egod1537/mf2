@@ -55,6 +55,7 @@ namespace MF2.Game.Networking
         private ClientStateCoordinator clientState;
         private GameSession subscribedSession;
         private bool networkCallbacksRegistered;
+        private bool coordinatorCallbacksRegistered;
 
         [Inject]
         private void Construct(ClientPresentationCoordinator presentation)
@@ -71,8 +72,14 @@ namespace MF2.Game.Networking
         private void OnEnable()
         {
             coordinator ??= GetComponent<ServerSessionCoordinator>();
+            if (coordinatorCallbacksRegistered)
+                return;
             coordinator.SessionStarted += OnSessionStarted;
             coordinator.SessionStopping += OnSessionStopping;
+            coordinatorCallbacksRegistered = true;
+
+            if (networkCallbacksRegistered && coordinator.TryGetSession(out var activeSession))
+                OnSessionStarted(activeSession);
         }
 
         private void Start()
@@ -316,13 +323,26 @@ namespace MF2.Game.Networking
             return true;
         }
 
+        private void OnDisable()
+        {
+            UnsubscribeCoordinator();
+            if (subscribedSession != null)
+                subscribedSession.TickCompleted -= OnSessionTickCompleted;
+            subscribedSession = null;
+        }
+
+        private void UnsubscribeCoordinator()
+        {
+            if (!coordinatorCallbacksRegistered || coordinator == null)
+                return;
+            coordinator.SessionStarted -= OnSessionStarted;
+            coordinator.SessionStopping -= OnSessionStopping;
+            coordinatorCallbacksRegistered = false;
+        }
+
         private void OnDestroy()
         {
-            if (coordinator != null)
-            {
-                coordinator.SessionStarted -= OnSessionStarted;
-                coordinator.SessionStopping -= OnSessionStopping;
-            }
+            UnsubscribeCoordinator();
             if (subscribedSession != null)
                 subscribedSession.TickCompleted -= OnSessionTickCompleted;
             if (clientPresentation != null)

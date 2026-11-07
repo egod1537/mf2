@@ -164,6 +164,30 @@ namespace MF2.Tests
         }
 
         [Test]
+        public void DeltaBudget_UsesOneBoundedMessageOrAnAtomicSnapshotFallback()
+        {
+            Assert.That(
+                WorldSnapshotTransferProtocol.MaximumDeltaBlocksPerMessage,
+                Is.EqualTo(WorldSnapshotTransferProtocol.MaximumBlocksPerPart));
+            Assert.That(
+                WorldSnapshotTransferProtocol.MaximumEstimatedPartBytes,
+                Is.LessThan(1282));
+            Assert.That(
+                WorldSnapshotTransferProtocol.RequiresSnapshotForDelta(
+                    WorldSnapshotTransferProtocol.MaximumDeltaBlocksPerMessage),
+                Is.False);
+            Assert.That(
+                WorldSnapshotTransferProtocol.RequiresSnapshotForDelta(
+                    WorldSnapshotTransferProtocol.MaximumDeltaBlocksPerMessage + 1),
+                Is.True,
+                "A large same-tick delta must use the already bounded, atomically applied snapshot path.");
+            Assert.That(
+                () => WorldSnapshotTransferProtocol.RequiresSnapshotForDelta(
+                    WorldSnapshotTransferProtocol.MaximumSnapshotBlocks + 1),
+                Throws.TypeOf<ArgumentOutOfRangeException>());
+        }
+
+        [Test]
         public void SnapshotTransfer_RejectsPartialDuplicateAndOversizedParts()
         {
             var sessionId = Guid.NewGuid();
