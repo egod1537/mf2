@@ -33,6 +33,12 @@ namespace MF2.Editor
         private const string OfflinePlayerPrefabPath = "Assets/Entities/Player/OfflineBlockPlayer.prefab";
         private const string PlayerPhysicsMaterialPath =
             "Assets/Entities/Player/PlayerNoFriction.physicMaterial";
+        private const string MinefarmPlayerVisualPrefabPath =
+            "Assets/Entities/Player/MinefarmVisual/Player.prefab";
+        private const string MinefarmPlayerAnimatorPath =
+            "Assets/Entities/Player/MinefarmVisual/animation/[0]Player.controller";
+        private const string CaveworksUiRoot =
+            "Assets/Entities/Shared/CaveworksUI/";
         private const string TitlePath = "Assets/Scenes/Title.unity";
         private const string OutgamePath = "Assets/Scenes/Outgame.unity";
         private const string TestPath = "Assets/Scenes/Test.unity";
@@ -113,16 +119,13 @@ namespace MF2.Editor
                 var binder = GetOrAdd<EntityViewBinder>(root);
                 var bindingGate = GetOrAdd<PlayerPresentationBindingGate>(root);
                 var controller = GetOrAdd<BlockPlayerController>(root);
-                ConfigureProPixelizerVisual(visual);
                 controller.ConfigureMvc(input, view, binder, bindingGate);
                 binder.Configure(view);
                 bindingGate.Configure(binder);
                 var facing = view.ConfigureVisual(visual.gameObject, rigidbody);
-                view.ConfigureRig(
-                    facing.Find("Left Arm Pivot"),
-                    facing.Find("Right Arm Pivot"),
-                    facing.Find("Left Leg Pivot"),
-                    facing.Find("Right Leg Pivot"));
+                var animator = ConfigureMinefarmPlayerVisual(facing);
+                view.ConfigureRig(null, null, null, null);
+                view.ConfigureAnimator(animator);
 
                 var oldRig = root.transform.Find("OwnerCameraRig");
                 if (oldRig != null)
@@ -176,13 +179,10 @@ namespace MF2.Editor
                 var visual = root.transform.Find("Visual");
                 if (visual != null)
                 {
-                    ConfigureProPixelizerVisual(visual);
                     var facing = view.ConfigureVisual(visual.gameObject, body);
-                    view.ConfigureRig(
-                        facing.Find("Left Arm Pivot"),
-                        facing.Find("Right Arm Pivot"),
-                        facing.Find("Left Leg Pivot"),
-                        facing.Find("Right Leg Pivot"));
+                    var animator = ConfigureMinefarmPlayerVisual(facing);
+                    view.ConfigureRig(null, null, null, null);
+                    view.ConfigureAnimator(animator);
                 }
 
                 var camera = root.GetComponentInChildren<Camera>(true);
@@ -449,25 +449,69 @@ namespace MF2.Editor
             pixelCamera.EnableProPixelizer = true;
         }
 
-        private static void ConfigureProPixelizerVisual(Transform visual)
+        private static Animator ConfigureMinefarmPlayerVisual(Transform facingRoot)
         {
-            if (visual == null)
-                throw new InvalidOperationException("Player prefab is missing its Visual root.");
+            if (facingRoot == null)
+                throw new InvalidOperationException("Player prefab is missing its facing root.");
 
-            var material = LoadRequiredAsset<Material>(ProPixelizerBlockMaterialPath);
-            var renderers = visual.GetComponentsInChildren<Renderer>(true);
+            while (facingRoot.childCount > 0)
+                UnityEngine.Object.DestroyImmediate(facingRoot.GetChild(0).gameObject);
+
+            var source = LoadRequiredAsset<GameObject>(MinefarmPlayerVisualPrefabPath);
+            var instance = (GameObject)PrefabUtility.InstantiatePrefab(source, facingRoot);
+            if (instance == null)
+                throw new InvalidOperationException("Minefarm0 player visual could not be instantiated.");
+            instance.name = "Minefarm Player Visual";
+            instance.transform.localPosition = Vector3.zero;
+            instance.transform.localRotation = Quaternion.identity;
+            instance.transform.localScale = Vector3.one;
+
+            var renderers = instance.GetComponentsInChildren<Renderer>(true);
             if (renderers.Length == 0)
-                throw new InvalidOperationException("Player Visual has no renderers to configure.");
+                throw new InvalidOperationException("Minefarm0 player visual has no renderers.");
+
+            var bounds = CalculateBounds(renderers);
+            const float targetHeight = 1.72f;
+            var uniformScale = targetHeight / Mathf.Max(0.001f, bounds.size.y);
+            instance.transform.localScale = Vector3.one * uniformScale;
+            bounds = CalculateBounds(renderers);
+            var facingOrigin = facingRoot.position;
+            instance.transform.position += new Vector3(
+                facingOrigin.x - bounds.center.x,
+                facingOrigin.y - bounds.min.y,
+                facingOrigin.z - bounds.center.z);
 
             foreach (var renderer in renderers)
             {
-                var materials = renderer.sharedMaterials;
-                for (var i = 0; i < materials.Length; i++)
-                    materials[i] = material;
-                renderer.sharedMaterials = materials;
                 renderer.shadowCastingMode = ShadowCastingMode.On;
                 renderer.receiveShadows = true;
+                foreach (var material in renderer.sharedMaterials)
+                {
+                    if (material == null || material.shader == null ||
+                        !material.shader.name.Contains("ProPixelizer", StringComparison.Ordinal))
+                    {
+                        throw new InvalidOperationException(
+                            "Minefarm0 player material must use a ProPixelizer shader.");
+                    }
+                }
             }
+
+            var animator = instance.GetComponentInChildren<Animator>(true);
+            if (animator == null)
+                throw new InvalidOperationException("Minefarm0 player visual has no Animator.");
+            animator.runtimeAnimatorController =
+                LoadRequiredAsset<RuntimeAnimatorController>(MinefarmPlayerAnimatorPath);
+            animator.applyRootMotion = false;
+            animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
+            return animator;
+        }
+
+        private static Bounds CalculateBounds(IReadOnlyList<Renderer> renderers)
+        {
+            var bounds = renderers[0].bounds;
+            for (var i = 1; i < renderers.Count; i++)
+                bounds.Encapsulate(renderers[i].bounds);
+            return bounds;
         }
 
         private static Camera CreateMinecraftMapCamera(string name)
@@ -687,15 +731,55 @@ namespace MF2.Editor
 
         private static void CreateInventoryHud(Canvas canvas)
         {
+            var panelSprite = LoadRequiredAsset<Sprite>(CaveworksUiRoot + "Panel.png");
+            var slotSprite = LoadRequiredAsset<Sprite>(CaveworksUiRoot + "Slot.png");
+            var titleSprite = LoadRequiredAsset<Sprite>(CaveworksUiRoot + "Title Panel 1.png");
+            var healthSprite = LoadRequiredAsset<Sprite>(CaveworksUiRoot + "HP Bar.png");
+            var selectionSprite = LoadFirstSprite(
+                CaveworksUiRoot + "gui_paper_animated_selection2.png");
             var controller = canvas.gameObject.AddComponent<InventoryHudController>();
-            var health = CreateText(canvas.gameObject, "HP -- / --", 22, TextAnchor.MiddleLeft, 42f);
+
+            var healthRoot = new GameObject(
+                "PlayerStatusFrame",
+                typeof(RectTransform),
+                typeof(UnityEngine.UI.Image));
+            healthRoot.transform.SetParent(canvas.transform, false);
+            var healthRootRect = (RectTransform)healthRoot.transform;
+            healthRootRect.anchorMin = healthRootRect.anchorMax = new Vector2(0f, 0f);
+            healthRootRect.pivot = new Vector2(0f, 0f);
+            healthRootRect.anchoredPosition = new Vector2(22f, 22f);
+            healthRootRect.sizeDelta = new Vector2(320f, 42f);
+            var healthFrame = healthRoot.GetComponent<UnityEngine.UI.Image>();
+            healthFrame.sprite = panelSprite;
+            healthFrame.type = UnityEngine.UI.Image.Type.Sliced;
+            healthFrame.color = Color.white;
+            healthFrame.raycastTarget = false;
+
+            var healthFillObject = new GameObject(
+                "HealthFill",
+                typeof(RectTransform),
+                typeof(UnityEngine.UI.Image));
+            healthFillObject.transform.SetParent(healthRoot.transform, false);
+            var healthFillRect = (RectTransform)healthFillObject.transform;
+            healthFillRect.anchorMin = Vector2.zero;
+            healthFillRect.anchorMax = Vector2.one;
+            healthFillRect.offsetMin = new Vector2(8f, 8f);
+            healthFillRect.offsetMax = new Vector2(-8f, -8f);
+            var healthFill = healthFillObject.GetComponent<UnityEngine.UI.Image>();
+            healthFill.sprite = healthSprite;
+            healthFill.type = UnityEngine.UI.Image.Type.Filled;
+            healthFill.fillMethod = UnityEngine.UI.Image.FillMethod.Horizontal;
+            healthFill.fillOrigin = 0;
+            healthFill.fillAmount = 0f;
+            healthFill.raycastTarget = false;
+
+            var health = CreateText(healthRoot, "HP -- / --", 18, TextAnchor.MiddleCenter, 42f);
             health.gameObject.name = "PlayerStatus";
             health.raycastTarget = false;
             var healthRect = (RectTransform)health.transform;
-            healthRect.anchorMin = healthRect.anchorMax = new Vector2(0f, 0f);
-            healthRect.pivot = new Vector2(0f, 0f);
-            healthRect.anchoredPosition = new Vector2(22f, 22f);
-            healthRect.sizeDelta = new Vector2(320f, 42f);
+            healthRect.anchorMin = Vector2.zero;
+            healthRect.anchorMax = Vector2.one;
+            healthRect.offsetMin = healthRect.offsetMax = Vector2.zero;
 
             var hotbar = new GameObject(
                 "Hotbar",
@@ -708,8 +792,10 @@ namespace MF2.Editor
             hotbarRect.pivot = new Vector2(0.5f, 0f);
             hotbarRect.anchoredPosition = new Vector2(0f, 22f);
             hotbarRect.sizeDelta = new Vector2(526f, 70f);
-            hotbar.GetComponent<UnityEngine.UI.Image>().color =
-                new Color(0.025f, 0.035f, 0.05f, 0.88f);
+            var hotbarImage = hotbar.GetComponent<UnityEngine.UI.Image>();
+            hotbarImage.sprite = panelSprite;
+            hotbarImage.type = UnityEngine.UI.Image.Type.Sliced;
+            hotbarImage.color = Color.white;
             var hotbarLayout = hotbar.GetComponent<UnityEngine.UI.HorizontalLayoutGroup>();
             hotbarLayout.padding = new RectOffset(8, 8, 8, 8);
             hotbarLayout.spacing = 6f;
@@ -718,7 +804,12 @@ namespace MF2.Editor
             hotbarLayout.childControlWidth = false;
             var quickbar = new InventorySlotButton[InventoryState.QuickbarSlotCount];
             for (var i = 0; i < quickbar.Length; i++)
-                quickbar[i] = CreateInventorySlot(hotbar.transform, $"QuickbarSlot {i + 1}", 62f);
+                quickbar[i] = CreateInventorySlot(
+                    hotbar.transform,
+                    $"QuickbarSlot {i + 1}",
+                    62f,
+                    slotSprite,
+                    selectionSprite);
 
             var panel = new GameObject(
                 "InventoryPanel",
@@ -728,33 +819,97 @@ namespace MF2.Editor
             var panelRect = (RectTransform)panel.transform;
             panelRect.anchorMin = panelRect.anchorMax = panelRect.pivot = new Vector2(0.5f, 0.5f);
             panelRect.sizeDelta = new Vector2(720f, 650f);
-            panel.GetComponent<UnityEngine.UI.Image>().color =
-                new Color(0.025f, 0.035f, 0.05f, 0.97f);
+            var panelImage = panel.GetComponent<UnityEngine.UI.Image>();
+            panelImage.sprite = panelSprite;
+            panelImage.type = UnityEngine.UI.Image.Type.Sliced;
+            panelImage.color = Color.white;
 
-            var title = CreateText(panel, "INVENTORY  [E]", 28, TextAnchor.MiddleCenter, 52f);
+            var titlePlate = new GameObject(
+                "InventoryTitlePlate",
+                typeof(RectTransform),
+                typeof(UnityEngine.UI.Image));
+            titlePlate.transform.SetParent(panel.transform, false);
+            var titlePlateRect = (RectTransform)titlePlate.transform;
+            titlePlateRect.anchorMin = new Vector2(0f, 1f);
+            titlePlateRect.anchorMax = new Vector2(1f, 1f);
+            titlePlateRect.pivot = new Vector2(0.5f, 1f);
+            titlePlateRect.anchoredPosition = new Vector2(0f, -18f);
+            titlePlateRect.sizeDelta = new Vector2(-36f, 52f);
+            var titlePlateImage = titlePlate.GetComponent<UnityEngine.UI.Image>();
+            titlePlateImage.sprite = titleSprite;
+            titlePlateImage.type = UnityEngine.UI.Image.Type.Sliced;
+            titlePlateImage.color = Color.white;
+            titlePlateImage.raycastTarget = false;
+
+            var title = CreateText(titlePlate, "INVENTORY  [E]", 24, TextAnchor.MiddleCenter, 52f);
             title.gameObject.name = "InventoryTitle";
             title.raycastTarget = false;
             var titleRect = (RectTransform)title.transform;
-            titleRect.anchorMin = new Vector2(0f, 1f);
-            titleRect.anchorMax = new Vector2(1f, 1f);
-            titleRect.pivot = new Vector2(0.5f, 1f);
-            titleRect.anchoredPosition = new Vector2(0f, -18f);
-            titleRect.sizeDelta = new Vector2(-36f, 52f);
+            titleRect.anchorMin = Vector2.zero;
+            titleRect.anchorMax = Vector2.one;
+            titleRect.offsetMin = titleRect.offsetMax = Vector2.zero;
 
             var bagGrid = CreateInventoryGrid(
-                panel.transform, "BagGrid", new Vector2(0f, 24f), new Vector2(492f, 410f), 6);
+                panel.transform, "BagGrid", new Vector2(-82f, 24f), new Vector2(492f, 410f), 6);
             var bag = new InventorySlotButton[InventoryState.BagSlotCount];
             for (var i = 0; i < bag.Length; i++)
-                bag[i] = CreateInventorySlot(bagGrid, $"BagSlot {i + 1}", 74f);
+                bag[i] = CreateInventorySlot(
+                    bagGrid,
+                    $"BagSlot {i + 1}",
+                    74f,
+                    slotSprite,
+                    selectionSprite);
 
             var equipmentGrid = CreateInventoryGrid(
-                panel.transform, "EquipmentGrid", new Vector2(272f, 24f), new Vector2(154f, 410f), 2);
+                panel.transform, "EquipmentGrid", new Vector2(250f, 24f), new Vector2(154f, 410f), 2);
             var equipment = new InventorySlotButton[InventoryState.EquipmentSlotCount];
             for (var i = 0; i < equipment.Length; i++)
-                equipment[i] = CreateInventorySlot(equipmentGrid, $"EquipmentSlot {i + 1}", 74f);
+                equipment[i] = CreateInventorySlot(
+                    equipmentGrid,
+                    $"EquipmentSlot {i + 1}",
+                    74f,
+                    slotSprite,
+                    selectionSprite);
 
-            controller.Configure(panel, quickbar, bag, equipment, health);
+            var dragGhostObject = new GameObject(
+                "InventoryDragGhost",
+                typeof(RectTransform),
+                typeof(CanvasGroup),
+                typeof(UnityEngine.UI.Image));
+            dragGhostObject.transform.SetParent(canvas.transform, false);
+            var dragGhost = (RectTransform)dragGhostObject.transform;
+            dragGhost.sizeDelta = new Vector2(74f, 74f);
+            var dragImage = dragGhostObject.GetComponent<UnityEngine.UI.Image>();
+            dragImage.sprite = slotSprite;
+            dragImage.type = UnityEngine.UI.Image.Type.Sliced;
+            dragImage.raycastTarget = false;
+            var dragCanvasGroup = dragGhostObject.GetComponent<CanvasGroup>();
+            dragCanvasGroup.blocksRaycasts = false;
+            dragCanvasGroup.interactable = false;
+            dragCanvasGroup.alpha = 0.9f;
+            var dragLabel = CreateText(
+                dragGhostObject,
+                string.Empty,
+                13,
+                TextAnchor.MiddleCenter,
+                74f);
+            dragLabel.raycastTarget = false;
+            var dragLabelRect = (RectTransform)dragLabel.transform;
+            dragLabelRect.anchorMin = Vector2.zero;
+            dragLabelRect.anchorMax = Vector2.one;
+            dragLabelRect.offsetMin = dragLabelRect.offsetMax = Vector2.zero;
+
+            controller.Configure(
+                panel,
+                quickbar,
+                bag,
+                equipment,
+                health,
+                healthFill,
+                dragGhost,
+                dragLabel);
             panel.SetActive(false);
+            dragGhostObject.SetActive(false);
         }
 
         private static void CreateReplicaMinimap(Canvas canvas)
@@ -821,7 +976,9 @@ namespace MF2.Editor
         private static InventorySlotButton CreateInventorySlot(
             Transform parent,
             string name,
-            float size)
+            float size,
+            Sprite slotSprite,
+            Sprite selectionSprite)
         {
             var gameObject = new GameObject(
                 name,
@@ -831,15 +988,51 @@ namespace MF2.Editor
             gameObject.transform.SetParent(parent, false);
             ((RectTransform)gameObject.transform).sizeDelta = new Vector2(size, size);
             var image = gameObject.GetComponent<UnityEngine.UI.Image>();
-            image.color = new Color(0.055f, 0.07f, 0.095f, 0.94f);
+            image.sprite = slotSprite;
+            image.type = UnityEngine.UI.Image.Type.Sliced;
+            image.color = Color.white;
             image.raycastTarget = true;
+
+            var iconObject = new GameObject(
+                "ItemIcon",
+                typeof(RectTransform),
+                typeof(UnityEngine.UI.Image));
+            iconObject.transform.SetParent(gameObject.transform, false);
+            var iconRect = (RectTransform)iconObject.transform;
+            iconRect.anchorMin = Vector2.zero;
+            iconRect.anchorMax = Vector2.one;
+            iconRect.offsetMin = new Vector2(11f, 11f);
+            iconRect.offsetMax = new Vector2(-11f, -11f);
+            var icon = iconObject.GetComponent<UnityEngine.UI.Image>();
+            icon.color = Color.clear;
+            icon.raycastTarget = false;
+
             var text = CreateText(gameObject, string.Empty, 13, TextAnchor.MiddleCenter, size);
             text.raycastTarget = false;
             var rect = (RectTransform)text.transform;
             rect.anchorMin = Vector2.zero;
             rect.anchorMax = Vector2.one;
             rect.offsetMin = rect.offsetMax = Vector2.zero;
-            return gameObject.GetComponent<InventorySlotButton>();
+
+            var selectionObject = new GameObject(
+                "Selection",
+                typeof(RectTransform),
+                typeof(UnityEngine.UI.Image));
+            selectionObject.transform.SetParent(gameObject.transform, false);
+            var selectionRect = (RectTransform)selectionObject.transform;
+            selectionRect.anchorMin = Vector2.zero;
+            selectionRect.anchorMax = Vector2.one;
+            selectionRect.offsetMin = new Vector2(-3f, -3f);
+            selectionRect.offsetMax = new Vector2(3f, 3f);
+            var selection = selectionObject.GetComponent<UnityEngine.UI.Image>();
+            selection.sprite = selectionSprite;
+            selection.preserveAspect = true;
+            selection.raycastTarget = false;
+            selectionObject.SetActive(false);
+
+            var button = gameObject.GetComponent<InventorySlotButton>();
+            button.ConfigureVisuals(image, icon, selection, text);
+            return button;
         }
 
         private static void CreateEventSystem(Transform parent)
@@ -858,6 +1051,17 @@ namespace MF2.Editor
             return asset != null
                 ? asset
                 : throw new InvalidOperationException($"Required asset was not found: {path}");
+        }
+
+        private static Sprite LoadFirstSprite(string path)
+        {
+            var sprite = AssetDatabase.LoadAllAssetsAtPath(path)
+                .OfType<Sprite>()
+                .OrderBy(asset => asset.name, StringComparer.Ordinal)
+                .FirstOrDefault();
+            return sprite != null
+                ? sprite
+                : throw new InvalidOperationException($"Required sprite was not found: {path}");
         }
 
         private static void SetObjectReference(UnityEngine.Object target, string propertyName, UnityEngine.Object value)

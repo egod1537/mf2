@@ -50,6 +50,11 @@ only the reported architectural ideas (read/write model separation, proxy seams,
 scopes, chunk lifecycle, snapshot/ACK cautions). No Caveworks implementation, asset, inferred
 license grant, or unverified runtime behavior is copied or asserted here.
 
+Later specification work on 2026-11-08 received explicit authorization from the owner of both
+projects and selectively imported five Caveworks UI sprites. That later asset operation is tracked
+separately in `docs/implementation/asset-provenance.csv`; it does not change the evidence boundary
+of this historical architecture audit.
+
 ### Evidence labels used in this audit
 
 | Label | Meaning |

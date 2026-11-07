@@ -24,6 +24,14 @@ namespace MF2.Entities.Player
         [SerializeField, Min(0.1f)] private float limbSwingSpeed = 8f;
         [SerializeField, Min(0.1f)] private float maximumMoveSpeed = 6f;
 
+        [Header("Model Animation")]
+        [SerializeField] private Animator modelAnimator;
+        [SerializeField, Min(0f)] private float locomotionDampTime = 0.08f;
+
+        private static readonly int MoveXParameter = Animator.StringToHash("Move X");
+        private static readonly int MoveYParameter = Animator.StringToHash("Move Y");
+        private static readonly int IsGroundParameter = Animator.StringToHash("IsGround");
+
         private PlayerPresentationState presentationState;
         private bool hasPresentation;
         private float stepCycle;
@@ -44,6 +52,15 @@ namespace MF2.Entities.Player
             rightArmPivot = rightArm;
             leftLegPivot = leftLeg;
             rightLegPivot = rightLeg;
+        }
+
+        public void ConfigureAnimator(Animator animator)
+        {
+            modelAnimator = animator;
+            if (modelAnimator == null)
+                return;
+            modelAnimator.applyRootMotion = false;
+            modelAnimator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
         }
 
         public void ConfigureOwnerCamera(Camera camera, AudioListener listener)
@@ -102,7 +119,11 @@ namespace MF2.Entities.Player
         public void Apply(in PlayerPresentationState state)
         {
             if (hasPresentation && state.AttackSequence > presentationState.AttackSequence)
+            {
                 attackPresentationTime = 0.22f;
+                if (modelAnimator != null && modelAnimator.runtimeAnimatorController != null)
+                    modelAnimator.Play("Attack", 1, 0f);
+            }
             if (hasPresentation && state.DashSequence > presentationState.DashSequence)
                 dashPresentationTime = 0.18f;
             presentationState = state;
@@ -122,6 +143,13 @@ namespace MF2.Entities.Player
             SetLimbRotation(rightArmPivot, Quaternion.identity, 1f);
             SetLimbRotation(leftLegPivot, Quaternion.identity, 1f);
             SetLimbRotation(rightLegPivot, Quaternion.identity, 1f);
+            if (modelAnimator != null && modelAnimator.runtimeAnimatorController != null)
+            {
+                modelAnimator.speed = 1f;
+                modelAnimator.Rebind();
+                if (modelAnimator.gameObject.activeInHierarchy)
+                    modelAnimator.Update(0f);
+            }
             if (facingRoot != null)
                 facingRoot.localRotation = Quaternion.identity;
             if (visualRoot != null)
@@ -139,6 +167,8 @@ namespace MF2.Entities.Player
                     visualRoot = visual.gameObject;
             }
             EnsureFacingRoot();
+            if (modelAnimator == null && visualRoot != null)
+                ConfigureAnimator(visualRoot.GetComponentInChildren<Animator>(true));
         }
 
         private void OnDestroy()
@@ -155,9 +185,28 @@ namespace MF2.Entities.Player
             var horizontalSpeed = Mathf.Sqrt(velocity.x * velocity.x + velocity.z * velocity.z);
             attackPresentationTime = Mathf.Max(0f, attackPresentationTime - Time.deltaTime);
             dashPresentationTime = Mathf.Max(0f, dashPresentationTime - Time.deltaTime);
-            AnimateRig(
-                Mathf.Clamp01(horizontalSpeed / Mathf.Max(0.01f, maximumMoveSpeed)),
-                Time.deltaTime);
+            var moveAmount = Mathf.Clamp01(
+                horizontalSpeed / Mathf.Max(0.01f, maximumMoveSpeed));
+            AnimateRig(moveAmount, Time.deltaTime);
+            AnimateModel(moveAmount, velocity.y, Time.deltaTime);
+        }
+
+        private void AnimateModel(float moveAmount, float verticalSpeed, float deltaTime)
+        {
+            if (modelAnimator == null || modelAnimator.runtimeAnimatorController == null)
+                return;
+
+            var locomotion = dashPresentationTime > 0f
+                ? Mathf.Max(0.85f, moveAmount)
+                : moveAmount;
+            modelAnimator.speed = dashPresentationTime > 0f ? 1.35f : 1f;
+            modelAnimator.SetFloat(
+                MoveXParameter,
+                locomotion,
+                locomotionDampTime,
+                deltaTime);
+            modelAnimator.SetFloat(MoveYParameter, 0f, locomotionDampTime, deltaTime);
+            modelAnimator.SetBool(IsGroundParameter, Mathf.Abs(verticalSpeed) <= 0.2f);
         }
 
         private void AnimateRig(float moveAmount, float deltaTime)

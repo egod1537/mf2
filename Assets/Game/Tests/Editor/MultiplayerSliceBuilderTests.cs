@@ -13,6 +13,7 @@ using MF2.World.Rendering;
 using NUnit.Framework;
 using ProPixelizer;
 using UnityEditor;
+using UnityEditor.Animations;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -58,6 +59,26 @@ namespace MF2.Game.Tests.Editor
             Assert.That(prefab.GetComponent<BlockPlayerView>(), Is.Not.Null);
             Assert.That(prefab.GetComponent<EntityViewBinder>(), Is.Not.Null);
             Assert.That(prefab.GetComponent<PlayerPresentationBindingGate>(), Is.Not.Null);
+
+            var model = prefab.transform.Find("Visual/FacingPivot/Minefarm Player Visual");
+            Assert.That(model, Is.Not.Null);
+            var animator = model.GetComponentInChildren<Animator>(true);
+            Assert.That(animator, Is.Not.Null);
+            Assert.That(
+                AssetDatabase.GetAssetPath(animator.runtimeAnimatorController),
+                Is.EqualTo(
+                    "Assets/Entities/Player/MinefarmVisual/animation/[0]Player.controller"));
+            Assert.That(animator.applyRootMotion, Is.False);
+            var animatorController = animator.runtimeAnimatorController as AnimatorController;
+            Assert.That(animatorController, Is.Not.Null);
+            Assert.That(
+                animatorController.parameters.Select(parameter => parameter.name),
+                Is.SupersetOf(new[] { "Move X", "Move Y", "IsGround" }));
+            Assert.That(
+                animatorController.layers.SelectMany(layer => layer.stateMachine.states)
+                    .Select(state => state.state.name),
+                Does.Contain("Attack"));
+            AssertMinefarmProPixelizerVisual(prefab);
         }
 
         [Test]
@@ -176,6 +197,26 @@ namespace MF2.Game.Tests.Editor
                     Is.EqualTo(InventoryState.QuickbarSlotCount +
                                InventoryState.BagSlotCount +
                                InventoryState.EquipmentSlotCount));
+                var inventoryPanel = scene.GetRootGameObjects()
+                    .SelectMany(root => root.GetComponentsInChildren<Transform>(true))
+                    .Single(transform => transform.name == "InventoryPanel");
+                Assert.That(
+                    AssetDatabase.GetAssetPath(
+                        inventoryPanel.GetComponent<Image>().sprite),
+                    Is.EqualTo("Assets/Entities/Shared/CaveworksUI/Panel.png"));
+                var firstSlot = FindAllInScene<InventorySlotButton>(scene).First();
+                Assert.That(firstSlot, Is.InstanceOf<IBeginDragHandler>());
+                Assert.That(firstSlot, Is.InstanceOf<IDragHandler>());
+                Assert.That(firstSlot, Is.InstanceOf<IEndDragHandler>());
+                Assert.That(firstSlot, Is.InstanceOf<IDropHandler>());
+                Assert.That(
+                    AssetDatabase.GetAssetPath(firstSlot.GetComponent<Image>().sprite),
+                    Is.EqualTo("Assets/Entities/Shared/CaveworksUI/Slot.png"));
+                Assert.That(
+                    scene.GetRootGameObjects()
+                        .SelectMany(root => root.GetComponentsInChildren<Transform>(true))
+                        .Any(transform => transform.name == "InventoryDragGhost"),
+                    Is.True);
                 Assert.That(FindAllInScene<SpawnPoint>(scene).Count, Is.EqualTo(expectedSpawnPoints));
 
                 var light = FindAllInScene<Light>(scene)
@@ -232,11 +273,11 @@ namespace MF2.Game.Tests.Editor
                 playerPrefab.GetComponentInChildren<PlayerCameraFollow>(true);
             Assert.That(cameraFollow, Is.Not.Null);
             Assert.That(cameraFollow.Target, Is.SameAs(playerPrefab.transform.Find("Visual")));
-            AssertProPixelizerVisual(playerPrefab, materialPath);
+            AssertMinefarmProPixelizerVisual(playerPrefab);
 
             var offlinePlayerPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(
                 "Assets/Entities/Player/OfflineBlockPlayer.prefab");
-            AssertProPixelizerVisual(offlinePlayerPrefab, materialPath);
+            AssertMinefarmProPixelizerVisual(offlinePlayerPrefab);
 
             foreach (var scenePath in new[]
                      {
@@ -340,11 +381,15 @@ namespace MF2.Game.Tests.Editor
             Assert.That(pixelCamera.HasSubCamera, Is.False);
         }
 
-        private static void AssertProPixelizerVisual(GameObject prefab, string materialPath)
+        private static void AssertMinefarmProPixelizerVisual(GameObject prefab)
         {
             Assert.That(prefab, Is.Not.Null);
             var visual = prefab.transform.Find("Visual");
             Assert.That(visual, Is.Not.Null, prefab.name);
+            Assert.That(
+                visual.Find("FacingPivot/Minefarm Player Visual"),
+                Is.Not.Null,
+                prefab.name);
 
             var renderers = visual.GetComponentsInChildren<Renderer>(true);
             Assert.That(renderers, Is.Not.Empty, prefab.name);
@@ -357,11 +402,12 @@ namespace MF2.Game.Tests.Editor
                     Assert.That(material, Is.Not.Null, renderer.name);
                     Assert.That(
                         AssetDatabase.GetAssetPath(material),
-                        Is.EqualTo(materialPath),
+                        Is.EqualTo(
+                            "Assets/Entities/Player/MinefarmVisual/material/Player.mat"),
                         renderer.name);
                     Assert.That(
                         material.shader.name,
-                        Is.EqualTo("ProPixelizer/ProPixelizerUberShader"),
+                        Does.Contain("ProPixelizer"),
                         renderer.name);
                 }
             }

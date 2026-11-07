@@ -5,9 +5,16 @@ using UnityEngine.EventSystems;
 namespace MF2.Game.UI
 {
     [DisallowMultipleComponent]
-    public sealed class InventorySlotButton : MonoBehaviour, IPointerClickHandler
+    public sealed class InventorySlotButton : MonoBehaviour,
+        IPointerClickHandler,
+        IBeginDragHandler,
+        IDragHandler,
+        IEndDragHandler,
+        IDropHandler
     {
         [SerializeField] private UnityEngine.UI.Image background;
+        [SerializeField] private UnityEngine.UI.Image itemIcon;
+        [SerializeField] private UnityEngine.UI.Image selection;
         [SerializeField] private UnityEngine.UI.Text label;
         private InventoryHudController owner;
         private InventoryContainerKind container;
@@ -27,18 +34,47 @@ namespace MF2.Game.UI
                 label = GetComponentInChildren<UnityEngine.UI.Text>(true);
         }
 
+        public void ConfigureVisuals(
+            UnityEngine.UI.Image slotBackground,
+            UnityEngine.UI.Image icon,
+            UnityEngine.UI.Image selectionOverlay,
+            UnityEngine.UI.Text itemLabel)
+        {
+            background = slotBackground;
+            itemIcon = icon;
+            selection = selectionOverlay;
+            label = itemLabel;
+        }
+
         public void Render(ItemStack stack, bool selected)
         {
             if (background != null)
-                background.color = selected
-                    ? new Color(0.95f, 0.78f, 0.24f, 0.96f)
-                    : ItemColor(stack.ItemId);
+                background.color = Color.white;
+            if (itemIcon != null)
+            {
+                itemIcon.enabled = !stack.IsEmpty;
+                itemIcon.color = ItemColor(stack.ItemId);
+            }
+            if (selection != null)
+                selection.gameObject.SetActive(selected);
             if (label != null)
                 label.text = stack.IsEmpty ? string.Empty : $"{ItemName(stack.ItemId)}\n{stack.Count}";
         }
 
         public void OnPointerClick(PointerEventData eventData) =>
             owner?.HandleSlotClick(container, slot, eventData.button);
+
+        public void OnBeginDrag(PointerEventData eventData) =>
+            owner?.BeginSlotDrag(container, slot, eventData.position);
+
+        public void OnDrag(PointerEventData eventData) =>
+            owner?.MoveSlotDrag(eventData.position);
+
+        public void OnEndDrag(PointerEventData eventData) =>
+            owner?.EndSlotDrag();
+
+        public void OnDrop(PointerEventData eventData) =>
+            owner?.DropOnSlot(container, slot);
 
         private static string ItemName(uint id)
         {

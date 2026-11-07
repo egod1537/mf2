@@ -23,7 +23,7 @@ Packages: FishNet `4.7.3`, VContainer `1.19.0`, Input System `1.20.1`, URP `17.3
 - `Game.Ingame.Item.dll` SHA-256: `E599C50A07C6E1B52A8F3200A5455DDCDB0F5F923380264D5509568DFC6993CD`
 - ILSpy 산출물: `C:\Users\egod1\proj\caveworks\recovered\mono`, 공개 분석 repo commit `1e77cee9f7daf1e832fdc911e72c661d6cc4d53a`
 
-확인된 동작은 30칸 Bag, 7칸 QuickSlot, 6칸 Equipment, `E` 인벤토리, 숫자 `1..7` 선택, 좌클릭 전체 스택 선택, 우클릭 절반 선택, 드래그 배치, merge/swap, Shift quick action이다. 이 동작 계약만 재작성하며 DLL 또는 원본 유료 UI 에셋은 MF2에 복사하지 않는다.
+확인된 동작은 30칸 Bag, 7칸 QuickSlot, 6칸 Equipment, `E` 인벤토리, 숫자 `1..7` 선택, 좌클릭 전체 스택 선택, 우클릭 절반 선택, 드래그 배치, merge/swap, Shift quick action이다. DLL은 복사하지 않고 MF2의 서버 권위 구현을 유지한다. 프로젝트 소유자의 2026-11-08 명시적 허가에 따라 Panel/Slot/Title/Selection/HP Bar 스프라이트와 원본 `.meta`만 `Assets/Entities/Shared/CaveworksUI`에 선별 이식했다.
 
 ### Minefarm0
 
@@ -34,7 +34,7 @@ Packages: FishNet `4.7.3`, VContainer `1.19.0`, Input System `1.20.1`, URP `17.3
 - `Player.prefab` SHA-256: `E2E9F7A33733011B0335139BCC57AFAE6D1E57BE5004713A3D3D9EB3FB4C7618`
 - `Attack.anim` SHA-256: `33F8F6106DA0CA7D765229997405B7FE15461BCCA8107F7D825B2329B69EA992`
 
-루트 라이선스와 GreenIdol 원저작/재배포 조건을 찾지 못했다. 따라서 모델·애니메이션 파일 복사는 차단하고, 공격/대시의 관찰 가능한 규칙만 MF2 Domain/FishNet 구조에 맞게 재작성한다. 출처가 확인되기 전 외부 FBX를 포함한 빌드를 완료로 표시하지 않는다.
+초기 정적 조사에서는 루트 라이선스 문서를 찾지 못했으나, 프로젝트 소유자가 2026-11-08 Minefarm0과 Caveworks 모두 본인 프로젝트이며 MF2 통합을 허가한다고 명시했다. 이에 `GreenIdol.fbx`, visual-only `Player.prefab`, material/texture와 Animator/animation을 원본 `.meta`와 함께 `Assets/Entities/Player/MinefarmVisual`에 이식했다. FishNet `NetworkObject`, Rigidbody, CapsuleCollider, Prediction controller는 기존 MF2 root에 그대로 두고 모델은 `Visual/FacingPivot` 아래 nested visual로만 연결한다.
 
 ## 시스템 현황
 
@@ -63,8 +63,8 @@ Packages: FishNet `4.7.3`, VContainer `1.19.0`, Input System `1.20.1`, URP `17.3
 | ID | 사실 | 결정 |
 |---|---|---|
 | P0-01 | 서버 `GameSession`과 client replica는 sibling scope이다. | HUD/minimap은 `ClientStateCoordinator`만 읽는다. |
-| P0-02 | Caveworks UI는 저작권/재배포 허가가 확인되지 않았다. | 동작과 레이아웃을 독립 구현하고 원본 에셋은 복사하지 않는다. |
-| P0-03 | Minefarm0 GreenIdol의 루트 라이선스가 없다. | 파일 이식은 BLOCKED, procedural MF2 visual은 유지한다. |
+| P0-02 | 프로젝트 소유자가 Caveworks 에셋 통합을 명시적으로 허가했다. | UI DLL은 복사하지 않고 필요한 UI 스프라이트와 `.meta`만 선별 이식한다. |
+| P0-03 | 프로젝트 소유자가 Minefarm0 에셋 통합을 명시적으로 허가했다. | 모델/애니메이션을 visual-only child로 이식하고 MF2 physics/network root는 유지한다. |
 | P0-04 | 기존 full EditMode가 깨끗하다. | 각 Phase마다 관련 test + full suite를 다시 실행한다. |
 | P0-05 | 기존 generated scenes/prefabs가 builder 산출물이다. | YAML 수작업 대신 builder 실행으로 반영한다. |
 

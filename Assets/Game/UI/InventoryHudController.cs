@@ -15,6 +15,9 @@ namespace MF2.Game.UI
     {
         [SerializeField] private GameObject inventoryPanel;
         [SerializeField] private UnityEngine.UI.Text healthText;
+        [SerializeField] private UnityEngine.UI.Image healthFill;
+        [SerializeField] private RectTransform dragGhost;
+        [SerializeField] private UnityEngine.UI.Text dragGhostLabel;
         [SerializeField] private InventorySlotButton[] quickbarSlots = Array.Empty<InventorySlotButton>();
         [SerializeField] private InventorySlotButton[] bagSlots = Array.Empty<InventorySlotButton>();
         [SerializeField] private InventorySlotButton[] equipmentSlots = Array.Empty<InventorySlotButton>();
@@ -44,13 +47,21 @@ namespace MF2.Game.UI
             InventorySlotButton[] quickbar,
             InventorySlotButton[] bag,
             InventorySlotButton[] equipment,
-            UnityEngine.UI.Text health)
+            UnityEngine.UI.Text health,
+            UnityEngine.UI.Image healthBarFill = null,
+            RectTransform ghost = null,
+            UnityEngine.UI.Text ghostLabel = null)
         {
             inventoryPanel = panel;
             quickbarSlots = quickbar ?? Array.Empty<InventorySlotButton>();
             bagSlots = bag ?? Array.Empty<InventorySlotButton>();
             equipmentSlots = equipment ?? Array.Empty<InventorySlotButton>();
             healthText = health;
+            healthFill = healthBarFill;
+            dragGhost = ghost;
+            dragGhostLabel = ghostLabel;
+            if (dragGhost != null)
+                dragGhost.gameObject.SetActive(false);
             BindButtons(quickbarSlots, InventoryContainerKind.Quickbar);
             BindButtons(bagSlots, InventoryContainerKind.Bag);
             BindButtons(equipmentSlots, InventoryContainerKind.Equipment);
@@ -149,6 +160,68 @@ namespace MF2.Game.UI
             Render();
         }
 
+        public void BeginSlotDrag(
+            InventoryContainerKind container,
+            int slot,
+            Vector2 screenPosition)
+        {
+            if (!IsOpen || inventoryReader == null ||
+                !inventoryReader.TryGetLocalInventory(out _, out var inventory))
+                return;
+            var stack = inventory.GetSlot(container, slot);
+            if (stack.IsEmpty)
+                return;
+
+            selectedContainer = container;
+            selectedSlot = slot;
+            selectedCount = stack.Count;
+            if (dragGhostLabel != null)
+                dragGhostLabel.text = $"{GetItemName(stack.ItemId)}\n{stack.Count}";
+            if (dragGhost != null)
+            {
+                dragGhost.gameObject.SetActive(true);
+                dragGhost.position = screenPosition;
+                dragGhost.SetAsLastSibling();
+            }
+            Render();
+        }
+
+        public void MoveSlotDrag(Vector2 screenPosition)
+        {
+            if (dragGhost != null && dragGhost.gameObject.activeSelf)
+                dragGhost.position = screenPosition;
+        }
+
+        public void DropOnSlot(InventoryContainerKind container, int slot)
+        {
+            if (selectedSlot < 0)
+                return;
+            if (container != selectedContainer || slot != selectedSlot)
+            {
+                commandSender?.SendInventoryCommand(InventoryCommand.Move(
+                    selectedContainer,
+                    selectedSlot,
+                    container,
+                    slot,
+                    selectedCount));
+            }
+            CancelSelection();
+            Render();
+        }
+
+        public void EndSlotDrag()
+        {
+            if (selectedSlot >= 0)
+            {
+                CancelSelection();
+                Render();
+            }
+            else if (dragGhost != null)
+            {
+                dragGhost.gameObject.SetActive(false);
+            }
+        }
+
         private bool TryQuickTransfer(
             InventoryState inventory,
             InventoryContainerKind sourceContainer,
@@ -222,6 +295,8 @@ namespace MF2.Game.UI
                 RenderEmpty(equipmentSlots);
                 if (healthText != null)
                     healthText.text = "HP -- / --";
+                if (healthFill != null)
+                    healthFill.fillAmount = 0f;
                 return;
             }
 
@@ -242,6 +317,12 @@ namespace MF2.Game.UI
             healthText.text =
                 $"HP {model.Health} / {model.MaximumHealth}    " +
                 $"DASH {model.Actions.DashCharges}/{PlayerActionState.MaximumDashCharges}";
+            if (healthFill != null)
+            {
+                healthFill.fillAmount = model.MaximumHealth > 0
+                    ? Mathf.Clamp01((float)model.Health / model.MaximumHealth)
+                    : 0f;
+            }
         }
 
         private void RenderContainer(
@@ -251,9 +332,10 @@ namespace MF2.Game.UI
         {
             for (var i = 0; i < views.Length; i++)
             {
-                var selected = container == InventoryContainerKind.Quickbar
-                    ? i == inventory.SelectedQuickbarSlot
-                    : container == selectedContainer && i == selectedSlot;
+                var selected = container == selectedContainer && i == selectedSlot;
+                if (container == InventoryContainerKind.Quickbar &&
+                    i == inventory.SelectedQuickbarSlot)
+                    selected = true;
                 views[i]?.Render(inventory.GetSlot(container, i), selected);
             }
         }
@@ -276,6 +358,17 @@ namespace MF2.Game.UI
         {
             selectedSlot = -1;
             selectedCount = 0;
+            if (dragGhost != null)
+                dragGhost.gameObject.SetActive(false);
+        }
+
+        private static string GetItemName(uint id)
+        {
+            if (id == ItemCatalog.Stone) return "STONE";
+            if (id == ItemCatalog.Dirt) return "DIRT";
+            if (id == ItemCatalog.Grass) return "GRASS";
+            if (id == ItemCatalog.Water) return "WATER";
+            return "?";
         }
 
         private static bool WasNumberPressed(Keyboard keyboard, int index) => index switch

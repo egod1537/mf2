@@ -126,6 +126,9 @@ retained console history were intermediate edits; the final compilation and suit
   vertical slice. Those numbers are not merged with the current test count.
 - **Reference only:** Caveworks report commit `1e77cee9`; it supplies analysis patterns and risk
   prompts, not source code or MF2 runtime evidence.
+- **Later owner-authorized assets:** the 2026-11-08 specification integration selectively imports
+  Caveworks UI sprites; provenance is recorded in `docs/implementation/asset-provenance.csv` and
+  is not evidence for the architecture pass described above.
 - **NOT RUN:** external remote client, Dedicated plus two clients, audible FMOD smoke, and profiler
   baseline. These remain NOT RUN even where static code or an older commit suggests they work.
 

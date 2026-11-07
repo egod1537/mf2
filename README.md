@@ -38,7 +38,7 @@ Player의 GameObject 책임은 다음과 같이 나뉜다.
 - `PlayerModel`/`PlayerRegistry`: Session이 소유하는 health/life-state struct 원본.
 - `BlockPlayerController`: FishNet `Replicate`/`Reconcile`과 `PredictionRigidbody` 접착제.
 - `BlockPlayerInputSource`: local owner 입력을 수집하고 prediction tick에서 atomic consume.
-- `BlockPlayerView`: limb animation, visual root, owner camera/audio만 제어.
+- `BlockPlayerView`: Minefarm0 Animator/visual root와 owner camera/audio만 제어.
 - `EntityViewBinder`: `PlayerId`로 client replica를 읽어 View에 즉시/변경 시 투영.
 - `PlayerPresentationBindingGate`: client replica dependency와 replicated `PlayerId`가 모두
   준비된 뒤 Bind하고 despawn/pool reuse에서 이전 구독과 ID를 제거.
@@ -108,6 +108,7 @@ Region JSON의 `Block(Id, State)`로 그대로 보존된다.
 - `E`: 인벤토리 열기/닫기. 열린 동안 이동·점프·공격·대시는 입력되지 않는다.
 - `1`~`7` 또는 마우스 휠: 퀵슬롯 선택.
 - 슬롯 좌클릭: 전체 스택 선택, 우클릭: 절반 선택, Shift+클릭: 빠른 이동.
+- 슬롯 드래그: Caveworks selection/drag ghost로 대상 슬롯에 drop.
 
 게임 씬 우측 상단 미니맵은 authoritative snapshot/delta로 만든 client replica만 읽는다.
 서버 `GameSession`이나 서버 `WorldCore`를 직접 참조하지 않는다.
@@ -130,6 +131,15 @@ Unity 메뉴 `Tools > World > Pixel Art to Voxels`는 Texture2D/Sprite의 불투
 현재 프로젝트 블록 팔레트에 매핑한다. XY/XZ/ZY 평면, pixel scale, depth와 alpha threshold를
 지정할 수 있으며 SceneView preview 후 선택한 Editor `WorldHost`에 한 번의 command batch로
 적용한다. 최대 65,536 블록 제한과 Undo/Redo를 제공한다.
+
+### Owner-authorized visual assets
+
+프로젝트 소유자의 명시적 허가에 따라 Minefarm0 플레이어 model/material/animation은
+`Assets/Entities/Player/MinefarmVisual`, Caveworks 공용 inventory sprites는
+`Assets/Entities/Shared/CaveworksUI`에 원본 `.meta`와 함께 배치한다. Scene/Player prefab을
+다시 생성해도 `MF2 > Build Multiplayer Test Slice`가 모델 Animator, ProPixelizer material,
+Caveworks Panel/Slot/Title/Selection/HP Bar 연결을 동일하게 복구한다. 출처 revision과
+SHA-256은 `docs/implementation/asset-provenance.csv`에 기록한다.
 
 ### 검증
 
