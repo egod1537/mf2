@@ -253,6 +253,67 @@ namespace MF2.Game.Tests.Editor
                 Is.False);
         }
 
+        [Test]
+        public void PointerProjection_UsesPlayerGroundPlane()
+        {
+            var cameraObject = new GameObject("Pointer Projection Camera");
+            try
+            {
+                var camera = cameraObject.AddComponent<Camera>();
+                camera.pixelRect = new Rect(0f, 0f, 1920f, 1080f);
+                camera.transform.position = new Vector3(-8f, 8f, -8f);
+                camera.transform.LookAt(Vector3.zero);
+                var playerPosition = Vector3.zero;
+                var target = new Vector3(3f, 0f, 4f);
+
+                var success = BlockPlayerInputSource.TryProjectPointerFacing(
+                    camera,
+                    camera.WorldToScreenPoint(target),
+                    playerPosition,
+                    out var facing);
+
+                Assert.That(success, Is.True);
+                Assert.That(facing.x, Is.EqualTo(0.6f).Within(0.001f));
+                Assert.That(facing.y, Is.EqualTo(0.8f).Within(0.001f));
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(cameraObject);
+            }
+        }
+
+        [Test]
+        public void Facing_RotatesModelPivotWithoutRotatingPhysicsRootOrCamera()
+        {
+            var player = new GameObject("Facing Player");
+            var visual = new GameObject("Visual");
+            var model = new GameObject("Body");
+            var cameraObject = new GameObject("OwnerCameraRig");
+            try
+            {
+                visual.transform.SetParent(player.transform, false);
+                model.transform.SetParent(visual.transform, false);
+                cameraObject.transform.SetParent(player.transform, false);
+                cameraObject.transform.localPosition = new Vector3(-8f, 8f, -8f);
+                var cameraPosition = cameraObject.transform.position;
+                var view = player.AddComponent<BlockPlayerView>();
+                var facingRoot = view.ConfigureVisual(visual, null);
+
+                view.SetFacing(Vector2.right);
+
+                Assert.That(facingRoot.name, Is.EqualTo("FacingPivot"));
+                Assert.That(model.transform.parent, Is.SameAs(facingRoot));
+                Assert.That(Vector3.Angle(facingRoot.forward, Vector3.right), Is.LessThan(0.01f));
+                Assert.That(visual.transform.localRotation, Is.EqualTo(Quaternion.identity));
+                Assert.That(player.transform.rotation, Is.EqualTo(Quaternion.identity));
+                Assert.That(cameraObject.transform.position, Is.EqualTo(cameraPosition));
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(player);
+            }
+        }
+
         [TestCase("Assets/Entities/Player/BlockPlayer.prefab", typeof(BlockPlayerController), true)]
         [TestCase("Assets/Entities/Player/OfflineBlockPlayer.prefab", typeof(OfflineBlockPlayerController), false)]
         public void PlayerPrefab_CarriesOnlyRequiredPresentationBinding(

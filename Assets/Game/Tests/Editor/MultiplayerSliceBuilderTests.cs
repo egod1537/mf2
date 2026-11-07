@@ -8,11 +8,14 @@ using MF2.Game.Networking;
 using MF2.Game.Presentation;
 using MF2.Game.UI;
 using MF2.World.Core;
+using MF2.World.Rendering;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -164,6 +167,68 @@ namespace MF2.Game.Tests.Editor
             }
         }
 
+        [Test]
+        public void BuilderOutput_IngameAndOutgameMatchMinecraftMapRenderingStyle()
+        {
+            const string profilePath =
+                "Assets/Scenes/MinecraftBlockMap/CM Isometric Camera Profile.asset";
+            const string materialPath =
+                "Assets/Minecraft/Materials/MinecraftBlockAtlas_ProPixelizer.mat";
+            const string materialSetPath =
+                "Assets/World/Rendering/ChunkMaterialSetProPixelizer.asset";
+
+            var materialSet = AssetDatabase.LoadAssetAtPath<ChunkMaterialSet>(materialSetPath);
+            Assert.That(materialSet, Is.Not.Null);
+            Assert.That(AssetDatabase.GetAssetPath(materialSet.Opaque), Is.EqualTo(materialPath));
+            Assert.That(materialSet.Cutout, Is.SameAs(materialSet.Opaque));
+            Assert.That(materialSet.Transparent, Is.SameAs(materialSet.Opaque));
+
+            var playerPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(
+                "Assets/Entities/Player/BlockPlayer.prefab");
+            AssertMinecraftMapCamera(playerPrefab.GetComponentInChildren<Camera>(true));
+            AssertProPixelizerVisual(playerPrefab, materialPath);
+
+            var offlinePlayerPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(
+                "Assets/Entities/Player/OfflineBlockPlayer.prefab");
+            AssertProPixelizerVisual(offlinePlayerPrefab, materialPath);
+
+            foreach (var scenePath in new[]
+                     {
+                         "Assets/Scenes/Ingame.unity",
+                         "Assets/Scenes/Outgame.unity"
+                     })
+            {
+                var scene = EditorSceneManager.OpenPreviewScene(scenePath);
+                try
+                {
+                    AssertMinecraftMapCamera(FindInScene<Camera>(scene));
+                    var volume = FindInScene<Volume>(scene);
+                    Assert.That(volume, Is.Not.Null, scenePath);
+                    Assert.That(volume.isGlobal, Is.True, scenePath);
+                    Assert.That(volume.weight, Is.EqualTo(1f), scenePath);
+                    Assert.That(
+                        AssetDatabase.GetAssetPath(volume.sharedProfile),
+                        Is.EqualTo(profilePath),
+                        scenePath);
+
+                    if (scenePath.EndsWith("Ingame.unity"))
+                    {
+                        var world = FindInScene<WorldHost>(scene);
+                        var serializedWorld = new SerializedObject(world);
+                        Assert.That(
+                            AssetDatabase.GetAssetPath(
+                                serializedWorld.FindProperty("chunkMaterialSet")
+                                    .objectReferenceValue),
+                            Is.EqualTo(materialSetPath));
+                    }
+                }
+                finally
+                {
+                    EditorSceneManager.ClosePreviewScene(scene);
+                }
+            }
+        }
+
         private static T FindInScene<T>(Scene scene) where T : Component =>
             FindAllInScene<T>(scene).FirstOrDefault();
 
@@ -181,6 +246,48 @@ namespace MF2.Game.Tests.Editor
                     methods.Add(button.onClick.GetPersistentMethodName(i));
             }
             return methods.ToArray();
+        }
+
+        private static void AssertMinecraftMapCamera(Camera camera)
+        {
+            Assert.That(camera, Is.Not.Null);
+            Assert.That(camera.clearFlags, Is.EqualTo(CameraClearFlags.SolidColor));
+            Assert.That(camera.backgroundColor.r, Is.EqualTo(0.43f).Within(0.001f));
+            Assert.That(camera.backgroundColor.g, Is.EqualTo(0.69f).Within(0.001f));
+            Assert.That(camera.backgroundColor.b, Is.EqualTo(0.92f).Within(0.001f));
+            Assert.That(camera.orthographic, Is.True);
+            Assert.That(camera.orthographicSize, Is.EqualTo(8.5f).Within(0.001f));
+            Assert.That(camera.nearClipPlane, Is.EqualTo(0.1f).Within(0.001f));
+            Assert.That(camera.farClipPlane, Is.EqualTo(160f).Within(0.001f));
+            Assert.That(camera.allowHDR, Is.False);
+
+            var cameraData = camera.GetComponent<UniversalAdditionalCameraData>();
+            Assert.That(cameraData, Is.Not.Null);
+            Assert.That(cameraData.renderPostProcessing, Is.True);
+            Assert.That((cameraData.volumeLayerMask.value & 1) != 0, Is.True);
+        }
+
+        private static void AssertProPixelizerVisual(GameObject prefab, string materialPath)
+        {
+            Assert.That(prefab, Is.Not.Null);
+            var visual = prefab.transform.Find("Visual");
+            Assert.That(visual, Is.Not.Null, prefab.name);
+
+            var renderers = visual.GetComponentsInChildren<Renderer>(true);
+            Assert.That(renderers, Is.Not.Empty, prefab.name);
+            foreach (var renderer in renderers)
+            foreach (var material in renderer.sharedMaterials)
+            {
+                Assert.That(material, Is.Not.Null, renderer.name);
+                Assert.That(
+                    AssetDatabase.GetAssetPath(material),
+                    Is.EqualTo(materialPath),
+                    renderer.name);
+                Assert.That(
+                    material.shader.name,
+                    Is.EqualTo("ProPixelizer/ProPixelizerUberShader"),
+                    renderer.name);
+            }
         }
     }
 }

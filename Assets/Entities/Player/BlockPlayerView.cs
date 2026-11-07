@@ -11,6 +11,7 @@ namespace MF2.Entities.Player
 
         [Header("Entity Visual")]
         [SerializeField] private GameObject visualRoot;
+        [SerializeField] private Transform facingRoot;
         [SerializeField] private Rigidbody motionBody;
 
         [Header("Block Rig")]
@@ -48,10 +49,25 @@ namespace MF2.Entities.Player
             ownerAudioListener = listener;
         }
 
-        public void ConfigureVisual(GameObject root, Rigidbody body)
+        public Transform ConfigureVisual(GameObject root, Rigidbody body)
         {
             visualRoot = root;
             motionBody = body;
+            return EnsureFacingRoot();
+        }
+
+        public void SetFacing(Vector2 worldDirection)
+        {
+            if (worldDirection.sqrMagnitude <= 0.0001f)
+                return;
+
+            var target = EnsureFacingRoot();
+            if (target == null)
+                return;
+
+            target.rotation = Quaternion.LookRotation(
+                new Vector3(worldDirection.x, 0f, worldDirection.y).normalized,
+                Vector3.up);
         }
 
         public void SetLocalOwner(bool active, bool disableOtherSceneCameras = false)
@@ -90,6 +106,8 @@ namespace MF2.Entities.Player
             SetLimbRotation(rightArmPivot, Quaternion.identity, 1f);
             SetLimbRotation(leftLegPivot, Quaternion.identity, 1f);
             SetLimbRotation(rightLegPivot, Quaternion.identity, 1f);
+            if (facingRoot != null)
+                facingRoot.localRotation = Quaternion.identity;
             if (visualRoot != null)
                 visualRoot.SetActive(false);
         }
@@ -104,6 +122,7 @@ namespace MF2.Entities.Player
                 if (visual != null)
                     visualRoot = visual.gameObject;
             }
+            EnsureFacingRoot();
         }
 
         private void LateUpdate()
@@ -134,6 +153,28 @@ namespace MF2.Entities.Player
         {
             if (limb != null)
                 limb.localRotation = Quaternion.Slerp(limb.localRotation, target, blend);
+        }
+
+        private Transform EnsureFacingRoot()
+        {
+            if (visualRoot == null)
+                return null;
+            if (facingRoot != null && facingRoot.parent == visualRoot.transform)
+                return facingRoot;
+
+            facingRoot = visualRoot.transform.Find("FacingPivot");
+            if (facingRoot != null)
+                return facingRoot;
+
+            var existingChildren = new Transform[visualRoot.transform.childCount];
+            for (var i = 0; i < existingChildren.Length; i++)
+                existingChildren[i] = visualRoot.transform.GetChild(i);
+
+            facingRoot = new GameObject("FacingPivot").transform;
+            facingRoot.SetParent(visualRoot.transform, false);
+            foreach (var child in existingChildren)
+                child.SetParent(facingRoot, false);
+            return facingRoot;
         }
     }
 }

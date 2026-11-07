@@ -67,13 +67,16 @@ namespace MF2.Entities.Player
 
         private void Update()
         {
-            ResolveInput().Capture();
+            var input = ResolveInput();
+            input.Capture();
+            ResolveView().SetFacing(input.CurrentWorldFacing);
         }
 
         private void FixedUpdate()
         {
             IsGrounded = CheckGrounded();
             var input = ResolveInput().Consume();
+            ResolveView().SetFacing(input.WorldFacing);
             var speed = input.Sprint ? sprintSpeed : walkSpeed;
             var velocity = body.linearVelocity;
             velocity.x = input.WorldMove.x * speed;

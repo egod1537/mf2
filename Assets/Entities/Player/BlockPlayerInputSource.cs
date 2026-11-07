@@ -5,14 +5,20 @@ namespace MF2.Entities.Player
 {
     public readonly struct BlockPlayerInputFrame
     {
-        public BlockPlayerInputFrame(Vector2 worldMove, bool sprint, bool jump)
+        public BlockPlayerInputFrame(
+            Vector2 worldMove,
+            Vector2 worldFacing,
+            bool sprint,
+            bool jump)
         {
             WorldMove = worldMove;
+            WorldFacing = worldFacing;
             Sprint = sprint;
             Jump = jump;
         }
 
         public Vector2 WorldMove { get; }
+        public Vector2 WorldFacing { get; }
         public bool Sprint { get; }
         public bool Jump { get; }
     }
@@ -23,8 +29,11 @@ namespace MF2.Entities.Player
         [SerializeField] private Camera movementCamera;
 
         private Vector2 moveInput;
+        private Vector2 worldFacing = Vector2.up;
         private bool sprintInput;
         private bool jumpQueued;
+
+        public Vector2 CurrentWorldFacing => worldFacing;
 
         public void ConfigureMovementCamera(Camera camera) => movementCamera = camera;
 
@@ -46,6 +55,16 @@ namespace MF2.Entities.Player
 
         public void Capture()
         {
+            var mouse = Mouse.current;
+            if (mouse != null && TryProjectPointerFacing(
+                    movementCamera,
+                    mouse.position.ReadValue(),
+                    transform.position,
+                    out var facing))
+            {
+                worldFacing = facing;
+            }
+
             var keyboard = Keyboard.current;
             if (keyboard == null)
             {
@@ -74,10 +93,38 @@ namespace MF2.Entities.Player
             var world = Vector3.ClampMagnitude(forward * local.y + right * local.x, 1f);
             var result = new BlockPlayerInputFrame(
                 new Vector2(world.x, world.z),
+                worldFacing,
                 sprintInput,
                 jumpQueued);
             jumpQueued = false;
             return result;
+        }
+
+        public static bool TryProjectPointerFacing(
+            Camera camera,
+            Vector2 screenPosition,
+            Vector3 playerPosition,
+            out Vector2 worldDirection)
+        {
+            worldDirection = default;
+            if (camera == null)
+                return false;
+
+            var ray = camera.ScreenPointToRay(screenPosition);
+            var groundPlane = new Plane(Vector3.up, playerPosition);
+            if (!groundPlane.Raycast(ray, out var distance))
+                return false;
+
+            var offset = ray.GetPoint(distance) - playerPosition;
+            worldDirection = new Vector2(offset.x, offset.z);
+            if (worldDirection.sqrMagnitude <= 0.0001f)
+            {
+                worldDirection = default;
+                return false;
+            }
+
+            worldDirection.Normalize();
+            return true;
         }
     }
 }

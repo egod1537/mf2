@@ -11,6 +11,7 @@ using NUnit.Framework;
 using Unity.Mathematics;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace MF2.Game.Tests.Editor
 {
@@ -204,6 +205,78 @@ namespace MF2.Game.Tests.Editor
             Assert.That(
                 serialized.FindProperty("_networkTransform").objectReferenceValue,
                 Is.Null);
+        }
+
+        [TestCase("Assets/Entities/Player/BlockPlayer.prefab")]
+        [TestCase("Assets/Entities/Player/OfflineBlockPlayer.prefab")]
+        public void PlayerPrefab_UsesFrictionlessCapsuleMaterial(string prefabPath)
+        {
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+            Assert.That(prefab, Is.Not.Null);
+
+            var material = prefab.GetComponent<CapsuleCollider>().sharedMaterial;
+            Assert.That(material, Is.Not.Null);
+            Assert.That(
+                AssetDatabase.GetAssetPath(material),
+                Is.EqualTo("Assets/Entities/Player/PlayerNoFriction.physicMaterial"));
+            Assert.That(material.dynamicFriction, Is.Zero);
+            Assert.That(material.staticFriction, Is.Zero);
+            Assert.That(material.bounciness, Is.Zero);
+            Assert.That(material.frictionCombine, Is.EqualTo(PhysicsMaterialCombine.Minimum));
+        }
+
+        [Test]
+        public void FrictionlessPlayerCapsule_SlidesDownWallWhileAirborne()
+        {
+            var material = AssetDatabase.LoadAssetAtPath<PhysicsMaterial>(
+                "Assets/Entities/Player/PlayerNoFriction.physicMaterial");
+            Assert.That(material, Is.Not.Null);
+
+            var scene = SceneManager.CreateScene(
+                "Player Wall Slide Regression",
+                new CreateSceneParameters(LocalPhysicsMode.Physics3D));
+            try
+            {
+                var wall = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                wall.name = "Wall";
+                wall.transform.SetPositionAndRotation(new Vector3(0f, 3f, 0f), Quaternion.identity);
+                wall.transform.localScale = new Vector3(1f, 10f, 10f);
+                SceneManager.MoveGameObjectToScene(wall, scene);
+
+                var player = new GameObject("Player");
+                SceneManager.MoveGameObjectToScene(player, scene);
+                player.transform.position = new Vector3(-0.82f, 3f, 0f);
+                var capsule = player.AddComponent<CapsuleCollider>();
+                capsule.height = 1.92f;
+                capsule.radius = 0.32f;
+                capsule.center = new Vector3(0f, 0.96f, 0f);
+                capsule.sharedMaterial = material;
+
+                var body = player.AddComponent<Rigidbody>();
+                body.useGravity = true;
+                body.constraints = RigidbodyConstraints.FreezeRotation;
+                body.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
+
+                var physicsScene = scene.GetPhysicsScene();
+                Assert.That(physicsScene.IsValid(), Is.True);
+                var initialY = player.transform.position.y;
+                for (var i = 0; i < 60; i++)
+                {
+                    var velocity = body.linearVelocity;
+                    velocity.x = 4f;
+                    body.linearVelocity = velocity;
+                    physicsScene.Simulate(1f / 60f);
+                }
+
+                Assert.That(
+                    player.transform.position.y,
+                    Is.LessThan(initialY - 2f),
+                    "An airborne player pressing into a wall must keep falling.");
+            }
+            finally
+            {
+                UnityEditor.SceneManagement.EditorSceneManager.CloseScene(scene, true);
+            }
         }
 
         [Test]

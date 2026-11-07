@@ -19,6 +19,8 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.UI;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
 
 namespace MF2.Editor
@@ -27,6 +29,8 @@ namespace MF2.Editor
     {
         private const string PlayerPrefabPath = "Assets/Entities/Player/BlockPlayer.prefab";
         private const string OfflinePlayerPrefabPath = "Assets/Entities/Player/OfflineBlockPlayer.prefab";
+        private const string PlayerPhysicsMaterialPath =
+            "Assets/Entities/Player/PlayerNoFriction.physicMaterial";
         private const string TitlePath = "Assets/Scenes/Title.unity";
         private const string OutgamePath = "Assets/Scenes/Outgame.unity";
         private const string TestPath = "Assets/Scenes/Test.unity";
@@ -34,6 +38,14 @@ namespace MF2.Editor
         private const string BlockRegistryManifestPath = "Assets/World/Registry/BlockRegistryManifest.asset";
         private const string BlockRenderManifestPath = "Assets/World/Rendering/BlockRenderManifest.asset";
         private const string ChunkMaterialSetPath = "Assets/World/Rendering/ChunkMaterialSet.asset";
+        private const string IngameChunkMaterialSetPath =
+            "Assets/World/Rendering/ChunkMaterialSetProPixelizer.asset";
+        private const string BlockAtlasPath =
+            "Assets/Minecraft/Atlas/minecraft_blocks_atlas.png";
+        private const string ProPixelizerBlockMaterialPath =
+            "Assets/Minecraft/Materials/MinecraftBlockAtlas_ProPixelizer.mat";
+        private const string MinecraftMapVolumeProfilePath =
+            "Assets/Scenes/MinecraftBlockMap/CM Isometric Camera Profile.asset";
 
         [MenuItem("MF2/Build Multiplayer Test Slice")]
         public static void BuildAll()
@@ -41,6 +53,7 @@ namespace MF2.Editor
             if (EditorApplication.isPlayingOrWillChangePlaymode)
                 throw new InvalidOperationException("플레이 모드에서는 씬을 생성할 수 없습니다.");
 
+            ConfigureIngameRenderingAssets();
             ConfigurePlayerPrefab();
             ConfigureOfflinePlayerPrefab();
             CreateTitleScene();
@@ -66,6 +79,8 @@ namespace MF2.Editor
                 capsule.height = 1.92f;
                 capsule.radius = 0.32f;
                 capsule.center = new Vector3(0f, 0.96f, 0f);
+                capsule.sharedMaterial = LoadRequiredAsset<PhysicsMaterial>(
+                    PlayerPhysicsMaterialPath);
 
                 var rigidbody = GetOrAdd<Rigidbody>(root);
                 rigidbody.mass = 1f;
@@ -92,27 +107,30 @@ namespace MF2.Editor
                 var binder = GetOrAdd<EntityViewBinder>(root);
                 var bindingGate = GetOrAdd<PlayerPresentationBindingGate>(root);
                 var controller = GetOrAdd<BlockPlayerController>(root);
+                ConfigureProPixelizerVisual(visual);
                 controller.ConfigureMvc(input, view, binder, bindingGate);
                 binder.Configure(view);
                 bindingGate.Configure(binder);
-                view.ConfigureVisual(visual.gameObject, rigidbody);
+                var facing = view.ConfigureVisual(visual.gameObject, rigidbody);
                 view.ConfigureRig(
-                    visual.Find("Left Arm Pivot"),
-                    visual.Find("Right Arm Pivot"),
-                    visual.Find("Left Leg Pivot"),
-                    visual.Find("Right Leg Pivot"));
+                    facing.Find("Left Arm Pivot"),
+                    facing.Find("Right Arm Pivot"),
+                    facing.Find("Left Leg Pivot"),
+                    facing.Find("Right Leg Pivot"));
 
                 var oldRig = root.transform.Find("OwnerCameraRig");
                 if (oldRig != null)
                     UnityEngine.Object.DestroyImmediate(oldRig.gameObject);
                 var cameraRig = new GameObject("OwnerCameraRig");
                 cameraRig.transform.SetParent(root.transform, false);
-                cameraRig.transform.localPosition = new Vector3(6f, 6.5f, -6f);
-                cameraRig.transform.localRotation = Quaternion.Euler(32f, -45f, 0f);
+                cameraRig.transform.localPosition = new Vector3(-8f, 8f, -8f);
+                cameraRig.transform.localRotation = new Quaternion(
+                    0.27984816f,
+                    0.3647052f,
+                    -0.1159169f,
+                    0.8804763f);
                 var ownerCamera = cameraRig.AddComponent<Camera>();
-                ownerCamera.fieldOfView = 55f;
-                ownerCamera.nearClipPlane = 0.1f;
-                ownerCamera.farClipPlane = 250f;
+                ConfigureMinecraftMapCamera(ownerCamera);
                 ownerCamera.tag = "MainCamera";
                 var listener = cameraRig.AddComponent<AudioListener>();
                 controller.ConfigureOwnerCamera(ownerCamera, listener);
@@ -136,6 +154,9 @@ namespace MF2.Editor
                 foreach (var binder in root.GetComponents<EntityViewBinder>())
                     UnityEngine.Object.DestroyImmediate(binder, true);
 
+                var capsule = GetOrAdd<CapsuleCollider>(root);
+                capsule.sharedMaterial = LoadRequiredAsset<PhysicsMaterial>(
+                    PlayerPhysicsMaterialPath);
                 var body = GetOrAdd<Rigidbody>(root);
                 var input = GetOrAdd<BlockPlayerInputSource>(root);
                 var view = GetOrAdd<BlockPlayerView>(root);
@@ -145,12 +166,13 @@ namespace MF2.Editor
                 var visual = root.transform.Find("Visual");
                 if (visual != null)
                 {
-                    view.ConfigureVisual(visual.gameObject, body);
+                    ConfigureProPixelizerVisual(visual);
+                    var facing = view.ConfigureVisual(visual.gameObject, body);
                     view.ConfigureRig(
-                        visual.Find("Left Arm Pivot"),
-                        visual.Find("Right Arm Pivot"),
-                        visual.Find("Left Leg Pivot"),
-                        visual.Find("Right Leg Pivot"));
+                        facing.Find("Left Arm Pivot"),
+                        facing.Find("Right Arm Pivot"),
+                        facing.Find("Left Leg Pivot"),
+                        facing.Find("Right Leg Pivot"));
                 }
 
                 var camera = root.GetComponentInChildren<Camera>(true);
@@ -211,6 +233,16 @@ namespace MF2.Editor
         {
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
             scene.name = "Outgame";
+
+            var camera = CreateMinecraftMapCamera("Minecraft Map Camera");
+            camera.transform.position = new Vector3(-8f, 9.68f, -15f);
+            camera.transform.rotation = new Quaternion(
+                0.27984816f,
+                0.3647052f,
+                -0.1159169f,
+                0.8804763f);
+            CreateMinecraftMapPostProcessing();
+
             var controller = new GameObject("OutgameController").AddComponent<OutgameController>();
             var panel = CreateCanvasWithPanel("OutgameCanvas", new Vector2(820f, 780f));
             CreateText(panel, "OUTGAME / LOBBY", 36, TextAnchor.MiddleCenter, 70f);
@@ -270,6 +302,11 @@ namespace MF2.Editor
             overview.transform.rotation = Quaternion.Euler(36f, -45f, 0f);
             overview.fieldOfView = 55f;
             overview.tag = "MainCamera";
+            if (!expandedTestScene)
+            {
+                ConfigureMinecraftMapCamera(overview);
+                CreateMinecraftMapPostProcessing();
+            }
 
             var spawnPositions = expandedTestScene
                 ? new[] { new Vector3(-4f, 0.1f, -3f), new Vector3(4f, 0.1f, 3f), new Vector3(-4f, 0.1f, 3f), new Vector3(4f, 0.1f, -3f) }
@@ -286,7 +323,8 @@ namespace MF2.Editor
             worldHost.ConfigureAssets(
                 LoadRequiredAsset<BlockRegistryManifest>(BlockRegistryManifestPath),
                 LoadRequiredAsset<BlockRenderManifest>(BlockRenderManifestPath),
-                LoadRequiredAsset<ChunkMaterialSet>(ChunkMaterialSetPath));
+                LoadRequiredAsset<ChunkMaterialSet>(
+                    expandedTestScene ? ChunkMaterialSetPath : IngameChunkMaterialSetPath));
 
             var debugInput = new GameObject("WorldCommandDebugInput")
                 .AddComponent<WorldCommandDebugInput>();
@@ -304,6 +342,91 @@ namespace MF2.Editor
             CreateSceneScope(scene);
 
             EditorSceneManager.SaveScene(scene, path);
+        }
+
+        private static void ConfigureIngameRenderingAssets()
+        {
+            var atlas = LoadRequiredAsset<Texture2D>(BlockAtlasPath);
+            var material = LoadRequiredAsset<Material>(ProPixelizerBlockMaterialPath);
+            var materialSet = AssetDatabase.LoadAssetAtPath<ChunkMaterialSet>(
+                IngameChunkMaterialSetPath);
+            if (materialSet == null)
+            {
+                materialSet = ScriptableObject.CreateInstance<ChunkMaterialSet>();
+                AssetDatabase.CreateAsset(materialSet, IngameChunkMaterialSetPath);
+            }
+
+            var serialized = new SerializedObject(materialSet);
+            serialized.FindProperty("atlas").objectReferenceValue = atlas;
+            serialized.FindProperty("opaque").objectReferenceValue = material;
+            serialized.FindProperty("cutout").objectReferenceValue = material;
+            serialized.FindProperty("transparent").objectReferenceValue = material;
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+            EditorUtility.SetDirty(materialSet);
+        }
+
+        private static void ConfigureProPixelizerVisual(Transform visual)
+        {
+            if (visual == null)
+                throw new InvalidOperationException("Player prefab is missing its Visual root.");
+
+            var material = LoadRequiredAsset<Material>(ProPixelizerBlockMaterialPath);
+            var renderers = visual.GetComponentsInChildren<Renderer>(true);
+            if (renderers.Length == 0)
+                throw new InvalidOperationException("Player Visual has no renderers to configure.");
+
+            foreach (var renderer in renderers)
+            {
+                var materials = renderer.sharedMaterials;
+                for (var i = 0; i < materials.Length; i++)
+                    materials[i] = material;
+                renderer.sharedMaterials = materials;
+            }
+        }
+
+        private static Camera CreateMinecraftMapCamera(string name)
+        {
+            var camera = new GameObject(name).AddComponent<Camera>();
+            ConfigureMinecraftMapCamera(camera);
+            camera.tag = "MainCamera";
+            return camera;
+        }
+
+        private static void ConfigureMinecraftMapCamera(Camera camera)
+        {
+            camera.clearFlags = CameraClearFlags.SolidColor;
+            camera.backgroundColor = new Color(0.43f, 0.69f, 0.92f, 1f);
+            camera.nearClipPlane = 0.1f;
+            camera.farClipPlane = 160f;
+            camera.fieldOfView = 40f;
+            camera.orthographic = true;
+            camera.orthographicSize = 8.5f;
+            camera.allowHDR = false;
+            camera.allowMSAA = true;
+            camera.allowDynamicResolution = false;
+            camera.useOcclusionCulling = true;
+
+            var cameraData = GetOrAdd<UniversalAdditionalCameraData>(camera.gameObject);
+            cameraData.renderShadows = true;
+            cameraData.volumeLayerMask = 1;
+            cameraData.renderPostProcessing = true;
+            cameraData.antialiasing = AntialiasingMode.None;
+            cameraData.antialiasingQuality = AntialiasingQuality.High;
+            cameraData.stopNaN = false;
+            cameraData.dithering = false;
+            cameraData.allowXRRendering = true;
+            cameraData.allowHDROutput = true;
+        }
+
+        private static void CreateMinecraftMapPostProcessing()
+        {
+            var volume = new GameObject("Minecraft Map Post Processing").AddComponent<Volume>();
+            volume.isGlobal = true;
+            volume.priority = 0f;
+            volume.blendDistance = 0f;
+            volume.weight = 1f;
+            volume.sharedProfile = LoadRequiredAsset<VolumeProfile>(
+                MinecraftMapVolumeProfilePath);
         }
 
         private static void CreateSceneScope(Scene scene)

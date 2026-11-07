@@ -19,13 +19,19 @@ namespace MF2.Entities.Player
         public struct MoveData : IReplicateData
         {
             public Vector2 WorldMove;
+            public Vector2 WorldFacing;
             public bool Sprint;
             public bool Jump;
             private uint tick;
 
-            public MoveData(Vector2 worldMove, bool sprint, bool jump)
+            public MoveData(
+                Vector2 worldMove,
+                Vector2 worldFacing,
+                bool sprint,
+                bool jump)
             {
                 WorldMove = worldMove;
+                WorldFacing = worldFacing;
                 Sprint = sprint;
                 Jump = jump;
                 tick = 0;
@@ -170,8 +176,12 @@ namespace MF2.Entities.Player
 
         private void Update()
         {
-            if (IsOwner)
-                ResolveInput().Capture();
+            if (!IsOwner)
+                return;
+
+            var input = ResolveInput();
+            input.Capture();
+            ResolveView().SetFacing(input.CurrentWorldFacing);
         }
 
         protected override void TimeManager_OnTick()
@@ -190,7 +200,11 @@ namespace MF2.Entities.Player
                 return default;
 
             var input = ResolveInput().Consume();
-            return new MoveData(input.WorldMove, input.Sprint, input.Jump);
+            return new MoveData(
+                input.WorldMove,
+                input.WorldFacing,
+                input.Sprint,
+                input.Jump);
         }
 
         [Replicate]
@@ -199,6 +213,7 @@ namespace MF2.Entities.Player
             ReplicateState state = ReplicateState.Invalid,
             Channel channel = Channel.Unreliable)
         {
+            ResolveView().SetFacing(data.WorldFacing);
             IsGrounded = CheckGrounded();
             var speed = data.Sprint ? sprintSpeed : walkSpeed;
             var velocity = body.linearVelocity;
